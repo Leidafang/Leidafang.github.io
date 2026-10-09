@@ -1,0 +1,14 @@
+AI + CFD 个人研究主页
+
+主页：https://leidafang.github.io/
+仓库：https://github.com/Leidafang/Leidafang.github.io
+署名：Leidafang；语言：中文。
+
+编辑 content.json 中的项目与笔记；编辑 style.css 调整样式。
+执行 python3 build_site.py，生成 docs/ 下的静态网页。
+GitHub Pages 从 main 分支的 /docs 发布；提交时同时包含源文件与生成文件。
+预览：python3 -m http.server 8877 --bind 127.0.0.1 --directory docs
+
+公开范围：当前主页文字、公开文献链接、构建脚本与样式。
+原始飞书资料、实验数据、私有仓库代码与未选定图表不包含在本站中。
+补充结果时注明工况、划分、指标来源与验证范围。

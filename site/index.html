@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Leidafang 的 AI + CFD 研究笔记。从 PINNs 圆柱绕流出发，交互式理解模型、物理约束与流场。">
+  <meta name="theme-color" content="#fafaf8">
+  <title>AI × CFD · Leidafang 的研究笔记</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23e27b4d'/%3E%3Cpath d='M10 25Q24 10 32 25T54 25M10 40Q24 25 32 40T54 40' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=20261010-2"><script defer src="app.js?v=20261010-2"></script>
+</head>
+<body>
+<a class="skip" href="#pinn">跳到内容</a>
+<header class="topbar">
+  <a class="brand" href="#pinn"><span class="brand-icon">≈</span> AI <span class="times">×</span> CFD <span class="brand-sub">研究笔记</span></a>
+  <nav aria-label="研究章节"><a class="active" href="#pinn">01 PINNs</a><a href="#domino">02 DoMINO</a><a href="#geotransolver">03 GeoTransolver</a><a href="#summary">04 总结</a></nav>
+  <a class="author" href="https://github.com/Leidafang" target="_blank" rel="noopener">Leidafang <span>↗</span></a>
+</header>
+<main>
+<section id="pinn" class="chapter">
+  <div class="chapter-intro">
+    <div class="eyebrow"><span class="orange-line"></span> 01 / PINNs <span class="intro-tag">从圆柱绕流开始</span></div>
+    <h1>让神经网络学会<span>遵守物理。</span></h1>
+    <p>从一个圆柱绕流问题出发：只输入空间坐标，如何在没有流场标签的情况下，得到速度与压力？</p>
+    <div class="case-meta"><span>二维稳态圆柱绕流</span><i></i><span>Re = 20</span><i></i><span>LibTorch + OpenFOAM</span></div>
+  </div>
+
+  <div class="explorer">
+    <div class="panel-heading"><div><span class="mini-label">MODEL EXPLORER</span><h2>从坐标到物理场</h2></div>
+      <div class="heading-actions"><div class="segmented" aria-label="模型路径"><button class="selected" id="training-mode" aria-pressed="true">训练</button><button id="inference-mode" aria-pressed="false">查询</button></div><button class="text-button" id="open-detailed">完整结构图 <span>↗</span></button></div>
+    </div>
+    <div class="board-hint"><span id="mode-caption">点击任一模块，展开它的作用与实现。</span><span class="diagram-legend"><i class="learned-dot"></i> 可学习模块 <i class="loss-dot"></i> 约束 / 优化</span></div>
+    <div class="board-scroll" tabindex="0" aria-label="模型总图，窄屏可横向滚动"><!-- MODEL_BOARD --></div><div class="mobile-pan-hint">← 左右滑动查看完整流程 →</div>
+    <div class="detail-panel" id="detail-panel" aria-live="polite">
+      <div class="detail-copy"><span class="detail-kicker" id="detail-kicker"></span><h3 id="detail-title"></h3><div id="detail-text"></div><div class="step-nav"><button id="previous-node" aria-label="上一个模块">←</button><span id="step-count"></span><button id="next-node" aria-label="下一个模块">→</button></div></div>
+      <div class="detail-visual" id="detail-visual"></div>
+    </div>
+  </div>
+
+  <div class="section-intro"><div><span class="section-number">01.1</span><h2>看看网络留下的流场</h2></div><p>保存的 PINN 预测 · 可切换物理量，移动指针读取局部数值</p></div>
+  <div class="case-workspace">
+    <div class="field-panel">
+      <div class="field-toolbar"><div class="segmented field-tabs" aria-label="显示的物理量"><button class="selected" data-field="speed" aria-pressed="true">速度大小</button><button data-field="u" aria-pressed="false">u</button><button data-field="v" aria-pressed="false">v</button><button data-field="p" aria-pressed="false">压力 p</button></div><label class="view-select">视野 <select id="field-view"><option value="near">圆柱附近</option><option value="full">完整计算域</option></select></label></div>
+      <div class="canvas-wrap" id="canvas-wrap"><canvas id="field-canvas" aria-label="保存的 PINN 圆柱绕流预测场，可点击或移动指针探查坐标与数值"></canvas><div class="field-loading" id="field-loading" role="status">正在读取保存的流场…</div><div class="field-badge">保存的预测场 <span>·</span> Re = 20</div><div class="flow-direction">来流 →</div></div>
+      <div class="field-controls"><button id="particles-toggle" aria-pressed="false">▷ 显示流向粒子</button><span class="scale-caption" id="scale-caption">|U| (m/s)</span><div class="color-scale"><div id="scale-gradient"></div><div class="scale-values"><span id="scale-min"></span><span id="scale-max"></span></div></div></div>
+      <div class="probe-readout" id="probe-readout" aria-live="off">将指针移入流场，或点击一个位置，查看插值后的局部数值。</div>
+      <p class="field-footnote">稳态场；粒子运动仅辅助显示流向，不代表瞬态预测或真实时间进程。圆柱内部不显示流体值。</p>
+    </div>
+    <aside class="config-panel"><span class="mini-label">CASE NOTES</span><h3>这个实验做了什么</h3><div class="config-tabs" role="group" aria-label="案例信息"><button data-config="setup" class="selected" aria-pressed="true">配置</button><button data-config="history" aria-pressed="false">训练记录</button><button data-config="source" aria-pressed="false">来源</button></div><div id="config-content"></div></aside>
+  </div>
+
+  <div class="section-intro reflection-heading"><div><span class="section-number">01.2</span><h2>这个案例带给我的理解</h2></div></div>
+  <div class="reflections">
+    <details open><summary><span>01</span> 自监督，省去的是流场标签</summary><p>吸引我开始做 PINNs 的，是可以直接把方程放进损失函数。这个实现没有使用 CFD 的真实速度、压力作为训练标签，但仍需要几何、边界条件、物性和采样点。</p></details>
+    <details><summary><span>02</span> 坐标网络，很适合描述一个连续的解</summary><p>同一个网络处理每一个坐标，自动微分得到空间导数。本案例更接近“用神经网络求解这一道 PDE”：没有把几何或工况作为输入，也没有由此验证跨场景泛化。</p></details>
+    <details><summary><span>03</span> 能写出物理损失，不等于训练一定成功</summary><p>如何采样、如何平衡边界与方程残差、如何优化，都直接影响训练。损失下降只是其中一条证据，还需要与独立参考解比较，才能判断流场精度。这也是我后来继续研究数据驱动代理模型的起点。</p></details>
+  </div>
+</section>
+
+<section id="domino" class="future-chapter"><span class="future-number">02</span><h2>DoMINO</h2><span class="construction"><i></i> 施工中</span></section>
+<section id="geotransolver" class="future-chapter"><span class="future-number">03</span><h2>GeoTransolver</h2><span class="construction"><i></i> 施工中</span></section>
+<section id="summary" class="future-chapter"><span class="future-number">04</span><h2>阶段总结</h2><span class="construction"><i></i> 施工中</span></section>
+</main>
+<footer><span>Leidafang · AI × CFD 研究笔记</span><span>交互形式参考 <a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer ↗</a></span></footer>
+
+<dialog id="detailed-dialog" aria-labelledby="detailed-title"><div class="dialog-heading"><div><span class="mini-label">DETAILED ARCHITECTURE</span><h2 id="detailed-title">圆柱绕流 PINN · 完整结构图</h2></div><button id="close-detailed" aria-label="关闭完整结构图">✕</button></div><div class="dialog-toolbar"><span>拖动画板平移 · 滚轮缩放</span><div><button id="zoom-out" aria-label="缩小">−</button><button id="zoom-reset">适应画板</button><button id="zoom-in" aria-label="放大">＋</button><a href="assets/pinn-detailed.drawio" download="pinn-detailed.drawio">下载可编辑源 ↗</a></div></div><div class="detailed-viewport" id="detailed-viewport"><img id="detailed-image" src="assets/pinn-detailed.drawio.svg" alt="PINN 从网格采样、共享坐标网络、自动微分到物理残差和参数更新的完整结构图" draggable="false"></div><p class="dialog-note">保留原始模型结构与连线。顶部总图经过简化；完整图包含历史实现中的残差、权重和边界细节。</p></dialog>
+<noscript><p class="noscript">交互模型与流场需要启用 JavaScript。可直接<a href="assets/pinn-detailed.drawio.svg">查看完整结构图</a>。</p></noscript>
+</body></html>

@@ -1,9 +1,1 @@
-<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>自动微分能算高阶导数，为什么训练仍然难？ · Leidafang</title><meta name="description" content="AI 与 CFD 研究记录：PINNs、DoMINO、GeoTransolver、神经算子与数据中心热环境预测。">
-<link rel="stylesheet" href="style.css"></head><body>
-<a class="skip" href="#main">跳转到内容</a>
-<header class="header"><a class="brand" href="index.html">Leidafang<span>AI + CFD / 研究记录</span></a>
-<nav aria-label="主导航"><a href="index.html#projects">项目</a><a href="index.html#notes">笔记</a><a href="index.html#about">关于</a><a href="https://github.com/Leidafang" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></header>
-<main id="main"><article class="article"><a class="back" href="index.html#notes">← 返回笔记</a><header class="article-head"><p class="eyebrow">研究笔记 · 自动微分</p><h1>自动微分能算高阶导数，为什么训练仍然难？</h1><p class="lead">在 PINNs 中，空间导数进入损失，而损失又需要对网络参数求导。把这两层微分分开，是理解实现与训练成本的关键。</p><div class="tags"><span>自动微分</span><span>高阶导数</span><span>优化</span></div></header><section class="article-section"><h2>自动微分在做什么</h2><p>网络由一系列基本运算组成。自动微分利用这些运算的导数规则与链式法则，计算复合函数的导数。它与在相邻采样点上做差分不是同一种操作。</p><p>高阶导数可以通过继续微分导数计算图获得。实践中需要保留相应计算图；只有一阶导数的数值，而没有它对输入的依赖关系，并不足以继续求导。</p></section><section class="article-section"><h2>空间导数与参数梯度</h2><p>构造方程残差时，计算的是输出对空间或时间的导数；更新网络时，计算的是损失对权重的梯度。包含高阶微分的残差会让训练所需的计算与存储更加复杂。</p></section><section class="article-section"><h2>为什么可微不等于容易训练</h2><p>自动微分解决的是如何按照计算图求导，没有消除不同损失项之间的冲突、优化病态或多尺度表示困难。网络的光滑性、初始化和采样策略也会影响训练。</p><p>因此，我把导数实现正确与否、训练是否稳定、最终物理解是否准确视为三个需要分别验证的问题。</p></section><section class="references"><h2>延伸阅读与来源</h2><ul><li><a href="https://proceedings.mlr.press/v235/rathore24a.html" target="_blank" rel="noopener noreferrer">Challenges in Training PINNs: A Loss Landscape Perspective ↗</a></li></ul><p class="source-note">本文记录个人实践与方法理解；以上链接为公开方法来源。页面将随研究进展持续更新。</p></section></article></main>
-<footer><span>© 2026 Leidafang · AI + CFD</span><span>以问题为起点，以证据为依据。</span></footer></body></html>
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./#pinn"><title>AI × CFD</title><a href="./#pinn">查看新版研究笔记</a></html>

@@ -1,0 +1,85 @@
+{
+  "source": "dataPred",
+  "source_sha256": "4b4feeab9cef3d03912ecaef6db609d1b87d370e7185055f9aa0dc9011fb95f5",
+  "source_rows": 11592,
+  "unique_xy": 5796,
+  "kind": "archived PINN prediction",
+  "fields": [
+    "u",
+    "v",
+    "p"
+  ],
+  "units": [
+    "m/s",
+    "m/s",
+    "m²/s²"
+  ],
+  "format": "interleaved int16 little-endian; -32768 is invalid; value = integer * scale + offset",
+  "interpolation": "piecewise linear interpolation of archived mesh-point predictions; cylinder masked",
+  "views": {
+    "near": {
+      "bounds": [
+        -4,
+        14,
+        -4,
+        4
+      ],
+      "size": [
+        451,
+        201
+      ],
+      "offset": [
+        0.5643553376029126,
+        -0.0008799390760088899,
+        0.08428993104446908
+      ],
+      "scale": [
+        1.814144934498851e-05,
+        1.514596962889303e-05,
+        1.6965020064670958e-05
+      ],
+      "url": "assets/field-near.bin"
+    },
+    "full": {
+      "bounds": [
+        -20,
+        30,
+        -20,
+        20
+      ],
+      "size": [
+        251,
+        201
+      ],
+      "offset": [
+        0.5639387455830293,
+        -0.000734990668050467,
+        0.06137151890497039
+      ],
+      "scale": [
+        1.8128735189465e-05,
+        1.4964284797879469e-05,
+        1.606640913444397e-05
+      ],
+      "url": "assets/field-full.bin"
+    }
+  },
+  "ranges": {
+    "u": [
+      -0.030184,
+      1.159
+    ],
+    "v": [
+      -0.49858,
+      0.49677
+    ],
+    "p": [
+      -0.47301,
+      0.64728
+    ],
+    "speed": [
+      0.00025699861575502697,
+      1.1702565669117178
+    ]
+  }
+}

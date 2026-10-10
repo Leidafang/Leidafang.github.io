@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-10-08T00:00:00.000Z" agent="Codex ELK.js + maxGraph" version="31.3.1" type="device" compressed="false">
+  <diagram id="pinn-cylinder" name="PINN｜Re=20 圆柱稳态绕流">
+    <mxGraphModel dx="1920" dy="1080" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1169" pageHeight="827" math="1" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="whole-board" value="" vertex="1" parent="1" connectable="0" style="shape=rectangle;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;rounded=0;container=1;collapsible=0;recursiveResize=0;movable=1;resizable=0;deletable=1;connectable=0;">
+          <mxGeometry as="geometry" x="0" y="0" width="8264" height="1479" />
+        </mxCell>
+        <mxCell id="diagram-title" value="PINN｜圆柱稳态绕流：坐标网络、物理约束与训练后查询" vertex="1" parent="whole-board" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#1F2937;whiteSpace=wrap;fontSize=28;fontStyle=1;">
+          <mxGeometry x="70" y="28" width="8124" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="diagram-subtitle" value="来源：pinnLibtorch/cylinderFoam/Make/files → cylinderPinnReCudaFoam.C；cylinder/constant/trainingProperties。2026-10-08 静态核对；未执行训练、CFD 或模型评估。" vertex="1" parent="whole-board" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#475569;whiteSpace=wrap;fontSize=15;">
+          <mxGeometry x="70" y="82" width="8124" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="diagram-rule" value="阅读：左→右；紫=数据，蓝=可学习/复用网络，灰=求导与数值操作，红=损失/优化，绿=物理输出。尺寸与公式放在框内，连线不重复变量标签。" vertex="1" parent="whole-board" style="shape=text;html=0;strokeColor=none;fillColor=#FEF3C7;align=left;verticalAlign=middle;fontColor=#334155;whiteSpace=wrap;fontSize=14;spacingLeft=10;">
+          <mxGeometry x="70" y="128" width="8124" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" value="1. 配点、边界与固定工况" vertex="1" parent="whole-board" style="shape=swimlane;horizontal=1;startSize=52;rounded=1;html=0;fillColor=#F8FAFC;swimlaneFillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;fontColor=#111827;fontStyle=1;fontSize=18;align=left;verticalAlign=middle;spacingLeft=16;arcSize=6;collapsible=0;">
+          <mxGeometry x="70" y="190" width="547" height="934" as="geometry" />
+        </mxCell>
+        <mxCell id="internal" value="内部配点：单元中心" vertex="1" parent="s1" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E8DDF8;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="98" width="390" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="internal-body" value="XΩ = (x,y)，[5616,2]，float32&#10;来自 mesh.C()；坐标启用梯度&#10;V [5616,1]：单元体积，参与损失加权&#10;网格提供位置与权重，不向网络传邻接表" vertex="1" parent="internal" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="390" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="边界配点：面中心" vertex="1" parent="s1" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E8DDF8;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="358" width="415" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary-body" value="Xb = (x,y)，四次独立网络调用&#10;in / out / cylinder / sym：48 / 48 / 48 / 216&#10;面面积 A；圆柱单位法向 n [48,2]&#10;边界等效权重 a = 0.05 A" vertex="1" parent="boundary" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="415" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="case" value="本图对应的固定案例" vertex="1" parent="s1" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E8DDF8;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="618" width="415" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="case-body" value="圆柱直径 D=2 m；入口 Uin=1 m/s&#10;ν=0.1 m²/s → Re=Uin D/ν=20&#10;ν、Uin 进入物理约束，不拼入坐标输入&#10;无时间 t、SDF、跨案例几何编码" vertex="1" parent="case" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="415" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="s1-note" value="OpenFOAM 提供几何采样与权重；蓝色网络只接收坐标。&#10;当前图依据现存主入口与 cylinder 配置，历史产物无完整运行清单。" vertex="1" parent="s1" style="shape=note;html=0;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;fontSize=14;fontColor=#1F2937;align=left;verticalAlign=top;spacing=12;">
+          <mxGeometry x="36" y="822" width="475" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" value="2. 逐点坐标网络 fθ：唯一的场表示" vertex="1" parent="whole-board" style="shape=swimlane;horizontal=1;startSize=52;rounded=1;html=0;fillColor=#F8FAFC;swimlaneFillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;fontColor=#111827;fontStyle=1;fontSize=18;align=left;verticalAlign=middle;spacingLeft=16;arcSize=6;collapsible=0;">
+          <mxGeometry x="727" y="190" width="2080" height="414" as="geometry" />
+        </mxCell>
+        <mxCell id="first" value="输入映射：Linear + Tanh" vertex="1" parent="s2" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#4F78C4;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="98" width="405" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="first-body" value="每次调用 X [n,2] → H₁ [n,64]&#10;H₁ = tanh(X W₁ᵀ + b₁)&#10;同一网络分别用于内部点和各类边界点&#10;原始 x、y 输入；代码未作坐标归一化" vertex="1" parent="first" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="405" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="hidden" value="隐藏变换：重复 5 次" vertex="1" parent="s2" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#4F78C4;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="597" y="98" width="385" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="hidden-body" value="每次 Linear(64,64) + Tanh&#10;[n,64] → [n,64]；五组不同权重&#10;加上输入映射，共 6 个隐藏层&#10;Tanh 平滑，可对坐标计算二阶导数" vertex="1" parent="hidden" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="385" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="readout" value="线性读出：Linear(64,3)" vertex="1" parent="s2" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#4F78C4;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="1108" y="98" width="380" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="readout-body" value="[n,64] → Y [n,3] = (u,v,p)&#10;输出层无激活函数&#10;7 个 Linear，合计 21,187 个参数&#10;所有空间位置共享同一组参数 θ" vertex="1" parent="readout" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="380" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="fields" value="预测场及其位置对应关系" vertex="1" parent="s2" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#DDF4E8;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="1614" y="98" width="400" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="fields-body" value="YΩ [5616,3]；Yb [Nb,3]&#10;u、v：平面速度，m/s&#10;p：运动学压力，m²/s²（对应算例 p）&#10;逐点前向；网络层间没有点与点聚合" vertex="1" parent="fields" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="400" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="s2-note" value="网络结构为 2→64→64→64→64→64→64→3。&#10;输入与各点输出一一对应；全场关联通过共享参数与物理约束学习。" vertex="1" parent="s2" style="shape=note;html=0;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;fontSize=14;fontColor=#1F2937;align=left;verticalAlign=top;spacing=12;">
+          <mxGeometry x="36" y="302" width="2008" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="3. 训练专用：空间导数与物理残差" vertex="1" parent="whole-board" style="shape=swimlane;horizontal=1;startSize=52;rounded=1;html=0;fillColor=#F8FAFC;swimlaneFillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;fontColor=#111827;fontStyle=1;fontSize=18;align=left;verticalAlign=middle;spacingLeft=16;arcSize=6;collapsible=0;">
+          <mxGeometry x="2917" y="190" width="1689" height="617" as="geometry" />
+        </mxCell>
+        <mxCell id="grad1" value="自动微分：一阶空间导数" vertex="1" parent="s3" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E5E7EB;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="188" width="425" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="grad1-body" value="autograd.grad(Y,X)，保留计算图&#10;内部：uₓ,uᵧ,vₓ,vᵧ,pₓ,pᵧ，各 [5616]&#10;边界：读取各自约束所需的一阶导数&#10;对网络函数求导，不作网格差分" vertex="1" parent="grad1" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="425" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="grad2" value="再次自动微分：二阶导数" vertex="1" parent="s3" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E5E7EB;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="617" y="98" width="425" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="grad2-body" value="uₓₓ,uᵧᵧ,uₓᵧ,vₓₓ,vᵧᵧ,vₓᵧ&#10;每项 [5616]；求导图参与参数反传&#10;Δu=uₓₓ+uᵧᵧ；Δv=vₓₓ+vᵧᵧ&#10;网络输出 p 的二阶导数未用于损失" vertex="1" parent="grad2" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="425" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="pde" value="稳态方程残差：按现有实现" vertex="1" parent="s3" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E5E7EB;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="1168" y="145" width="455" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="pde-body" value="c = uₓ + vᵧ&#10;rₓ = u uₓ + v uᵧ + pₓ − νΔu + u c − νcₓ&#10;rᵧ = u vₓ + v vᵧ + pᵧ − νΔv + v c − νcᵧ&#10;cₓ=uₓₓ+vₓᵧ；cᵧ=uₓᵧ+vᵧᵧ&#10;三个残差向量，各 [5616]，目标均为 0" vertex="1" parent="pde" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="455" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="bc" value="边界残差：按代码逐项列出" vertex="1" parent="s3" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E5E7EB;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="617" y="279" width="415" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="bc-body" value="入口 in：u−Uin，v，pₓ&#10;圆柱 cylinder：u，v，∇p·n&#10;出口 out：p，uₓ&#10;上下边界 sym：p，vᵧ&#10;均为软约束；sym 名称不等于对称条件" vertex="1" parent="bc" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="415" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-note" value="对坐标求导得到物理残差；对参数求导才是训练更新。&#10;动量式保留现有代码的 c、∇c 修正项，避免简化成不同的训练目标。" vertex="1" parent="s3" style="shape=note;html=0;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;fontSize=14;fontColor=#1F2937;align=left;verticalAlign=top;spacing=12;">
+          <mxGeometry x="36" y="505" width="1617" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="s4" value="4. 训练专用：加权损失与参数优化" vertex="1" parent="whole-board" style="shape=swimlane;horizontal=1;startSize=52;rounded=1;html=0;fillColor=#F8FAFC;swimlaneFillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;fontColor=#111827;fontStyle=1;fontSize=18;align=left;verticalAlign=middle;spacingLeft=16;arcSize=6;collapsible=0;">
+          <mxGeometry x="4716" y="190" width="1694" height="666" as="geometry" />
+        </mxCell>
+        <mxCell id="lpde" value="PDE 损失：体积平方加权" vertex="1" parent="s4" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#D95B57;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="71" y="350" width="445" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="lpde-body" value="E_V(r) = Σ(Vᵢ² rᵢ²) / ΣVᵢ²&#10;Lc=E_V(c)，Lx=E_V(rₓ)，Ly=E_V(rᵧ)&#10;Lpde = 107.19669 × 0.333 × (Lc+Lx+Ly)&#10;weightsPDE=1；c、r 的目标为零" vertex="1" parent="lpde" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="445" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="lbc" value="边界损失：面积平方加权" vertex="1" parent="s4" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#D95B57;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="98" width="450" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="lbc-body" value="E_b(r) = Σ(aᵢ² rᵢ²) / Σaᵢ²，aᵢ=0.05Aᵢ&#10;Lin、Lwall：各 3 项 E_b 之和 × 0.3333&#10;Lout、Lsym：各 2 项 E_b 之和 × 0.5&#10;Lbc=0.21743Lin+0.03371Lwall&#10;       +0.21743Lout+0.5368Lsym；wBD=1" vertex="1" parent="lbc" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="450" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="loss" value="总损失：只有方程与边界" vertex="1" parent="s4" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#D95B57;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="642" y="137" width="420" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="loss-body" value="L = Lpde + Lbc，标量&#10;内部 5616 点与全部边界点全量参与&#10;weightsDATA 虽被读取，但未用于 L&#10;已有 CFD 场不作为本入口的训练标签" vertex="1" parent="loss" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="420" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="update" value="参数反传与 AdamW 更新" vertex="1" parent="s4" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#D95B57;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="1188" y="126" width="440" height="182" as="geometry" />
+        </mxCell>
+        <mxCell id="update-body" value="对 θ 求 ∂L/∂θ：loss.backward()&#10;opti.step()；学习率 1×10⁻⁵&#10;更新全部 7 个 Linear 的权重和偏置&#10;配置上限 3,000,000 次；不是已完成次数&#10;已有 net.pth 时先加载网络参数" vertex="1" parent="update" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="440" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="s4-note" value="先乘体积／面积，再计算 MSE，等价于平方权重。&#10;红色回路更新第 2 阶段全部参数；训练迭代不是物理时间步。" vertex="1" parent="s4" style="shape=note;html=0;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;fontSize=14;fontColor=#1F2937;align=left;verticalAlign=top;spacing=12;">
+          <mxGeometry x="36" y="554" width="1622" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="s5" value="5. 复用训练权重：位置查询与场输出" vertex="1" parent="whole-board" style="shape=swimlane;horizontal=1;startSize=52;rounded=1;html=0;fillColor=#F8FAFC;swimlaneFillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;fontColor=#111827;fontStyle=1;fontSize=18;align=left;verticalAlign=middle;spacingLeft=16;arcSize=6;collapsible=0;">
+          <mxGeometry x="6520" y="190" width="1674" height="674" as="geometry" />
+        </mxCell>
+        <mxCell id="query" value="训练后查询：给出空间位置" vertex="1" parent="s5" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#E8DDF8;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="358" width="425" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="query-body" value="Xq [Nq,2]，位于本案例流体域内&#10;现存导出使用 mesh.points()&#10;Nq=11,592，含前后两层的重复 (x,y)&#10;位置仍为 x、y，不输入真实速度或压力" vertex="1" parent="query" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="425" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="inference" value="复用训练好的坐标网络 fθ" vertex="1" parent="s5" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#4F78C4;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="617" y="358" width="425" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="inference-body" value="Xq [Nq,2] → Yq [Nq,3]&#10;与第 2 阶段相同的 MLP、同一组 θ&#10;纯查询只需前向，不需方程残差分支&#10;本源码把顶点导出调用放在训练循环内" vertex="1" parent="inference" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="425" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="output" value="二维稳态圆柱绕流场" vertex="1" parent="s5" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#DDF4E8;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#1F2937;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="1168" y="358" width="440" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="output-body" value="Yq=(u,v,p)；速度模长由 √(u²+v²) 得到&#10;导出 upPred；格心另存 up / pressure&#10;同一位置输出固定；没有时间递推&#10;该权重对应本几何、本工况的近似解" vertex="1" parent="output" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="440" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="evidence" value="历史结果的证据范围" vertex="1" parent="s5" style="shape=swimlane;horizontal=1;startSize=38;rounded=1;html=0;fillColor=#F1F5F9;swimlaneFillColor=#FFFFFF;strokeColor=#475569;strokeWidth=2;fontColor=#64748B;fontStyle=1;fontSize=15;align=center;verticalAlign=middle;spacing=6;arcSize=6;collapsible=0;">
+          <mxGeometry x="66" y="98" width="430" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="evidence-body" value="已有流场图、net.pth、9241 行损失记录&#10;loss 最后一行总损失：1.82438×10⁻⁶&#10;存图为 PINN 输出，不是参考解误差图&#10;未找到独立误差报告；未重跑模型" vertex="1" parent="evidence" style="shape=text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;spacingLeft=10;spacingRight=8;spacingTop=8;">
+          <mxGeometry y="38" width="430" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="s5-note" value="本案例是单工况坐标 PINN。改变来流或黏度，现有输入无法条件化。&#10;图中蓝色复用框不是新网络；结果卡只陈述已保存的证据。" vertex="1" parent="s5" style="shape=note;html=0;whiteSpace=wrap;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;fontSize=14;fontColor=#1F2937;align=left;verticalAlign=top;spacing=12;">
+          <mxGeometry x="36" y="562" width="1602" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="e-internal-first" value="" edge="1" parent="whole-board" source="internal" target="first" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.4958124999999999;entryX=0;entryY=0.4421875;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="542.0" y="367.33" />
+              <mxPoint x="542.0" y="358.75" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-boundary-first" value="" edge="1" parent="whole-board" source="boundary" target="first" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.4421875;entryX=0;entryY=0.603125;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="567.0" y="618.75" />
+              <mxPoint x="567.0" y="384.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-first-hidden" value="" edge="1" parent="whole-board" source="first" target="hidden" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.4958124999999999;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1214.0" y="384.5" />
+              <mxPoint x="1214.0" y="367.33" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-hidden-readout" value="" edge="1" parent="whole-board" source="hidden" target="readout" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.4958124999999999;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1725.0" y="384.5" />
+              <mxPoint x="1725.0" y="367.33" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-readout-fields" value="" edge="1" parent="whole-board" source="readout" target="fields" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#15803D;fontSize=13;fontColor=#15803D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.603125;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-fields-grad1" value="" edge="1" parent="whole-board" source="fields" target="grad1" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.4421875;entryX=0;entryY=0.603125;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2757.0" y="358.75" />
+              <mxPoint x="2757.0" y="474.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-grad1-grad2" value="" edge="1" parent="whole-board" source="grad1" target="grad2" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.4421875;entryX=0;entryY=0.603125;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3424.0" y="448.75" />
+              <mxPoint x="3424.0" y="384.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-grad1-pde" value="" edge="1" parent="whole-board" source="grad1" target="pde" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.38461538461538464;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3521.0" y="474.5" />
+              <mxPoint x="3521.0" y="275.0" />
+              <mxPoint x="4069.0" y="275.0" />
+              <mxPoint x="4069.0" y="405.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-grad2-pde" value="" edge="1" parent="whole-board" source="grad2" target="pde" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.521978021978022;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3975.0" y="384.5" />
+              <mxPoint x="3975.0" y="430.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-fields-pde" value="" edge="1" parent="whole-board" source="fields" target="pde" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.6593406593406593;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2757.0" y="384.5" />
+              <mxPoint x="2757.0" y="275.0" />
+              <mxPoint x="3972.0" y="275.0" />
+              <mxPoint x="3972.0" y="455.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-grad1-bc" value="" edge="1" parent="whole-board" source="grad1" target="bc" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.7640625;entryX=0;entryY=0.38461538461538464;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3424.0" y="500.25" />
+              <mxPoint x="3424.0" y="539.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-fields-bc" value="" edge="1" parent="whole-board" source="fields" target="bc" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.7640625;entryX=0;entryY=0.521978021978022;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2970.0" y="410.25" />
+              <mxPoint x="2970.0" y="564.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-case-pde" value="" edge="1" parent="whole-board" source="case" target="pde" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#6D28D9;fontSize=13;fontColor=#6D28D9;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=1;dashPattern=7 5;exitX=1;exitY=0.49581250000000027;entryX=0;entryY=0.7967032967032966;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="594.0" y="887.33" />
+              <mxPoint x="594.0" y="1219.0" />
+              <mxPoint x="4583.0" y="1219.0" />
+              <mxPoint x="4583.0" y="530.0" />
+              <mxPoint x="4069.0" y="530.0" />
+              <mxPoint x="4069.0" y="480.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-case-bc" value="" edge="1" parent="whole-board" source="case" target="bc" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#6D28D9;fontSize=13;fontColor=#6D28D9;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=1;dashPattern=7 5;exitX=1;exitY=0.7104374999999997;entryX=0;entryY=0.6593406593406593;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="594.0" y="921.67" />
+              <mxPoint x="594.0" y="1239.0" />
+              <mxPoint x="2940.0" y="1239.0" />
+              <mxPoint x="2940.0" y="589.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-boundary-bc" value="" edge="1" parent="whole-board" source="boundary" target="bc" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#6D28D9;fontSize=13;fontColor=#6D28D9;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=1;dashPattern=7 5;exitX=1;exitY=0.603125;entryX=0;entryY=0.7967032967032966;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="594.0" y="644.5" />
+              <mxPoint x="594.0" y="1259.0" />
+              <mxPoint x="3518.0" y="1259.0" />
+              <mxPoint x="3518.0" y="800.0" />
+              <mxPoint x="2940.0" y="800.0" />
+              <mxPoint x="2940.0" y="682.0" />
+              <mxPoint x="3518.0" y="682.0" />
+              <mxPoint x="3518.0" y="614.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-pde-lpde" value="" edge="1" parent="whole-board" source="pde" target="lpde" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.5906593406593407;entryX=0;entryY=0.49581250000000027;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4556.0" y="442.5" />
+              <mxPoint x="4556.0" y="619.33" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-internal-lpde" value="" edge="1" parent="whole-board" source="internal" target="lpde" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#6D28D9;fontSize=13;fontColor=#6D28D9;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=1;dashPattern=7 5;exitX=1;exitY=0.7104375;entryX=0;entryY=0.7104374999999997;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630.0" y="401.67" />
+              <mxPoint x="630.0" y="1279.0" />
+              <mxPoint x="4739.0" y="1279.0" />
+              <mxPoint x="4739.0" y="653.67" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-bc-lbc" value="" edge="1" parent="whole-board" source="bc" target="lbc" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.5906593406593407;entryX=0;entryY=0.4762087912087913;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4766.0" y="576.5" />
+              <mxPoint x="4766.0" y="374.67" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-boundary-lbc" value="" edge="1" parent="whole-board" source="boundary" target="lbc" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#6D28D9;fontSize=13;fontColor=#6D28D9;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=1;dashPattern=7 5;exitX=1;exitY=0.7640625;entryX=0;entryY=0.70510989010989;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="567.0" y="670.25" />
+              <mxPoint x="567.0" y="999.0" />
+              <mxPoint x="594.0" y="999.0" />
+              <mxPoint x="594.0" y="1117.0" />
+              <mxPoint x="567.0" y="1117.0" />
+              <mxPoint x="567.0" y="1299.0" />
+              <mxPoint x="4766.0" y="1299.0" />
+              <mxPoint x="4766.0" y="849.0" />
+              <mxPoint x="4739.0" y="849.0" />
+              <mxPoint x="4739.0" y="416.33" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-lpde-loss" value="" edge="1" parent="whole-board" source="lpde" target="loss" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.4958124999999999;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="5248.0" y="636.5" />
+              <mxPoint x="5248.0" y="406.33" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-lbc-loss" value="" edge="1" parent="whole-board" source="lbc" target="loss" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.5906593406593407;entryX=0;entryY=0.7104375;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="5342.0" y="395.5" />
+              <mxPoint x="5342.0" y="440.67" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-loss-update" value="" edge="1" parent="whole-board" source="loss" target="update" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.5906593406593407;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-update-first" value="" edge="1" parent="whole-board" source="update" target="first" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.38461538461538464;entryX=0;entryY=0.7640625;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="6387.0" y="386.0" />
+              <mxPoint x="6387.0" y="1319.0" />
+              <mxPoint x="750.0" y="1319.0" />
+              <mxPoint x="750.0" y="410.25" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-update-hidden" value="" edge="1" parent="whole-board" source="update" target="hidden" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.521978021978022;entryX=0;entryY=0.7104375;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="6360.0" y="411.0" />
+              <mxPoint x="6360.0" y="731.0" />
+              <mxPoint x="6387.0" y="731.0" />
+              <mxPoint x="6387.0" y="849.0" />
+              <mxPoint x="6360.0" y="849.0" />
+              <mxPoint x="6360.0" y="1339.0" />
+              <mxPoint x="714.0" y="1339.0" />
+              <mxPoint x="714.0" y="461.0" />
+              <mxPoint x="1308.0" y="461.0" />
+              <mxPoint x="1308.0" y="401.67" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-update-readout" value="" edge="1" parent="whole-board" source="update" target="readout" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#BE185D;fontSize=13;fontColor=#BE185D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.6593406593406593;entryX=0;entryY=0.7104375;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="6423.0" y="436.0" />
+              <mxPoint x="6423.0" y="1359.0" />
+              <mxPoint x="1819.0" y="1359.0" />
+              <mxPoint x="1819.0" y="597.0" />
+              <mxPoint x="2784.0" y="597.0" />
+              <mxPoint x="2784.0" y="461.0" />
+              <mxPoint x="1819.0" y="461.0" />
+              <mxPoint x="1819.0" y="401.67" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-query-inference" value="" edge="1" parent="whole-board" source="query" target="inference" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2;strokeColor=#475569;fontSize=13;fontColor=#475569;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.49581250000000027;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="7027.0" y="644.5" />
+              <mxPoint x="7027.0" y="627.33" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-update-inference" value="" edge="1" parent="whole-board" source="update" target="inference" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#7E22CE;fontSize=13;fontColor=#7E22CE;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.7967032967032966;entryX=0;entryY=0.7104374999999997;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="7121.0" y="461.0" />
+              <mxPoint x="7121.0" y="661.67" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-inference-output" value="" edge="1" parent="whole-board" source="inference" target="output" style="edgeStyle=none;rounded=1;orthogonalLoop=1;jettySize=28;html=0;endArrow=block;endFill=1;endSize=10;strokeWidth=2.5;strokeColor=#15803D;fontSize=13;fontColor=#15803D;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=8;dashed=0;exitX=1;exitY=0.603125;entryX=0;entryY=0.603125;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="supervision-lane-label" value="底部专用通道：固定工况与积分权重（紫色虚线）；参数梯度回传（红色）；同一组权重复用（紫色实线）。网络深度、训练迭代和物理时间是不同概念。" vertex="1" parent="whole-board" style="shape=text;html=0;strokeColor=#F9A8D4;fillColor=#FCE7F3;align=center;verticalAlign=middle;fontColor=#1F2937;whiteSpace=wrap;fontSize=14;fontStyle=1;">
+          <mxGeometry x="70" y="1175" width="8124" height="38" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

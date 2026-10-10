@@ -1,28 +1,22 @@
-AI × CFD 个人研究主页 · v2
+AI × CFD 个人研究笔记 · v3
 
-主页：https://leidafang.github.io/
-仓库：https://github.com/Leidafang/Leidafang.github.io
-中文为主，署名 Leidafang。
+线上：https://leidafang.github.io/
+GitHub Pages 读取 main 分支的 docs/。
 
-信息结构：PINNs → DoMINO → GeoTransolver → 阶段总结。
-当前展开 PINNs 圆柱绕流；其余三章保留标题与“施工中”。
+城市风环境 → DoMINO → 物理约束与 PINNs 圆柱案例。
+数据中心 CHT → GeoTransolver → 稳态与瞬态进展。
+最后整理模型任务、物理约束与证据边界。
 
-编辑 site/index.html 调整结构和文字；编辑 site/style.css 调整样式；
-编辑 site/app.js 调整模型说明和交互。site/assets/ 为已整理的显示资源。
-执行 python3 build_site.py，生成 docs/ 静态网站。
-GitHub Pages 使用 main 分支的 /docs；源文件与生成文件一同提交。
-改动样式或脚本时，同步更新 index.html 中的版本查询参数，避免旧缓存。
-根目录 content.json 和 style.css 为 v1 历史文件，不再参与当前构建。
+site/index.html 是正文；site/style.css 是样式；site/app.js 是案例和模型交互。
+site/pinn/ 保留完整的 PINN 流场、训练记录和模型探索器。
+build_site.py 定义四张模型简图并生成原生 Draw.io 与嵌入源的 SVG。
+构建：python3 build_site.py
+静态校验：python3 check_static.py
+代码与素材均为静态文件，无在线模型服务。旧版未引用素材暂留兼容。
 
-已确认公开：本站文字、保存的 PINN 预测的紧凑显示数据、历史损失曲线、
-配置摘要、可编辑模型图、公开引用、静态网站源文件。
-不含模型权重、完整原始数据集、私有项目代码或本机路径与凭据。
-
-交互范围：模型模块点击、训练/查询路径、完整图缩放与拖动；
-速度/压力切换、近场/全域、局部数值、流向粒子、配置/训练记录/来源。
-粒子只用于显示保存的稳态场流向，不表示在线推理或瞬态预测。
-日志横轴为记录序号，不等于完成的训练迭代数；训练损失不等于独立精度。
-历史文件缺少统一运行清单，不宣称全部来源于同一次运行。
-
-交互形式参考 Transformer Explainer；本页面自行实现。
-旧的六个文章 URL 重定向到新版相应章节。
+城市预览使用 OSM 衍生归档建筑几何（© OpenStreetMap contributors，ODbL）；
+原始速度对照图是不同的历史测试样本，保留各自色标。
+CHT 展示的是五个独立的归档稳态 CFD 工况，粒子不是 AI 瞬态推理。
+模型图为原理与已核对配置的简化图，保留可编辑文件。
+飞书原文、私有文档链接、OAuth 资料和原始研究数据不在本仓库中。
+新 CHT 的本地稳态 AI 功能未部署为此主页的公网推理服务。

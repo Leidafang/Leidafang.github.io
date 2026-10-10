@@ -1,67 +1,49 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Leidafang 的 AI + CFD 研究笔记。从 PINNs 圆柱绕流出发，交互式理解模型、物理约束与流场。">
-  <meta name="theme-color" content="#fafaf8">
-  <title>AI × CFD · Leidafang 的研究笔记</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23e27b4d'/%3E%3Cpath d='M10 25Q24 10 32 25T54 25M10 40Q24 25 32 40T54 40' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=20261010-2"><script defer src="app.js?v=20261010-2"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI × CFD — Leidafang 的研究笔记</title>
+  <meta name="description" content="从城市风环境到数据中心散热，记录 DoMINO、PINNs 与 GeoTransolver 的模型机制、实验和研究思考。">
+  <meta name="theme-color" content="#f2f4f5">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b848c'/%3E%3Cpath d='M10 25Q24 10 32 25T54 25M10 40Q24 25 32 40T54 40' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=3"><script defer src="app.js?v=3"></script>
 </head>
 <body>
-<a class="skip" href="#pinn">跳到内容</a>
-<header class="topbar">
-  <a class="brand" href="#pinn"><span class="brand-icon">≈</span> AI <span class="times">×</span> CFD <span class="brand-sub">研究笔记</span></a>
-  <nav aria-label="研究章节"><a class="active" href="#pinn">01 PINNs</a><a href="#domino">02 DoMINO</a><a href="#geotransolver">03 GeoTransolver</a><a href="#summary">04 总结</a></nav>
-  <a class="author" href="https://github.com/Leidafang" target="_blank" rel="noopener">Leidafang <span>↗</span></a>
-</header>
-<main>
-<section id="pinn" class="chapter">
-  <div class="chapter-intro">
-    <div class="eyebrow"><span class="orange-line"></span> 01 / PINNs <span class="intro-tag">从圆柱绕流开始</span></div>
-    <h1>让神经网络学会<span>遵守物理。</span></h1>
-    <p>从一个圆柱绕流问题出发：只输入空间坐标，如何在没有流场标签的情况下，得到速度与压力？</p>
-    <div class="case-meta"><span>二维稳态圆柱绕流</span><i></i><span>Re = 20</span><i></i><span>LibTorch + OpenFOAM</span></div>
+<a class="skip" href="#urban">跳到研究内容</a>
+<header class="topbar"><a class="brand" href="#top"><span class="brand-mark">≈</span> AI <span class="times">×</span> CFD <span class="brand-note">研究笔记</span></a><nav aria-label="研究章节"><a href="#urban" class="active">01 城市风环境</a><a href="#data-center">02 数据中心</a><a href="#reflections">03 阶段思考</a></nav><a class="author" href="https://github.com/Leidafang" target="_blank" rel="noopener">Leidafang ↗</a></header>
+<main id="top">
+<section class="hero"><div class="eyebrow"><span class="status-dot"></span> A PERSONAL RESEARCH NOTEBOOK</div><h1>从流动问题出发，<br>理解 <span>AI 如何<span class="mobile-only"><br></span>预测物理场。</span></h1><div class="hero-bottom"><p>城市中的风，机柜之间的热。<br>用两个工程问题，串起我的模型实践、实验结果与尚未解决的问题。</p><a class="outline-link" href="#urban">开始探索 <span>↓</span></a></div><div class="hero-index"><span>DoMINO <i>几何与空间查询</i></span><span>PINNs <i>物理约束与优化</i></span><span>GeoTransolver <i>全场交互与时间响应</i></span></div></section>
+
+<section class="chapter" id="urban">
+  <div class="section-heading"><div><span class="eyebrow">01 / URBAN WIND</span><h2>建筑改变了风，<br class="mobile-only">模型如何读懂几何？</h2></div><p>以建筑群周围的稳态流场为起点，<br>探索 DoMINO 从几何到速度、压力的映射。</p></div>
+  <div class="workspace" id="urban-workspace">
+    <div class="workspace-top"><div class="tabbar" aria-label="城市案例视图"><button class="selected" data-urban="geometry" aria-pressed="true">建筑几何</button><button data-urban="result" aria-pressed="false">历史预测对照</button></div><span class="workspace-label">CASE EXPLORER <i></i> 01</span></div>
+    <div class="workspace-body">
+      <div class="view-main">
+        <div class="dark-stage" id="urban-stage"><canvas id="urban-canvas" aria-label="归档建筑几何的三维线框，拖动旋转，滚轮缩放" tabindex="0"></canvas><div class="canvas-caption"><span class="small-pill">归档建筑几何</span><h3>城市的形状，<br>是流动的边界。</h3></div><div class="stage-bottom"><span>拖动旋转 · 滚轮缩放 · 方向键旋转</span><button id="urban-reset" class="glass-button">复位 ↺</button></div><div id="urban-loading" class="load-status" role="status">正在读取几何…</div></div>
+        <div class="image-stage" id="urban-result" hidden><div class="result-header"><span>历史测试 No.62 · 速度大小</span><div class="tabbar"><button class="selected" data-result="ref" aria-pressed="true">CFD 参考</button><button data-result="pred" aria-pressed="false">模型预测</button></div></div><img id="urban-result-image" src="assets/urban-ref.png" alt="历史测试 No.62 的 CFD 参考速度场与原始色标"><div class="image-caption">原始截图，保留数值与色标。与几何预览为不同归档样本；本页不据此计算定量误差。</div></div>
+      </div>
+      <aside class="inspector"><div class="eyebrow">THE ENGINEERING QUESTION</div><h3>换一组建筑，<br>风会怎样绕行？</h3><p>遮挡、加速与回流决定局部风环境。希望模型理解建筑形状，在指定空间位置预测速度与压力。</p><dl class="facts"><div><dt>案例类型</dt><dd>室外 · 稳态 · 体积场</dd></div><div><dt>几何来源</dt><dd>OSM 建筑数据</dd></div><div><dt>研究方法</dt><dd>CFD 数据 → DoMINO</dd></div></dl><details><summary>查看历史数据配置</summary><p>早期流程从大连建筑数据构建局部建筑群，并通过旋转生成几何变化。归档实验包含 800 个案例，后续调整过数据划分与预处理。</p><p>CFD 计算域大于模型的查询域。历史模型查询范围为 150 × 150 × 75 m，几何特征网格为 64 × 64 × 32。</p><p>几何预览只展示一个归档样本，不代表已验证任意城市泛化。</p></details><a class="inline-link" href="#domino-model">模型怎样处理几何 <span>↓</span></a></aside>
+    </div><div class="workspace-foot"><span><i class="tiny-dot"></i> 几何预览不包含预测流场</span><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL ↗</a></div>
   </div>
 
-  <div class="explorer">
-    <div class="panel-heading"><div><span class="mini-label">MODEL EXPLORER</span><h2>从坐标到物理场</h2></div>
-      <div class="heading-actions"><div class="segmented" aria-label="模型路径"><button class="selected" id="training-mode" aria-pressed="true">训练</button><button id="inference-mode" aria-pressed="false">查询</button></div><button class="text-button" id="open-detailed">完整结构图 <span>↗</span></button></div>
-    </div>
-    <div class="board-hint"><span id="mode-caption">点击任一模块，展开它的作用与实现。</span><span class="diagram-legend"><i class="learned-dot"></i> 可学习模块 <i class="loss-dot"></i> 约束 / 优化</span></div>
-    <div class="board-scroll" tabindex="0" aria-label="模型总图，窄屏可横向滚动"><!-- MODEL_BOARD --></div><div class="mobile-pan-hint">← 左右滑动查看完整流程 →</div>
-    <div class="detail-panel" id="detail-panel" aria-live="polite">
-      <div class="detail-copy"><span class="detail-kicker" id="detail-kicker"></span><h3 id="detail-title"></h3><div id="detail-text"></div><div class="step-nav"><button id="previous-node" aria-label="上一个模块">←</button><span id="step-count"></span><button id="next-node" aria-label="下一个模块">→</button></div></div>
-      <div class="detail-visual" id="detail-visual"></div>
-    </div>
-  </div>
+  <div class="model-section" id="domino-model"><div class="subheading"><div><span class="eyebrow">MODEL / 01</span><h3>DoMINO <span>先编码几何，再回答空间查询</span></h3></div><span class="model-type">CNN 几何编码 + 局部解码</span></div><p class="section-lead">把建筑几何编码成可读取的特征场。每次查询一个位置，提取附近特征，结合位置与工况，得到这个点的预测。</p><div class="model-explorer" data-model="domino"></div></div>
+  <div class="work-notes"><div><span class="eyebrow">WHAT I WORKED ON</span><h3>让模型真正接上<br>工程数据。</h3></div><div class="note-list"><details open><summary><span>01</span> 从建筑数据到可训练样本</summary><p>构建建筑几何、OpenFOAM 流场与模型数据之间的处理链，检查几何、网格、工况输入和归一化的一致性。数据接口的细节，会直接改变模型实际学到的问题。</p></details><details><summary><span>02</span> 物理残差下降，预测却没有同步变好</summary><p>在部分加入 N–S 约束的试验中，物理残差明显降低，但数据拟合与验证结果没有同步改善。这支持继续排查损失平衡、离散误差与数据一致性，不能据此宣称物理约束已经提高了泛化能力。</p></details><details><summary><span>03</span> 一个关键排查：监督值到底位于哪里？</summary><p>将单元中心结果外推为节点值时，近壁数据可能与壁面约束冲突。后续改用单元中心体积场，并修订数据处理和划分。方程、标签与边界需要描述同一套物理量、位置和单位。</p></details></div></div>
 
-  <div class="section-intro"><div><span class="section-number">01.1</span><h2>看看网络留下的流场</h2></div><p>保存的 PINN 预测 · 可切换物理量，移动指针读取局部数值</p></div>
-  <div class="case-workspace">
-    <div class="field-panel">
-      <div class="field-toolbar"><div class="segmented field-tabs" aria-label="显示的物理量"><button class="selected" data-field="speed" aria-pressed="true">速度大小</button><button data-field="u" aria-pressed="false">u</button><button data-field="v" aria-pressed="false">v</button><button data-field="p" aria-pressed="false">压力 p</button></div><label class="view-select">视野 <select id="field-view"><option value="near">圆柱附近</option><option value="full">完整计算域</option></select></label></div>
-      <div class="canvas-wrap" id="canvas-wrap"><canvas id="field-canvas" aria-label="保存的 PINN 圆柱绕流预测场，可点击或移动指针探查坐标与数值"></canvas><div class="field-loading" id="field-loading" role="status">正在读取保存的流场…</div><div class="field-badge">保存的预测场 <span>·</span> Re = 20</div><div class="flow-direction">来流 →</div></div>
-      <div class="field-controls"><button id="particles-toggle" aria-pressed="false">▷ 显示流向粒子</button><span class="scale-caption" id="scale-caption">|U| (m/s)</span><div class="color-scale"><div id="scale-gradient"></div><div class="scale-values"><span id="scale-min"></span><span id="scale-max"></span></div></div></div>
-      <div class="probe-readout" id="probe-readout" aria-live="off">将指针移入流场，或点击一个位置，查看插值后的局部数值。</div>
-      <p class="field-footnote">稳态场；粒子运动仅辅助显示流向，不代表瞬态预测或真实时间进程。圆柱内部不显示流体值。</p>
-    </div>
-    <aside class="config-panel"><span class="mini-label">CASE NOTES</span><h3>这个实验做了什么</h3><div class="config-tabs" role="group" aria-label="案例信息"><button data-config="setup" class="selected" aria-pressed="true">配置</button><button data-config="history" aria-pressed="false">训练记录</button><button data-config="source" aria-pressed="false">来源</button></div><div id="config-content"></div></aside>
-  </div>
-
-  <div class="section-intro reflection-heading"><div><span class="section-number">01.2</span><h2>这个案例带给我的理解</h2></div></div>
-  <div class="reflections">
-    <details open><summary><span>01</span> 自监督，省去的是流场标签</summary><p>吸引我开始做 PINNs 的，是可以直接把方程放进损失函数。这个实现没有使用 CFD 的真实速度、压力作为训练标签，但仍需要几何、边界条件、物性和采样点。</p></details>
-    <details><summary><span>02</span> 坐标网络，很适合描述一个连续的解</summary><p>同一个网络处理每一个坐标，自动微分得到空间导数。本案例更接近“用神经网络求解这一道 PDE”：没有把几何或工况作为输入，也没有由此验证跨场景泛化。</p></details>
-    <details><summary><span>03</span> 能写出物理损失，不等于训练一定成功</summary><p>如何采样、如何平衡边界与方程残差、如何优化，都直接影响训练。损失下降只是其中一条证据，还需要与独立参考解比较，才能判断流场精度。这也是我后来继续研究数据驱动代理模型的起点。</p></details>
-  </div>
+  <section class="physics-bridge" id="pinn"><div class="bridge-intro"><div><span class="eyebrow">A DETOUR INTO PHYSICS / PINNs</span><h2>把物理写进损失，<br>究竟意味着什么？</h2></div><p>DoMINO 的数据监督可以叠加物理残差。再往前一步：如果只用方程和边界，不给流场标签呢？我用一个圆柱绕流案例来理解 PINNs。</p></div><div class="bridge-grid"><div class="cylinder-art" aria-label="圆柱绕流的概念示意，非计算结果"><svg viewBox="0 0 600 250" role="img" aria-label="流线绕过圆柱的概念示意"><defs><linearGradient id="flow-line"><stop stop-color="#165566" stop-opacity=".1"/><stop offset=".5" stop-color="#4dd7e6"/><stop offset="1" stop-color="#165566" stop-opacity=".1"/></linearGradient></defs><g fill="none" stroke="url(#flow-line)" stroke-width="1.5"><path d="M0 38C170 38 190 26 270 26S420 38 600 38"/><path d="M0 66C160 66 190 47 270 47S420 66 600 66"/><path d="M0 96C160 96 190 67 270 67S420 96 600 96"/><path d="M0 122C140 122 193 84 270 84S402 122 600 122"/><path d="M0 144C140 144 193 184 270 184S402 144 600 144"/><path d="M0 170C160 170 190 201 270 201S420 170 600 170"/><path d="M0 200C160 200 190 222 270 222S420 200 600 200"/></g><circle cx="270" cy="134" r="35" fill="#12313c" stroke="#8cd6df" stroke-width="1.5"/><text x="270" y="139" text-anchor="middle" fill="#8cd6df" font-size="12">Re 20</text><text x="24" y="236" fill="#64838e" font-size="11">概念示意 · 非仿真结果</text></svg></div><div class="bridge-copy"><span class="small-label">我的圆柱绕流实验 / LibTorch</span><h3>一张坐标网络，求解一个流场。</h3><p>输入 (x, y)，输出 (u, v, p)。对坐标自动微分，构造连续性、动量与边界残差，再更新网络参数。</p><div class="chip-row"><span>二维稳态</span><span>固定几何</span><span>本案例无流场标签</span></div><a class="primary-link" href="pinn/">打开 PINNs 交互实验 <span>↗</span></a><span class="link-note">真实归档预测 · 场值探查 · 训练记录 · 完整结构图</span></div></div><div class="model-explorer" data-model="pinn"></div><details class="physics-compare"><summary>这里的物理约束，与 DoMINO 试验有什么区别？</summary><div class="compare-grid"><div><h4>PINN 圆柱案例</h4><p>连续坐标网络对输入坐标自动微分，得到空间导数；本例依靠方程和边界求解一个固定问题。</p></div><div><h4>我的 DoMINO 物理约束试验</h4><p>在数据监督上增加残差项；所用路径通过预测值的邻域最小二乘等数值方法近似空间导数。训练仍通过自动微分计算损失对参数的梯度。</p></div></div><p>两者都可以注入物理信息。区别在于任务设定、导数构造与监督方式；这些是具体实现选择，不是所有 PINNs 或 DoMINO 的唯一做法。</p></details></section>
+  <aside class="side-note"><span>另一段探索</span><p><strong>从风环境到室内热舒适。</strong>我也尝试了室内送回风位置变化与带温度场的 DoMINO 任务。这段工作把关注点从速度分布扩展到热环境，相关结果将在后续单独整理。</p></aside>
 </section>
 
-<section id="domino" class="future-chapter"><span class="future-number">02</span><h2>DoMINO</h2><span class="construction"><i></i> 施工中</span></section>
-<section id="geotransolver" class="future-chapter"><span class="future-number">03</span><h2>GeoTransolver</h2><span class="construction"><i></i> 施工中</span></section>
-<section id="summary" class="future-chapter"><span class="future-number">04</span><h2>阶段总结</h2><span class="construction"><i></i> 施工中</span></section>
-</main>
-<footer><span>Leidafang · AI × CFD 研究笔记</span><span>交互形式参考 <a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer ↗</a></span></footer>
+<section class="chapter" id="data-center"><div class="section-heading"><div><span class="eyebrow">02 / DATA CENTER · CHT</span><h2>热源和送风改变后，<br>温度会如何响应？</h2></div><p>从稳态温度场走向瞬态预测。<br>以六机柜数据中心为场景，探索 GeoTransolver。</p></div>
+  <div class="workspace" id="cht-workspace"><div class="workspace-top"><span class="workspace-title">六机柜 · 闭环散热</span><span class="workspace-label">CASE EXPLORER <i></i> 02</span></div><div class="workspace-body"><div class="view-main"><div class="dark-stage" id="cht-stage"><canvas id="cht-canvas" aria-label="六机柜 CHT 场景，显示已有稳态 CFD 路径；拖动旋转，滚轮缩放" tabindex="0"></canvas><div class="canvas-caption compact"><span class="small-pill">已有稳态 CFD 场</span><h3 id="cht-caption">名义工况 / 30 kW</h3></div><div class="temperature-legend"><span>路径空气温度 / °C</span><div></div><p><span>15</span><span>40</span><span>65</span></p></div><div class="stage-bottom"><span>拖动旋转 · 滚轮缩放</span><div><button class="glass-button" id="cht-motion" aria-pressed="true">暂停粒子 Ⅱ</button><button class="glass-button" id="cht-reset">复位 ↺</button></div></div><div id="cht-loading" class="load-status" role="status">正在读取已有 CFD 路径…</div></div></div><aside class="inspector"><span class="eyebrow">EXPLORE THE CASE</span><h3>气流带走热，<br>水侧完成冷却。</h3><label class="select-label" for="cht-case">切换归档工况</label><select id="cht-case" disabled><option>正在读取…</option></select><div class="metric-pair"><div><span id="cht-heat">—</span><small>总热负载 / kW</small></div><div><span id="cht-max">—</span><small>空气最高温 / °C</small></div></div><dl class="facts" id="cht-facts"></dl><details><summary>查看输入与显示范围</summary><p>当前 v6 的 8 个控制量：三组机柜热源、三组机柜风机、回风风机、水侧质量流量。冷水入口固定 15 °C。</p><p>每个选项是一个独立的稳态 CFD 工况。显示的是已有流线的抽样子集；粒子辅助显示流动方向，不表示时间响应或在线 AI 推理。</p></details><a class="inline-link" href="https://glodon-mdc-campus.yy-lei.chatgpt.site/" target="_blank" rel="noopener">打开完整 CFD 展示 <span>↗</span></a></aside></div><div class="workspace-foot"><span><i class="tiny-dot"></i> CHT = 流体与固体共同参与的传热</span><span>工程等效模型 · 独立稳态工况</span></div></div>
+  <div class="model-section" id="geo-model"><div class="subheading"><div><span class="eyebrow">MODEL / 03</span><h3>GeoTransolver <span>让点与点交换信息</span></h3></div><span class="model-type">Transformer · GALE</span></div><p class="section-lead">在当前固定几何的 CHT 实现里，把空间点信息放入 local 分支，把工况放入 global 分支。通过学到的状态聚合，使全场信息与控制条件共同参与预测。</p><div class="model-switch tabbar" aria-label="GeoTransolver 结构层级"><button class="selected" data-geo="geo" aria-pressed="true">当前稳态模型</button><button data-geo="gale" aria-pressed="false">展开 GALE 内部</button></div><div class="model-explorer" data-model="geo" id="geo-explorer"></div></div>
+  <div class="work-notes"><div><span class="eyebrow">RESEARCH IN PROGRESS</span><h3>从路线验证，<br>走向新的工程场景。</h3></div><div class="milestones"><article><span class="step-num">01</span><div><div class="milestone-title"><h4>旧 R8：探索三种预测任务</h4><span class="state done">已有实验</span></div><p>在简化的固定几何上，完成稳态、端点重组与状态递推的实现和验证。它们复用同类骨干与工具链，各自训练权重。</p><details><summary>为什么要区分任务？</summary><p>稳态预测给定工况的最终场；端点重组利用端点场与时间条件构造响应；状态递推从当前状态和控制预测后续状态。时间规律来自任务设计与训练，不是 attention 自动保证。</p><p>旧 R8 的 8 维是四区送风 + 四区热源，与新 CHT 的 8 维控制定义不同。这些结果不能直接作为新 CHT 瞬态精度的证据。</p></details></div></article><article><span class="step-num">02</span><div><div class="milestone-title"><h4>新 CHT：稳态模型与本地交互</h4><span class="state done">本地已接通</span></div><p>建立六机柜的流固传热场景，完成新数据上的稳态训练，并在本地接通工况输入、预测场与可视化。本页展示的仍是已有 CFD 结果。</p><details><summary>查看当前稳态验证范围</summary><p>512 个工况，384 / 64 / 64 划分；固定几何，98,376 个体积单元。测试集位于控制空间的外侧区域，需要结合低风量、高热源等困难组合解释误差。</p><p>归档测试：三组区域平衡的温度 RMSE 约 0.208 K；空气体积加权温度 RMSE 约 0.282 K。两者统计方式不同，不能混用。这些数值不证明跨几何或瞬态精度。</p></details></div></article><article><span class="step-num">03</span><div><div class="milestone-title"><h4>新 CHT：扩展瞬态能力</h4><span class="state pending">继续研究</span></div><p>积累新场景瞬态数据，检查状态定义与时间覆盖，再验证端点响应或递推模型。下一步重点是长期误差、困难工况与展示集成。</p></div></article></div></div>
+  <details class="selection-note"><summary>为什么当前沿用 GeoTransolver？</summary><div class="compare-grid"><div><h4>结构与工程连续性</h4><p>local / global 的组织方式便于接入空间点、当前场与控制条件。相较 DoMINO 多尺度几何、查询读取与局部解码的组合，我更喜欢这条处理路径；这是实现与维护上的取舍。</p></div><div><h4>已有工作比印象更有分量</h4><p>项目已沿这条骨干搭建三类任务，并延伸到 CHT 稳态与本地交互。公开行业案例提供了尝试方向，但不能代替本项目验证。</p></div></div><p>目前没有同数据、同预算、同硬件的公平对照，因此不声称 GeoTransolver 比 DoMINO 更准、更快或更省数据。</p></details>
+</section>
 
-<dialog id="detailed-dialog" aria-labelledby="detailed-title"><div class="dialog-heading"><div><span class="mini-label">DETAILED ARCHITECTURE</span><h2 id="detailed-title">圆柱绕流 PINN · 完整结构图</h2></div><button id="close-detailed" aria-label="关闭完整结构图">✕</button></div><div class="dialog-toolbar"><span>拖动画板平移 · 滚轮缩放</span><div><button id="zoom-out" aria-label="缩小">−</button><button id="zoom-reset">适应画板</button><button id="zoom-in" aria-label="放大">＋</button><a href="assets/pinn-detailed.drawio" download="pinn-detailed.drawio">下载可编辑源 ↗</a></div></div><div class="detailed-viewport" id="detailed-viewport"><img id="detailed-image" src="assets/pinn-detailed.drawio.svg" alt="PINN 从网格采样、共享坐标网络、自动微分到物理残差和参数更新的完整结构图" draggable="false"></div><p class="dialog-note">保留原始模型结构与连线。顶部总图经过简化；完整图包含历史实现中的残差、权重和边界细节。</p></dialog>
-<noscript><p class="noscript">交互模型与流场需要启用 JavaScript。可直接<a href="assets/pinn-detailed.drawio.svg">查看完整结构图</a>。</p></noscript>
-</body></html>
+<section class="chapter closing" id="reflections"><span class="eyebrow">03 / WORKING UNDERSTANDING</span><h2>我现在更关注的，<br>是模型究竟学会了什么。</h2><div class="reflection-grid"><article><span>01</span><h3>先分清任务</h3><p>求解一道 PDE、学习一族工况、预测时间演化，是不同问题。输入、数据划分和验证方式都应围绕任务来定义。</p></article><article><span>02</span><h3>物理信息不是成功保证</h3><p>残差能够写出来，不代表优化容易。需要同时检查数据误差、边界、离散方式与损失尺度。</p></article><article><span>03</span><h3>把证据留在场景里</h3><p>模型名字不能代替实验。固定几何上的结果、旧场景的时间响应和新场景的稳态精度，都有各自的适用范围。</p></article></div><details class="model-comparison"><summary>对照看三种模型在这里扮演的角色</summary><div class="table-scroll"><table><thead><tr><th>本页案例</th><th>输入与主要机制</th><th>如何学习</th><th>验证的边界</th></tr></thead><tbody><tr><td>DoMINO · 建筑风环境</td><td>几何、工况与查询坐标；CNN 几何编码 + 局部解码</td><td>CFD 监督，另有物理约束试验</td><td>需检查几何分组、空间数据与工况覆盖</td></tr><tr><td>PINNs · 圆柱绕流</td><td>(x, y) → MLP → (u, v, p)</td><td>本例用方程与边界；坐标自动微分</td><td>固定几何、固定工况的解</td></tr><tr><td>GeoTransolver · CHT</td><td>点特征与全局控制；软状态聚合与 attention</td><td>已有 CFD 数据监督；任务分别训练</td><td>新 CHT 稳态与旧场景瞬态分别看待</td></tr></tbody></table></div></details><div class="closing-note"><span class="status-dot"></span><p>持续整理中。这里保留结果，也保留试验没有按预期工作的地方。下一步逐项补齐实验对照、训练细节与模型内部交互。</p></div></section>
+</main>
+<footer><div><a class="brand" href="#top"><span class="brand-mark">≈</span> AI × CFD</a><p>Leidafang · 个人研究与实践记录</p></div><div class="footer-links"><a href="https://github.com/Leidafang" target="_blank" rel="noopener">GitHub ↗</a><a href="assets/models-feishu.drawio" download>模型总图 · 可编辑源 ↗</a><a href="https://github.com/MengTo/threeui" target="_blank" rel="noopener">UI 灵感 / ThreeUI ↗</a></div><span class="version">内容整理 · 2026.10</span></footer>
+<noscript><p class="noscript">研究正文可直接阅读。三维预览与模型详情需要 JavaScript；可下载可编辑结构图。</p></noscript>
+</body>
+</html>

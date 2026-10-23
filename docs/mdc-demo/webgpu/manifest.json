@@ -1,0 +1,81 @@
+{
+  "schema": "mdc-webgpu-model-v1",
+  "model_id": "mdc-v6-solid-mask-e300",
+  "geometry_id": "wall98376-global-energy-overlap-v1",
+  "checkpoint_sha256": "d0a0876b9209155053079067e133b122dcb4d2983df611e8e4c892b47ae9eb78",
+  "points": 98376,
+  "air_cells": 92016,
+  "local_width": 5,
+  "output_width": 4,
+  "control_order": [
+    "heat_A",
+    "heat_B",
+    "heat_C",
+    "rack_fan_A",
+    "rack_fan_B",
+    "rack_fan_C",
+    "return_fan",
+    "cooling_water_flow"
+  ],
+  "control_range": [
+    0.1,
+    0.9
+  ],
+  "state_mean": [
+    301.6238860054607,
+    0.0038039152347187155,
+    -0.27307531564702625,
+    0.0022466897912402648
+  ],
+  "state_std": [
+    7.4137442182298905,
+    0.33284070795052145,
+    0.7248602216694029,
+    0.6531840860292176
+  ],
+  "files": {
+    "model.onnx": {
+      "name": "model.onnx",
+      "sha256": "e4b511aec7f483e42a3013081f3c1836bbfd1d26becaa67dff8ad6aa27e247ba",
+      "bytes": 18369445
+    },
+    "local.f32": {
+      "name": "local.f32",
+      "sha256": "8199c9066aa860fba24dfee003d60ea766ed2d4d065c8a9dfadd5e575430e15f",
+      "bytes": 1967520
+    },
+    "geometry.json": {
+      "name": "geometry.json",
+      "sha256": "380bc3282a4f50eb717c14c9faef2e4d3dfbd228da7974a18a31e2d705ab88bc",
+      "bytes": 174420
+    }
+  },
+  "opset": 18,
+  "operators": [
+    "Add",
+    "Cast",
+    "Clip",
+    "Concat",
+    "Constant",
+    "Div",
+    "Einsum",
+    "Erf",
+    "Gather",
+    "LayerNormalization",
+    "MatMul",
+    "Mul",
+    "ReduceSum",
+    "Reshape",
+    "Shape",
+    "Sigmoid",
+    "Slice",
+    "Softmax",
+    "Split",
+    "Sqrt",
+    "Squeeze",
+    "Sub",
+    "Transpose",
+    "Unsqueeze"
+  ],
+  "export_seconds": 0.8061190657317638
+}

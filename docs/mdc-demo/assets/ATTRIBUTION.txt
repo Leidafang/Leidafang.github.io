@@ -1,0 +1,59 @@
+REUSABLE PRESENTATION ASSETS
+
+Trees: EZ-Tree 1.1.0 — Copyright (c) 2024 Daniel Greenheck, MIT.
+Full notice: ./ez-tree/LICENSE
+Project: https://github.com/dgreenheck/ez-tree
+Pinned ESM: https://cdn.jsdelivr.net/npm/@dgreenheck/ez-tree@1.1.0/build/ez-tree.es.js
+SHA256: a08c515049ef2f2606e57523a75dac70f1eebde57d5e972101d7dcf0f42d63ac
+Original bundle retained; Oak Small and Bush 1 presets regenerated with fixed
+seeds and scaled to campus planting height. Embedded leaf images fall under the project
+MIT license; bark images originate from ambientCG under CC0.
+Texture notice: ./ez-tree/TEXTURE_LICENSE.md
+https://github.com/dgreenheck/ez-tree/blob/main/src/app/public/textures/LICENSE.md
+
+Shrub 03 — Rico Cilliers / Poly Haven. CC0 1.0 public-domain dedication.
+https://polyhaven.com/a/shrub_03
+https://polyhaven.com/license
+https://creativecommons.org/publicdomain/zero/1.0/
+Original 1K glTF, shared BIN, diffuse/normal/ARM maps and alpha PNG.
+Presentation changes: separate the four catalog variants, normalize dimensions,
+place in the campus, attach the supplied alpha map without altering bitmap data.
+
+Three.js 0.180.0 — MIT. Full notice: ../vendor/THREE-LICENSE.txt
+RoundedBoxGeometry / BufferGeometryUtils / GLTFLoader / analytic Sky are from the pinned
+project dependency; no runtime CDN is used.
+
+Grass004 — ambientCG / Lennart Demes, CC0 1.0.
+https://ambientcg.com/view?id=Grass004
+https://docs.ambientcg.com/license/
+https://ambientcg.com/get?file=Grass004_1K-JPG.zip
+Original 1K JPG Color / NormalGL / Roughness, 1.4 m physical tile.
+
+Clean Asphalt — Dimitrios Savva / Poly Haven, CC0 1.0. Physical tile 2.1 m.
+https://polyhaven.com/a/clean_asphalt
+Concrete Pavement 02 — Charlotte Baglioni / Poly Haven, CC0 1.0.
+Display repeats: equipment 1.8 m; main plaza and footpaths 3.6 m.
+https://polyhaven.com/a/concrete_pavement_02
+https://polyhaven.com/license
+Original 1K JPG diffuse / OpenGL normal / roughness maps, locally renamed.
+https://creativecommons.org/publicdomain/zero/1.0/
+All surface bitmap pixels are unmodified. Only colour maps use sRGB decoding;
+normal/roughness data remain linear. No runtime asset requests to third parties.
+Leaves use outdoor PBR shading; their original images and notices are unchanged.
+
+The container shell is bespoke illustrative geometry fitted to the CFD room.
+It is not manufacturer CAD or an ISO-dimension-certified shipping container.
+Vegetation, exterior panels and service fittings are display-only and do not
+change CFD occupancy, temperature, trajectories or boundary conditions.
+
+Glodon / 广联达 logo
+User-supplied brand asset, glodon-logo.png. Original PNG preserved unchanged.
+Brand/trademark rights remain with the respective owner; this asset is not
+covered by the MIT or CC0 licenses of the vegetation and surface materials.
+
+Office architecture: bespoke Three.js model referencing the user-supplied
+Glodon office photograph. Six storeys and 32 x 14 x 18.65 m are illustrative
+model dimensions, not surveyed dimensions or vendor CAD. The reference photo
+is not bundled. Roof lettering traces the supplied Glodon alpha/colour contours
+into shallow extruded geometry, with simplified pixel edges and retained holes.
+The original logo PNG is unchanged; no white matte or signboard is rendered.

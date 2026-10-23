@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Predict steady airflow and temperature in a six-rack modular data center using eight adjustable controls and five parameter presets." data-i18n-content="六机柜闭环模块化数据中心：八个参数与五组预设驱动 AI 稳态热流场预测。">
+  <meta name="color-scheme" content="light">
+  <title data-i18n="广联达 · 模块化数据中心热流场">Glodon · Modular Data Center Thermal Flow</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./controls.css">
+  <link rel="stylesheet" href="./transient.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
+</head>
+<body>
+  <main id="app" class="field-hidden">
+    <header>
+      <div class="identity"><div><h1><span data-i18n="模块化数据中心">Modular Data Center</span></h1><p><span data-i18n="闭环 CHT · 三维热流场">Closed-loop CHT · 3D thermal flow</span></p></div></div>
+      <div class="case"><span class="status-dot"></span><span id="source-label" data-i18n="稳态结果">Steady state</span> <span class="muted">/</span> <span id="header-power">—</span> kW</div>
+      <div class="header-actions"><div class="language-switch" role="group" aria-label="Language / 语言"><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button><button type="button" data-language="zh" lang="zh-CN" aria-label="中文" aria-pressed="false">中文</button></div>
+      <button id="fullscreen" class="quiet" title="Enter fullscreen" data-i18n-title="全屏展示"><span data-i18n="全屏 ↗">Fullscreen ↗</span></button></div>
+    </header>
+    <section id="stage" aria-label="Interactive 3D airflow field" data-i18n-aria="交互式三维气流场">
+      <canvas id="scene" tabindex="0" aria-label="3D model: drag to rotate, scroll to zoom, right-drag to pan. Preset view buttons are also available." data-i18n-aria="三维模型：拖动旋转，滚轮缩放，右键拖动平移。亦可用上方预设视角按钮。"></canvas>
+      <div id="ai-unavailable" class="ai-unavailable" role="alert" hidden>
+        <span class="warning-icon" aria-hidden="true">⚠</span>
+        <strong data-i18n="当前设备不支持 AI 预测">AI prediction unavailable on this device</strong>
+        <p id="ai-unavailable-reason"></p>
+        <p data-i18n="不显示稳态流场；瞬态演示仍可使用。">Steady fields are unavailable. Transient playback remains available.</p>
+      </div>
+      <div id="labels" aria-hidden="true"></div>
+      <nav class="views" aria-label="Camera views" data-i18n-aria="查看角度">
+        <button data-view="campus" aria-pressed="true"><span data-i18n="园区">Campus</span></button>
+        <button data-view="overview" aria-pressed="false"><span data-i18n="整体">Overview</span></button>
+        <button data-view="hot" aria-pressed="false"><span data-i18n="热侧">Hot aisle</span></button>
+        <button data-view="section" aria-pressed="false"><span data-i18n="纵剖面">Section</span></button>
+        <button data-view="plenum" aria-pressed="false"><span data-i18n="地板下">Underfloor</span></button>
+        <button data-view="solid" aria-pressed="false"><span data-i18n="服务器温度">Rack temperature</span></button>
+      </nav>
+      <div id="loading" role="status"><span class="loader"></span><span data-i18n="准备三维场景…">Preparing the 3D scene…</span></div>
+      <aside id="info">
+        <div class="panel-heading"><div><div class="eyebrow">THERMAL EXPLORER</div><h2><span data-i18n="场景控制">Scene controls</span></h2></div><span class="panel-status">30 kW</span></div>
+        <div class="mode-switch" role="group" aria-label="Simulation mode"><button id="mode-ai" aria-pressed="true" data-i18n="AI稳态预测">AI steady</button><button id="mode-transient" aria-pressed="false" data-i18n="CFD瞬态演示">CFD transient</button></div>
+        <section id="transient-controls-panel" hidden>
+          <div class="transient-kicker">TRANSIENT / 01</div>
+          <h3 data-i18n="增载主导">Load increase</h3>
+          <div class="transient-load"><span>24.47 <small>kW</small></span><span class="transient-arrow">→</span><strong>36.64 <small>kW</small></strong></div>
+          <p id="transient-range-caption" class="transient-caption" data-i18n="增载案例 · 0–30秒本地预览">Load increase · 0–30 s local preview</p>
+          <div id="transient-endpoints" class="transient-endpoints" role="group" aria-label="Inspect steady endpoints">
+            <button id="transient-initial" aria-pressed="true">P0 Initial steady</button>
+            <button id="transient-target" aria-pressed="false">P1 Target steady</button>
+          </div>
+          <button id="transient-start" class="transient-primary" data-i18n="开始工况切换">Start transition</button>
+          <button id="transient-animation" class="transient-target" hidden>Pause particles</button>
+          <p id="transient-message" role="status" class="transient-caption"></p>
+          <div class="transient-stats"><div><span data-i18n="最高空气温度">Peak air temp.</span><strong id="transient-air">—</strong></div><div><span data-i18n="最高发热板温度">Peak plate temp.</span><strong id="transient-rack">—</strong></div></div>
+          <div class="transient-chart-title" data-i18n="六柜平均温度 · °C">Six rack mean temperatures · °C</div>
+          <canvas id="transient-chart" width="260" height="118" aria-label="Rack mean temperatures over time"></canvas>
+          <div class="transient-rack-key"><span>R1</span><span>R2</span><span>R3</span><span>R4</span><span>R5</span><span>R6</span></div>
+          <details class="transient-params"><summary data-i18n="切换前后参数">Before / after controls</summary><table id="transient-controls"></table></details>
+          <button id="transient-final" class="transient-target" aria-pressed="false">View final transient frame (60 s)</button>
+        </section>
+        <details id="ai-controls" class="ai-controls" open>
+          <summary data-i18n="AI 调参预测">AI parameter prediction</summary>
+          <form id="ai-form">
+            <div id="ai-compat-warning" class="ai-compat-warning" role="alert" hidden>
+              <strong><span aria-hidden="true">⚠</span> <span data-i18n="当前设备不支持 AI 预测">AI prediction unavailable on this device</span></strong>
+              <p id="ai-compat-reason"></p>
+              <p data-i18n="不显示稳态流场；瞬态演示仍可使用。">Steady fields are unavailable. Transient playback remains available.</p>
+            </div>
+            <label class="field-label case-label" for="ai-preset" data-i18n="参数预设">Parameter preset</label>
+            <select id="ai-preset" aria-describedby="preset-hint"></select>
+            <p id="preset-hint" class="ai-hint" data-i18n="选择预设或调整表盘，点击预测后更新结果。">Choose a preset or adjust the dials, then predict to update the result.</p>
+            <div id="ai-dials" class="ai-dials"></div>
+            <p id="ai-range-note" class="ai-hint" data-i18n="红蓝弧表示冷热趋势；外圈斜纹为外推区，深色刻线内为训练范围。">Red/blue shows thermal tendency. Hatched outer arcs mark extrapolation; dark ticks bound the training range.</p>
+            <p class="ai-hint" data-i18n="风量重分配会影响局部温度，实际结果以预测为准；进水固定 15°C。">Airflow redistribution affects local temperatures; use the prediction to assess the result. Water inlet fixed at 15°C.</p>
+            <p id="ai-domain" class="ai-domain" role="status"></p>
+            <div class="ai-action">
+              <button id="ai-predict" type="submit" disabled><span id="ai-predict-label">Predict steady field</span></button>
+              <div id="ai-progress" role="progressbar" aria-label="Prediction progress" hidden></div>
+            </div>
+            <p id="ai-local-note" class="ai-hint" hidden></p>
+            <p id="ai-status" role="status" aria-live="polite"></p>
+          </form>
+        </details>
+        <p id="case-status" class="case-status" role="status"></p>
+        <div class="panel-tabs" role="tablist" aria-label="Control panel sections" data-i18n-aria="控制面板分组">
+          <button role="tab" id="tab-inspect" aria-controls="panel-inspect" aria-selected="true" data-panel="inspect"><span data-i18n="查看">Inspect</span></button>
+          <button role="tab" id="tab-flow" aria-controls="panel-flow" aria-selected="false" tabindex="-1" data-panel="flow"><span data-i18n="气流">Airflow</span></button>
+          <button role="tab" id="tab-scene" aria-controls="panel-scene" aria-selected="false" tabindex="-1" data-panel="scene"><span data-i18n="场景">Scene</span></button>
+          <button role="tab" id="tab-case" aria-controls="panel-case" aria-selected="false" tabindex="-1" data-panel="case"><span data-i18n="工况">Case</span></button>
+        </div>
+        <section id="panel-inspect" role="tabpanel" aria-labelledby="tab-inspect">
+          <div class="eyebrow"><span data-i18n="温度与部件">Temperature &amp; components</span></div>
+          <p class="panel-help" id="view-help"><span data-i18n="园区视角展示办公楼与数据中心的联系；外部环境为概念设计。">Explore the office and data center connection. The external campus is conceptual.</span></p>
+          <label class="field-label" for="solid-field"><span data-i18n="固体温度显示">Solid temperature</span></label>
+          <select id="solid-field"><option value="off" data-i18n="关闭 · 展示设备外观">Off · equipment appearance</option><option value="coil" data-i18n="换热器 · 地板下">Heat exchanger · underfloor</option><option value="racks" data-i18n="服务器 · 等效发热板">Racks · equivalent heat plates</option></select>
+          <p class="panel-help" id="solid-note"><span data-i18n="选择固体场时自动切换到对应视角，空气粒子保持运行。">Selecting a solid field opens its inspection view. Air particles remain active.</span></p>
+          <label class="toggle"><input type="checkbox" id="xray" checked><span><span data-i18n="机柜透视">Rack transparency</span></span></label>
+          <label class="toggle"><input type="checkbox" id="showlabels" checked><span><span data-i18n="部件标注">Component labels</span></span></label>
+          <label class="toggle transient-slice-toggle" hidden><input id="transient-slice" type="checkbox"><span data-i18n="空气温度切面">Air temperature section</span></label>
+          <div class="inspection-tip"><span data-i18n="拖动旋转 / 滚轮缩放">Drag to rotate / scroll to zoom</span><br><span data-i18n="点击机柜可查看功率与固体均温">Click a rack for heat load and mean solid temperature</span></div>
+        </section>
+        <section id="panel-flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+          <div class="transient-flow" hidden><p class="panel-help" data-i18n="粒子按时变速度场运动，零速处保留；短尾迹显示最近0.3秒的运动。">Particles follow the time-varying field and remain at zero speed. Trails show the last 0.3 s.</p><label class="toggle"><input id="transient-particles" type="checkbox" checked><span data-i18n="显示瞬态粒子">Transient particles</span></label><label class="toggle"><input id="transient-trails" type="checkbox" checked><span data-i18n="显示短尾迹">Short trails</span></label><div class="transient-density"><label for="transient-density"><span data-i18n="显示粒子数量">Displayed particles</span><output id="transient-density-value" for="transient-density">1000</output></label><input id="transient-density" type="range" min="500" max="4000" step="250" value="1000" disabled aria-describedby="transient-density-note"><div class="transient-density-ticks"><span>500</span><span id="transient-density-max">4000</span></div><p id="transient-density-note" class="panel-help"></p></div></div>
+          <div class="steady-flow">
+          <label class="toggle"><input type="checkbox" id="original-flow" checked><span data-i18n="显示原流线粒子">Show original flow tracers</span></label>
+          <div class="eyebrow"><span data-i18n="空气示踪">Air tracers</span></div>
+          <p class="panel-help"><span data-i18n="位置来自稳态速度场积分，颜色是当地空气温度。底栏控制播放与整体速度。">Paths are integrated from the steady velocity field; color shows local air temperature. Playback controls are below.</span></p>
+          <label class="toggle"><input type="checkbox" id="streamlines" checked><span><span data-i18n="流线轨迹">Streamline trails</span></span></label>
+          <div class="range-label"><label for="density"><span data-i18n="气流密度">Flow density</span></label><output id="density-label"><span data-i18n="标准">Standard</span></output></div>
+          <input id="density" type="range" min="1" max="6" step="1" value="3">
+          <p class="density-help" data-i18n="同步调整流线与粒子数量。">Adjusts paths and particles together.</p>
+          <label class="toggle"><input type="checkbox" id="fanslow"><span><span data-i18n="叶片慢放 ×1/30">Slow blades ×1/30</span></span></label>
+          <p class="panel-help"><span data-i18n="叶片慢放仅影响风扇外观，不改变空气运动速度。转速为未标定的展示假设。">Slow blades affect fan appearance only, not airflow timing. RPM values are uncalibrated display assumptions.</span></p>
+                  </div>
+        </section>
+        <section id="panel-scene" role="tabpanel" aria-labelledby="tab-scene" hidden>
+          <div class="eyebrow"><span data-i18n="环境与外观">Environment &amp; appearance</span></div>
+          <label class="toggle"><input type="checkbox" id="environment" checked><span><span data-i18n="办公楼与园区环境">Office &amp; campus</span></span></label>
+          <label class="toggle"><input type="checkbox" id="detail" checked><span><span data-i18n="设备细节 · 示意外观">Equipment detail · illustrative</span></span></label>
+          <label class="toggle"><input type="checkbox" id="shell"><span><span data-i18n="完整集装箱外壳">Complete container shell</span></span></label>
+          <p class="panel-help"><span data-i18n="默认剖开前壁与屋顶，展示内部热流。打开完整外壳查看波纹板、检修门和运输框架；实体外壳会遮挡内部。">The front wall and roof are cut away by default. Enable the complete shell to see corrugated panels, service doors and frame; it will obscure the interior.</span></p>
+          <p class="panel-help"><span data-i18n="园区只在“园区 / 整体”视角显示。固体温度视角使用真实计算板件，自动隐藏对应的装饰外观。">The campus appears only in Campus / Overview. Solid-temperature views show the actual CFD plates and hide the corresponding decorative geometry.</span></p>
+        </section>
+        <section id="panel-case" role="tabpanel" aria-labelledby="tab-case" hidden>
+        <div class="eyebrow"><span data-i18n="R8 控制参数">R8 control parameters</span></div>
+        <div class="r8-controls">
+          <table class="r8-table" aria-label="R8 control parameters" data-i18n-aria="R8 控制参数">
+            <thead><tr><th scope="col" data-i18n="柜组">Group</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th></tr></thead>
+            <tbody>
+              <tr id="group-power"><th scope="row"><span data-i18n="热功率">Heat load</span> <small>kW</small></th><td>—</td><td>—</td><td>—</td></tr>
+              <tr id="rack-fans"><th scope="row"><span data-i18n="风机倍率">Fan speed</span> <small>×</small></th><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <div class="metric r8-control"><span data-i18n="回风倍率">Return fan</span><strong id="return-fan">—</strong></div>
+          <div class="metric r8-control"><span data-i18n="水流量">Water flow</span><strong id="water-flow">—</strong></div>
+        </div>
+        <div class="eyebrow"><span data-i18n="计算结果与固定条件">Results &amp; fixed conditions</span></div>
+        <div class="metric"><span><span data-i18n="机柜总发热">Rack heat load</span></span><strong id="power">—</strong></div>
+        <div class="metric"><span><span data-i18n="冷侧送风">Cold supply</span></span><strong id="supply">—</strong></div>
+        <div class="metric"><span><span data-i18n="热侧回风">Hot return</span></span><strong id="return">—</strong></div>
+        <div class="metric"><span><span data-i18n="水侧取热">Heat to water</span></span><strong id="cooling">—</strong></div>
+        <div class="metric"><span><span data-i18n="实际回风量">Actual return airflow</span></span><strong id="airflow">—</strong></div>
+        <div class="metric"><span><span data-i18n="进水 → 回水">Water in → out</span></span><strong id="water">—</strong></div>
+        <div class="metric"><span><span data-i18n="最高空气温度">Peak air temp.</span></span><strong id="air-max">—</strong></div>
+        <div class="metric"><span><span data-i18n="最高发热板温度">Peak plate temp.</span></span><strong id="rack-max">—</strong></div>
+        <p id="metric-estimates" class="metric-estimates" hidden></p>
+        <p id="case-note" class="panel-help"></p>
+        <details><summary><span data-i18n="数据与建模说明">Data &amp; modeling notes</span></summary><div class="details-content">
+          <p data-i18n="本展示使用基于 CFD 数据训练的 AI 模型，根据八个控制参数预测稳态温度和空气速度。五组预设仅用于填入参数，结果均通过 AI 预测生成。">This viewer uses an AI model trained on CFD data to predict steady-state temperature and air velocity from eight control parameters. The five presets fill in parameters; all displayed results are generated by AI prediction.</p>
+          <p data-i18n="粒子沿预测流线运动，颜色表示空气温度。粒子数量不表示风量，叶片慢放只影响风扇动画，不改变粒子运动速度。">Particles follow predicted streamlines, with color indicating air temperature. Particle count does not represent airflow rate. Slow blades affect only the fan animation, not particle speed.</p>
+          <p data-i18n="机柜和换热器采用等效热模型，所示温度不是 CPU 结温。办公楼、绿化及设备外观用于场景展示，不参与热流计算。">Racks and the heat exchanger use equivalent thermal models; displayed temperatures are not CPU junction temperatures. The office, landscaping and decorative equipment geometry are visual context and do not participate in the thermal-flow calculation.</p>
+          <p data-i18n="空气、机柜和冷板分别使用本次预测的温度范围，六柜共用机柜色标。比较不同结果时，请以色标数值为准。">Air, racks and cooling plates each use their own temperature range from the current prediction. All six racks share one rack scale. Compare the numerical legends when comparing results.</p>
+          <p data-i18n="送回风温度和回风量由预测流场计算；水侧取热和回水温度由预测冷板温度、水流量及等效换热模型估算，进水温度固定为 15°C。">Supply and return air temperatures and return airflow are calculated from the predicted field. Heat removal and return-water temperature are estimated from predicted cooling-plate temperatures, water flow and the equivalent heat-exchange model. Inlet water temperature is fixed at 15°C.</p>
+          <p data-i18n="超出训练范围的参数越多、偏离幅度越大，预测误差可能越大。当前模型尚未完成实际设备标定。">Prediction errors may increase as more parameters fall outside the training range and deviate further from it. The model has not yet been calibrated against actual equipment.</p>
+          <p><a href="./assets/ATTRIBUTION.txt" target="_blank" rel="noopener"><span data-i18n="资产来源与许可证 ↗">Asset sources &amp; licenses ↗</span></a></p>
+        </div></details>
+        </section>
+      </aside>
+      <div id="selection" hidden><button id="close-selection" aria-label="Close component details" data-i18n-aria="关闭部件说明">×</button><h3></h3><p></p></div>
+      <div class="legend"><div><span class="legend-dot"></span><span data-i18n="粒子 · 空气温度">Particles · air temperature</span> <span class="unit">°C</span></div><canvas id="colorbar" width="300" height="12"></canvas><div class="ticks"><span id="tmin">—</span><span id="tmid">—</span><span id="tmax">—</span></div></div>
+      <div id="solid-legend" class="legend solid-legend" hidden><div><span id="solid-title"><span data-i18n="固体温度">Solid temperature</span></span><span class="unit">°C</span></div><canvas id="solid-colorbar" width="300" height="12"></canvas><div class="ticks"><span id="solid-min">—</span><span id="solid-mid">—</span><span id="solid-max">—</span></div><p><span data-i18n="实际固体单元温度 · 独立色标">Actual solid-cell T · separate scale</span></p></div>
+      <div class="hint"><span data-i18n="拖动旋转 · 滚轮缩放 · 点击机柜查看">Drag to rotate · scroll to zoom · click a rack</span></div>
+    </section>
+    <footer>
+      <div id="transient-timeline" hidden><button id="transient-reset" data-i18n="重置">Reset</button><div class="transient-time-main"><div class="transient-time-head"><strong id="transient-phase">P0</strong><output id="transient-seconds">0.00 / 30.00 s</output></div><input id="transient-time" aria-label="Transient time (seconds)" type="range" min="0" max="30" step="0.01" value="0"><div class="transient-time-ticks"><span>0 s</span><span>10 s</span><span>20 s</span><span>30 s</span></div></div><select id="transient-speed" aria-label="Transient playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
+      <button id="play" class="play" aria-label="Pause particle animation" data-i18n-aria="暂停粒子动画">Ⅱ</button>
+      <div class="playback"><strong id="play-state"><span data-i18n="气流运动">Airflow in motion</span></strong><span><span data-i18n="稳态场中的示踪粒子">Tracers in a steady flow field</span></span></div>
+      <div class="speed"><label for="speed"><span data-i18n="播放速度">Playback speed</span></label><input id="speed" type="range" min="0.2" max="2" step="0.1" value="1"><output id="speed-label">1.0×</output></div>
+      <div class="brand"><img class="brand-logo" src="./assets/brand/glodon-logo.png" alt="Glodon / 广联达" width="346" height="33"></div>
+    </footer>
+  </main>
+  <script type="module" src="./i18n.js"></script>
+  <script type="module" src="./viewer.js"></script>
+</body>
+</html>

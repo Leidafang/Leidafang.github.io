@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import {AdvectionField} from './advection-field.js';
 import {CONTROL_ORDER,validateCase} from './case-data.js';
 const digest=async a=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',a)),v=>v.toString(16).padStart(2,'0')).join('');

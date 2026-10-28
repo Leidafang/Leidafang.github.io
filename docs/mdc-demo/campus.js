@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import * as THREE from 'three';
 import {addTree,addShrub,addPlanterBush} from './vegetation.js';
 import {groundSurface,grassBed,pavedSlab} from './landscape.js';

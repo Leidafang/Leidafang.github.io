@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 // Browser-independent numerical helpers, tested against the exported data.
 // Same physical range; saturated cool/warm branches emphasize the aisle contrast.
 export const COLOR_STOPS = [[0,[24,80,255]], [.25,[0,169,255]], [.46,[32,221,242]], [.54,[255,181,32]], [.75,[255,76,12]], [1,[255,24,66]]];

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import * as ort from './vendor/ort/ort.webgpu.bundle.min.mjs';
 const root=new URL('./webgpu/',import.meta.url).href;
 const hash=async b=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b)),n=>n.toString(16).padStart(2,'0')).join('');

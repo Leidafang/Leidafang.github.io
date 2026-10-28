@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 // Pure numerical kernel. World coordinates in metres, U in m/s, time in seconds.
 // No lifetime, low-speed cut-off, random kick, normalization or automatic respawn.
 const requireValue=(ok,msg)=>{if(!ok)throw new Error(msg);};

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 // Chinese source strings are stable message IDs; English is the first-visit default.
 // Labels use textContent, so translations and interpolated values cannot inject HTML.
 export const messages = {

@@ -1,0 +1,34 @@
+MDC Demo — Limited Online Demonstration Permission
+Copyright (c) 2026 广联达科技股份有限公司. All rights reserved.
+Contact for written permission: xiongyn@glodon.com
+Version: 2026-10-28
+
+中文
+本声明适用于本演示中权利人拥有的专有代码、训练后模型权重、模型配套文件和展示数据。
+仅允许通过本网页进行在线体验，以及为此必需的浏览器自动加载和缓存。
+除法律规定、第三方许可证或托管平台适用条款另有允许外，未经事先书面许可，
+不得提取或另行保存上述材料，不得复制、修改、再分发、重新部署、用于其他系统、
+模型训练/蒸馏或商业用途。在线可访问不等于开源或获得上述授权。
+如需下载、研究复用、集成或商业合作，请先联系 xiongyn@glodon.com，说明身份、
+拟使用材料、用途和分发范围，取得书面许可后再使用。发送申请或点击进入演示不代表获批。
+
+第三方组件、第三方模型基础代码和素材的权利及原有许可证不受本声明限制。
+请同时参阅 vendor/ 中的许可证、assets/ATTRIBUTION.txt 和各素材目录的许可证。
+本声明只适用于权利人有权授权的部分，不改变其他部分已有的许可。
+
+English
+This notice covers the proprietary code, trained model weights, supporting model files,
+and presentation data owned by the rights holder in this demo.
+Permission is limited to online evaluation through this webpage and the browser loading
+and caching necessary for that evaluation.
+Except as otherwise permitted by law, applicable third-party licenses or hosting-platform
+terms, prior written permission is required to extract or separately retain these materials,
+copy, modify, redistribute, redeploy, integrate them into another system, use them for model
+training/distillation, or use them commercially. Public availability is not an open-source license.
+For downloads, research reuse, integration or commercial cooperation, contact
+xiongyn@glodon.com with your identity, requested materials, intended use and distribution scope.
+Submitting a request or entering the demo does not grant that permission.
+
+Third-party components, third-party model base code and assets retain their own rights and
+licenses. See vendor/ licenses, assets/ATTRIBUTION.txt and the relevant asset directories.
+This notice only applies to portions the rights holder is entitled to license.

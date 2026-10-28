@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import {locate} from './flow-math.js';
 // Distance-based fading avoids bright particles dwelling at low-speed wall ends.
 // A cut view retains only sufficiently long contiguous visible pieces. Never

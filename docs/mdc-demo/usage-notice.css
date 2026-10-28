@@ -1,0 +1,11 @@
+/* Copyright (c) 2026 广联达科技股份有限公司. See LICENSE.txt. */
+.usage-pending #app {visibility:hidden}
+#usage-dialog {color:#18374b;background:#fff;border:1px solid #d3e3ec;border-top:4px solid #0085ce;border-radius:14px;width:min(590px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:28px;box-shadow:0 24px 90px #00182c55}
+#usage-dialog::backdrop {background:#0b1d2bdc;backdrop-filter:blur(5px)}
+.usage-top,.usage-actions,.usage-languages {display:flex;align-items:center;gap:10px}.usage-top {justify-content:space-between}.usage-languages button {padding:6px 9px}.usage-languages [aria-pressed=true] {color:white;background:#0085ce;border-color:#0085ce}
+#usage-dialog .usage-kicker {font-size:11px;letter-spacing:.16em;color:#0085ce;margin:26px 0 8px}#usage-dialog h2 {font-size:24px;margin:0 0 16px}#usage-dialog p {font-size:14px;line-height:1.75}#usage-dialog .usage-intro {font-size:16px;font-weight:600}#usage-dialog .usage-third {font-size:12px;color:#597083}
+.usage-contact {padding:12px 16px;border-left:3px solid #66b821;background:#f0f7fb;border-radius:4px}.usage-mail {font-weight:700}#usage-dialog .usage-contact p {font-size:12px;margin:6px 0 0}.usage-terms {display:inline-block;font-size:12px;margin:14px 0}
+.usage-consent {display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.65}.usage-consent input {flex:none;margin-top:4px;accent-color:#0085ce}.usage-actions {justify-content:space-between;margin-top:22px}.usage-actions a {font-size:13px}.usage-actions button {background:#0085ce;color:white;border-color:#0085ce}.usage-actions button:disabled {cursor:not-allowed}
+#usage-dialog .usage-owner {font-size:11px;color:#597083;margin:22px 0 0}#usage-error {color:#a23026}.usage-consent[hidden],.usage-actions [hidden] {display:none}
+#usage-open {font-size:12px;padding:7px 10px;white-space:nowrap}.brand {display:flex;flex-direction:column;gap:6px;align-items:flex-end}#usage-stamp {font-size:10px;color:#536b7b;white-space:nowrap}
+@media(max-width:600px){#usage-dialog {padding:20px}#usage-dialog h2 {font-size:21px}#usage-dialog p {font-size:13px}.usage-actions {flex-wrap:wrap}.usage-actions button {flex:1}.header-actions {gap:6px}#usage-open {padding:6px}#usage-stamp {white-space:normal}.brand {align-items:flex-start}}

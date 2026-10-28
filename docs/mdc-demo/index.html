@@ -9,14 +9,16 @@
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./controls.css">
   <link rel="stylesheet" href="./transient.css">
+  <link rel="stylesheet" href="./usage-notice.css">
+  <link rel="license" href="./LICENSE.txt">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
-<body>
+<body class="usage-pending">
   <main id="app" class="field-hidden">
     <header>
       <div class="identity"><div><h1><span data-i18n="模块化数据中心">Modular Data Center</span></h1><p><span data-i18n="闭环 CHT · 三维热流场">Closed-loop CHT · 3D thermal flow</span></p></div></div>
       <div class="case"><span class="status-dot"></span><span id="source-label" data-i18n="稳态结果">Steady state</span> <span class="muted">/</span> <span id="header-power">—</span> kW</div>
-      <div class="header-actions"><div class="language-switch" role="group" aria-label="Language / 语言"><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button><button type="button" data-language="zh" lang="zh-CN" aria-label="中文" aria-pressed="false">中文</button></div>
+      <div class="header-actions"><button id="usage-open" type="button">Usage terms</button><div class="language-switch" role="group" aria-label="Language / 语言"><button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button><button type="button" data-language="zh" lang="zh-CN" aria-label="中文" aria-pressed="false">中文</button></div>
       <button id="fullscreen" class="quiet" title="Enter fullscreen" data-i18n-title="全屏展示"><span data-i18n="全屏 ↗">Fullscreen ↗</span></button></div>
     </header>
     <section id="stage" aria-label="Interactive 3D airflow field" data-i18n-aria="交互式三维气流场">
@@ -167,10 +169,10 @@
       <button id="play" class="play" aria-label="Pause particle animation" data-i18n-aria="暂停粒子动画">Ⅱ</button>
       <div class="playback"><strong id="play-state"><span data-i18n="气流运动">Airflow in motion</span></strong><span><span data-i18n="稳态场中的示踪粒子">Tracers in a steady flow field</span></span></div>
       <div class="speed"><label for="speed"><span data-i18n="播放速度">Playback speed</span></label><input id="speed" type="range" min="0.2" max="2" step="0.1" value="1"><output id="speed-label">1.0×</output></div>
-      <div class="brand"><img class="brand-logo" src="./assets/brand/glodon-logo.png" alt="Glodon / 广联达" width="346" height="33"></div>
+      <div class="brand"><img class="brand-logo" src="./assets/brand/glodon-logo.png" alt="Glodon / 广联达" width="346" height="33"><span id="usage-stamp">Online demo · Permission required for reuse</span></div>
     </footer>
   </main>
   <script type="module" src="./i18n.js"></script>
-  <script type="module" src="./viewer.js"></script>
+  <script type="module" src="./usage-notice.js"></script>
 </body>
 </html>

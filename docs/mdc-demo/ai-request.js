@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import {loadCase} from './case-data.js';
 export const AI_MODEL='mdc-v6-solid-mask-e300',AI_GEOMETRY='wall98376-global-energy-overlap-v1';
 export function controlsFromEngineering(values){

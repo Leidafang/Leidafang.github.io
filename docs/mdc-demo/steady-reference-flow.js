@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import * as THREE from 'three';
 import {samplePath,phaseTime} from './flow-math.js';
 import {PARTICLE_SAMPLES,TRAIL_STEP_S,particleGeometry,particleMaterial,particleColors,particleVertex} from './particle-style.js';

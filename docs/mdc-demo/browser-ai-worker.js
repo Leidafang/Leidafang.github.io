@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import {createBrowserModel} from './webgpu-runtime.js';
 import {presentPrediction} from './webgpu-presentation.js';
 let model,geometry,busy=false;

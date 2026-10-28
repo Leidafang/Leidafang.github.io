@@ -1,3 +1,4 @@
+// Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 // Explicit v6 steady-state contract. No transient interpolation or legacy R8 indexing.
 export const CONTROL_ORDER=['heat_A','heat_B','heat_C','rack_fan_A','rack_fan_B','rack_fan_C','return_fan','cooling_water_flow'];
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);

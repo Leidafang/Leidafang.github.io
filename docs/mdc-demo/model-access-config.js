@@ -1,0 +1,1 @@
+export const modelAccessConfig=Object.freeze({"enabled": true, "endpoint": "https://mdc-prie-fffbbb-djeeftwvjj.cn-shanghai.fcapp.run", "delivery": "oss-signed-url", "assetOrigin": "https://mdc-private-7514fffbb70b.oss-cn-shanghai.aliyuncs.com"});

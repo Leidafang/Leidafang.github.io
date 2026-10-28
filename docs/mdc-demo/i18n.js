@@ -2,6 +2,9 @@
 // Chinese source strings are stable message IDs; English is the first-visit default.
 // Labels use textContent, so translations and interpolated values cannot inject HTML.
 export const messages = {
+  "仍可查看名义 CFD 工况和瞬态演示。": "Nominal CFD and transient playback remain available.",
+"未解锁时展示预计算名义 CFD 工况。授权后下载模型，在访问者 GPU 上根据八个参数预测稳态温度和空气速度；五组预设用于填参。": "Before unlocking, the viewer shows precomputed nominal CFD. Authorized users download the model and predict steady fields on their GPU. Five presets fill in controls.",
+  "当前展示名义 CFD 工况；解锁后可在本机运行 AI 预测。": "Showing nominal CFD. Unlock to run AI predictions on your GPU.",
   "准备三维场景…": "Preparing the 3D scene…",
   "不显示稳态流场；瞬态演示仍可使用。": "Steady fields are unavailable. Transient playback remains available.",
   "当前设备无法预测稳态流场；可切换到瞬态演示。": "Steady AI prediction is unavailable on this device. You can use transient playback.",

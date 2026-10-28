@@ -12,8 +12,9 @@ import {prepareVegetation,vegetationStats} from './vegetation.js';
 import {prepareLandscape,landscapeStats} from './landscape.js';
 import {exposedBlocks,outsideBlocks} from './render-geometry.js';
 
-import {loadCatalog,loadEmptyScene} from './case-data.js';
+import {loadCatalog,loadEmptyScene,loadCase} from './case-data.js';
 import {controlsFromEngineering,controlDomain,predictCase,AI_MODEL,AI_GEOMETRY} from './ai-request.js';
+import {protectedModels,modelUnlocked,mountModelAccess,refreshAccess} from './model-access.js';
 import {localAI,browserAIStatus,predictBrowserCase} from './browser-ai.js';
 import {bindDials} from './ai-dials.js';
 import {createTransientPlayer} from './transient-player.js';
@@ -31,6 +32,7 @@ const transientEntry=new URLSearchParams(location.search).get('mode')==='transie
 let aiLastError=null;
 // Empty while checking or compatible; an incompatible device shows a warning only.
 let aiCompatibilityIssue="";
+let nominalData=null;
 let fieldReady=false,aiStage='idle',aiReady=false,aiBusy=false,aiMessage='连接本地 AI 服务后可预测。',aiMessageError=false;
 let flowVisibility=[],traceMode=null,traceDensity=NaN,activePathIndices=[];
 const particlesPerPath=4;
@@ -521,7 +523,8 @@ function installField(data){
 async function start(){
   if(!transientEntry){await Promise.all([prepareVegetation(),prepareLandscape(),prepareCampus()]);campusReady=true;}
   catalog=await loadCatalog();
-  const data=await loadEmptyScene(catalog);
+  const data=protectedModels?await loadCase(catalog,'nominal'):await loadEmptyScene(catalog);
+  if(protectedModels){nominalData=data;fieldReady=true;}
   manifest=data.manifest;packed=data.packed;
   solidFields=buildSolidFields(data.solidMeta,data.solid);
   for(const entry of catalog.cases){const option=document.createElement('option');option.value=entry.id;$('ai-preset').appendChild(option);}
@@ -584,17 +587,19 @@ function fillPresetControls(entry){
   [...e.group_heat_kW,...e.rack_fan_multipliers,e.return_fan_multiplier,e.water_mass_flow_kg_s].forEach((value,i)=>{$('ai-u'+i).value=Number(value.toFixed(12));});
 }
 function refreshAI(){
+  refreshAccess();
+  const locked=protectedModels&&!modelUnlocked();
   $('ai-local-note').hidden=!localAI;
   $('ai-local-note').textContent=t('本机 GPU 实验版 · 首次下载模型；推理和流线均在你的设备计算。');
   const incompatible=localAI&&Boolean(aiCompatibilityIssue);
   $('ai-compat-warning').hidden=!incompatible;
   $('ai-compat-reason').textContent=t(aiCompatibilityIssue);
-  $('ai-unavailable').hidden=!incompatible||transientMode;
+  $('ai-unavailable').hidden=!incompatible||transientMode||fieldReady;
   $('ai-unavailable-reason').textContent=t(aiCompatibilityIssue);
-  $('ai-predict').disabled=!aiReady||aiBusy;
+  $('ai-predict').disabled=!aiReady||aiBusy||locked;
   $('ai-predict').hidden=aiBusy;
   $('ai-progress').hidden=!aiBusy;
-  $('ai-preset').disabled=aiBusy;
+  $('ai-preset').disabled=aiBusy||locked;
   $('ai-form').setAttribute('aria-busy',String(aiBusy));
   $('app').classList.toggle('field-hidden',transientMode?!transientPlayer?.ready:!fieldReady||aiBusy);
   $('mode-ai').disabled=aiBusy;$('mode-transient').disabled=aiBusy;
@@ -602,7 +607,7 @@ function refreshAI(){
     const entry=catalog.cases.find(c=>c.id===option.value);
     option.textContent=entry?(getLanguage()==='zh'?entry.title_zh:entry.title_en):t('自定义参数');
   }
-  for(let i=0;i<8;i++)$('ai-u'+i).disabled=aiBusy;
+  for(let i=0;i<8;i++)$('ai-u'+i).disabled=aiBusy||locked;
   refreshDials();
   let domain='invalid';
   try{domain=controlDomain(controlsFromEngineering(Array.from({length:8},(_,i)=>$('ai-u'+i).valueAsNumber)));}catch{}
@@ -618,6 +623,16 @@ function refreshAI(){
   for(let i=0;i<6;i++)$('ai-u'+i).setAttribute('aria-label',`${t(i<3?'热功率':'风机倍率')} ${'ABC'[i%3]}`);
 }
 function bindAI(){
+  mountModelAccess($('ai-controls'));
+  document.addEventListener('mdc:model-access',()=>{
+    if(protectedModels&&!modelUnlocked()&&nominalData){
+      ++caseRequest;caseAbort?.abort();aiBusy=false;aiStage='idle';caseLoading=false;
+      installField(nominalData);fieldReady=true;fillPresetControls(catalog.cases.find(c=>c.id==='nominal'));
+      aiMessage='当前展示名义 CFD 工况；解锁后可在本机运行 AI 预测。';
+      refreshLanguage();
+    }
+    refreshAI();
+  });
   refreshDials=bindDials($('ai-dials'));
   $('ai-preset').addEventListener('change',()=>{
     if(aiBusy)return;
@@ -634,7 +649,7 @@ function bindAI(){
         const status=await browserAIStatus();aiReady=status.ready;
         aiCompatibilityIssue=aiReady?'':status.reason==='webgpu-buffer-limit'?'此设备的 GPU 缓冲区上限不足，无法运行当前 AI 模型。':'当前浏览器或设备未提供可用的 WebGPU，无法运行本地 AI 推理。';
       }catch{aiReady=false;aiCompatibilityIssue='当前浏览器或设备未提供可用的 WebGPU，无法运行本地 AI 推理。';}
-      aiMessage=aiReady?'本机 GPU 已就绪；首次推理需要准备模型。':'当前设备无法预测稳态流场；可切换到瞬态演示。';aiMessageError=false;
+      aiMessage=protectedModels&&!modelUnlocked()?'当前展示名义 CFD 工况；解锁后可在本机运行 AI 预测。':aiReady?'本机 GPU 已就绪；首次推理需要准备模型。':'当前设备无法预测稳态流场；可切换到瞬态演示。';aiMessageError=false;
       refreshAI();return;
     }
     try{
@@ -654,7 +669,7 @@ function bindAI(){
     if(!aiBusy){$('ai-preset').value='custom';aiMessage='参数已修改，点击预测后更新画面。';aiMessageError=false;refreshAI();}
   });
   $('ai-form').addEventListener('submit',async event=>{
-    event.preventDefault();if(aiBusy||!aiReady)return;
+    event.preventDefault();if(aiBusy||!aiReady||(protectedModels&&!modelUnlocked()))return;
     let values;
     try{values=controlsFromEngineering(Array.from({length:8},(_,i)=>$('ai-u'+i).valueAsNumber));}
     catch{aiMessage='请输入允许范围内的八个参数。';aiMessageError=true;refreshAI();return;}

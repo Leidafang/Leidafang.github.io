@@ -1,6 +1,8 @@
 // Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
+import {protectedModels,requireModelAccess,modelUnlocked} from './model-access.js';
 let worker;
-export const localAI=true; // Standalone public GPU test: never use the local Python API.
+document.addEventListener('mdc:model-access',()=>{if(!modelUnlocked()){worker?.terminate();worker=null;}});
+export const localAI=protectedModels||new URLSearchParams(location.search).get('ai')==='webgpu';
 export async function browserAIStatus(){
   if(!navigator.gpu)return {ready:false,reason:'webgpu-unavailable'};
   const adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});
@@ -8,7 +10,8 @@ export async function browserAIStatus(){
   if(adapter.limits.maxStorageBufferBindingSize<512*1024**2)return {ready:false,reason:'webgpu-buffer-limit'};
   return {ready:true};
 }
-export function predictBrowserCase(catalog,controls,id,signal,onStage){
+export async function predictBrowserCase(catalog,controls,id,signal,onStage){
+  const access=await requireModelAccess();
   return new Promise((resolve,reject)=>{
     if(signal.aborted){reject(new DOMException('Aborted','AbortError'));return;}
     worker??=new Worker(new URL('./browser-ai-worker.js',import.meta.url),{type:'module'});
@@ -21,6 +24,6 @@ export function predictBrowserCase(catalog,controls,id,signal,onStage){
     signal.addEventListener('abort',abort,{once:true});
     current.onerror=event=>{event.preventDefault();fail(Error(event.message));};
     current.onmessage=({data})=>{if(data.id!==id)return;if(data.status){onStage(data.status.stage);return;}if(data.error){fail(Error(data.error));return;}cleanup();resolve(data.result);};
-    current.postMessage({id,controls});
+    current.postMessage({id,controls,access});
   });
 }

@@ -1,8 +1,10 @@
 // Copyright (c) 2026 广联达科技股份有限公司. Proprietary portions: see LICENSE.txt; third-party licenses remain applicable.
 import * as ort from './vendor/ort/ort.webgpu.bundle.min.mjs';
+import {modelAccessConfig} from './model-access-config.js';
+import {createModelReader} from './model-download.js';
 const root=new URL('./webgpu/',import.meta.url).href;
 const hash=async b=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b)),n=>n.toString(16).padStart(2,'0')).join('');
-async function asset(spec){const r=await fetch(root+(spec.file??spec.name));if(!r.ok)throw Error('模型资产读取失败');const b=await r.arrayBuffer();if(await hash(b)!==spec.sha256)throw Error('模型资产校验失败');return b;}
+async function asset(spec,read=path=>fetch(root+path)){const name=spec.file??spec.name;if(!/^[a-z0-9.-]+$/.test(name))throw Error('Invalid asset path');const r=await read(name);if(!r.ok)throw Error('模型资产读取失败');const b=await r.arrayBuffer();if(await hash(b)!==spec.sha256)throw Error('模型资产校验失败');return b;}
 export async function browserCapability(){
   if(!navigator.gpu)throw Error('webgpu-unavailable');
   const adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});
@@ -12,16 +14,17 @@ export async function browserCapability(){
   if(limits.maxStorageBufferBindingSize<512*1024**2)throw Error('webgpu-buffer-limit');
   return {adapter,info,limits};
 }
-export async function createBrowserModel(progress=()=>{}){
+export async function createBrowserModel(progress=()=>{},access=null){
+  const read=createModelReader(modelAccessConfig,access,root);
   const {adapter,info,limits}=await browserCapability();progress({stage:'device',info,limits});
   const device=await adapter.requestDevice({requiredLimits:limits});
   ort.env.webgpu.device=device;ort.env.wasm.numThreads=1;ort.env.wasm.wasmPaths=new URL('./vendor/ort/',import.meta.url).href;
   let session;
   try{
-    const response=await fetch(root+'manifest.json');if(!response.ok)throw Error('模型清单读取失败');const manifest=await response.json();
+    const response=await read('manifest.json');if(!response.ok)throw Error('模型清单读取失败');const manifest=await response.json();
     if(manifest.model_id!=='mdc-v6-solid-mask-e300'||manifest.geometry_id!=='wall98376-global-energy-overlap-v1'||manifest.checkpoint_sha256!=='d0a0876b9209155053079067e133b122dcb4d2983df611e8e4c892b47ae9eb78'||manifest.points!==98376)throw Error('模型身份不匹配');
     progress({stage:'download',info,limits});
-    const [model,local]=await Promise.all([asset(manifest.files['model.onnx']),asset(manifest.files['local.f32'])]);
+    const [model,local]=await Promise.all([asset(manifest.files['model.onnx'],read),asset(manifest.files['local.f32'],read)]);
     const runtimeRoot=new URL('./vendor/ort/',import.meta.url);
     const runtime=await (await fetch(new URL('runtime.json',runtimeRoot))).json();
     const compressed=await fetch(new URL('runtime.bin',runtimeRoot));if(!compressed.ok)throw Error('推理运行时读取失败');
@@ -42,9 +45,9 @@ export async function createBrowserModel(progress=()=>{}){
         }finally{ct.dispose();outputs.field.dispose();}
       },
       async loadGeometry(){
-        const geo=JSON.parse(new TextDecoder().decode(await asset(manifest.files['geometry.json'])));
+        const geo=JSON.parse(new TextDecoder().decode(await asset(manifest.files['geometry.json'],read)));
         if(geo.schema!=='mdc-webgpu-geometry-v1'||geo.checkpoint_sha256!==manifest.checkpoint_sha256)throw Error('几何身份不匹配');
-        const assets=Object.fromEntries(await Promise.all(Object.entries(geo.files).map(async([name,spec])=>[name,new (spec.dtype==='<u4'?Uint32Array:spec.dtype==='u1'?Uint8Array:Float32Array)(await asset(spec))])));
+        const assets=Object.fromEntries(await Promise.all(Object.entries(geo.files).map(async([name,spec])=>[name,new (spec.dtype==='<u4'?Uint32Array:spec.dtype==='u1'?Uint8Array:Float32Array)(await asset(spec,read))])));
         return {geo,assets};
       },
       async dispose(){input.dispose();await session.release();device.destroy();}

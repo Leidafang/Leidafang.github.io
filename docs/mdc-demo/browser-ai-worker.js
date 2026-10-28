@@ -2,11 +2,11 @@
 import {createBrowserModel} from './webgpu-runtime.js';
 import {presentPrediction} from './webgpu-presentation.js';
 let model,geometry,busy=false;
-self.onmessage=async({data:{id,controls}})=>{
+self.onmessage=async({data:{id,controls,access}})=>{
   if(busy){self.postMessage({id,error:'busy'});return;}busy=true;
   const progress=status=>self.postMessage({id,status});
   try{
-    model??=await createBrowserModel(progress);geometry??=await model.loadGeometry();
+    model??=await createBrowserModel(progress,access);geometry??=await model.loadGeometry();
     progress({stage:'inference'});const prediction=await model.predict(controls);
     progress({stage:'paths'});const result=await presentPrediction(prediction.field,controls,model.manifest,geometry.geo,geometry.assets,progress);
     result.result.inference_seconds=prediction.milliseconds/1000;result.result.device=model.info;

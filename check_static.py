@@ -23,6 +23,8 @@ for p,doc in pages.items():
         if u.fragment and target in pages:assert u.fragment in pages[target].ids,(p,ref)
 for p in D.rglob('*'):
     if not p.is_file():continue
+    if p.is_relative_to(D/'mdc-demo'):
+        assert not p.is_relative_to(D/'mdc-demo/webgpu') and p.suffix != '.onnx', ('Private MDC model asset',p)
     assert '_private' not in str(p) and 'credentials' not in p.name and 'token.json' not in p.name
     if p.suffix in ['.html','.js','.css','.json','.svg','.drawio']:
         s=p.read_text()

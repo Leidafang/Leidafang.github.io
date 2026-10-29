@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 static_validation.json
+# MDC model assets belong in private cloud storage, never this public repository.
+/docs/mdc-demo/webgpu/
+/docs/mdc-demo/**/*.onnx

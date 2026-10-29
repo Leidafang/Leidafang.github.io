@@ -12,7 +12,7 @@ export function createTransientPlayer(world,onChange){
   const group=new THREE.Group();world.add(group);group.visible=false;
   let active=false,ready=false,loading=false,error=false,meta,positions,solids,slices,valid,target,phase='initial',time=0,playing=false,speed=1,view='solid',kind='racks',last=-1;
   let particles,trails,sliceMesh,solidTexture,sliceTexture;const meshes=[];
-  let displayCount=1000,cpuUpdateMs=0,color;
+  let displayCount=2000,cpuUpdateMs=0,color;
   let reference,referenceFlow,referenceSlice,referenceLoading=false,referenceError=false,referenceRequest=0,referencePromise;
   let initial,initialFlow,initialSlice,initialSolids;
   const steady=()=>phase==='initial'||phase==='target';
@@ -32,7 +32,7 @@ export function createTransientPlayer(world,onChange){
     try{
       const r=await fetch(root+'manifest.json');if(!r.ok)throw Error('manifest');meta=await r.json();if(meta.schema!=='mdc-transient-preview-v1'||!Number.isInteger(meta.frames)||meta.frames<2||meta.frames>2401||meta.dt!==.05||Math.abs((meta.frames-1)*meta.dt-meta.end_s)>1e-8||meta.solid_cells!==6360)throw Error('schema');
       if(!Number.isInteger(meta.particles)||meta.particles<1||meta.particles>10000)throw Error('particle capacity');
-      displayCount=Math.min(meta.particles,meta.selection?.default_count??1000);
+      displayCount=Math.min(meta.particles,meta.selection?.default_count??2000);
       const [geo,sg,tgt]=await Promise.all([asset(meta.geometry_file),asset(meta.slice_geometry_file),asset(meta.target_file)]);target=tgt;
       positions=new Float32Array(meta.frames*meta.particles*4);solids=new Float32Array(meta.frames*meta.solid_cells);slices=new Float32Array(meta.frames*meta.slice_cells);valid=new Uint8Array(meta.frames*meta.particles);
       // Selected prototype is compact enough to preload in bounded 5 s blocks.

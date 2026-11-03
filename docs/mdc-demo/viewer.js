@@ -630,7 +630,7 @@ function refreshAI(){
   if(aiBusy){
     const [percent,zh,en]=aiPhases[aiStage]??aiPhases.start;
     const fraction=aiStage==='paths'?aiPathFraction:null;
-    aiProgress.update(aiStage,percent+25*(fraction??0),[zh,en],fraction);
+    aiProgress.update(percent+25*(fraction??0),[zh,en]);
   }
   $('ai-status').textContent=t(aiMessage);
   $('ai-status').dataset.error=String(aiMessageError);

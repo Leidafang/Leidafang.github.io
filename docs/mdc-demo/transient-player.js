@@ -26,7 +26,7 @@ export function createTransientPlayer(world,onChange){
       endpoints:[86,'读取 P0 / P1 稳态…','Loading P0 / P1 steady fields…'],
       rendering:[97,'准备三维展示…','Preparing the 3D view…']
     }[loadStage];
-    loadProgress.update(loadStage,percent+70*(fraction??0),[zh,en],fraction);
+    loadProgress.update(percent+70*(fraction??0),[zh,en]);
   }
   const steady=()=>phase==='initial'||phase==='target';
   const currentFlow=()=>phase==='initial'?initialFlow:referenceFlow;

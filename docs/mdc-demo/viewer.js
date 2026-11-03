@@ -18,6 +18,7 @@ import {protectedModels,modelUnlocked,mountModelAccess,refreshAccess} from './mo
 import {localAI,browserAIStatus,predictBrowserCase} from './browser-ai.js';
 import {bindDials} from './ai-dials.js';
 import {createTransientPlayer} from './transient-player.js';
+import {createWorkProgress} from './work-progress.js';
 import {prepareVisibility,pathOpacity,distanceOpacity,selectFlowPaths} from './flow-visibility.js';
 
 const $=id=>document.getElementById(id);
@@ -586,6 +587,18 @@ function fillPresetControls(entry){
   $('ai-preset').value=entry.id;
   [...e.group_heat_kW,...e.rack_fan_multipliers,e.return_fan_multiplier,e.water_mass_flow_kg_s].forEach((value,i)=>{$('ai-u'+i).value=Number(value.toFixed(12));});
 }
+const aiPhases={
+  start:[4,'准备预测…','Preparing prediction…'],
+  device:[8,'准备本机 GPU…','Preparing local GPU…'],
+  download:[14,'读取本机推理模型…','Loading the inference model…'],
+  compile:[34,'准备 GPU 推理…','Preparing GPU inference…'],
+  geometry:[48,'读取流场网格…','Loading the flow mesh…'],
+  inference:[60,'AI 正在预测稳态流场…','Predicting the steady field…'],
+  paths:[70,'在本机生成流线…','Generating streamlines locally…'],
+  loading:[88,'读取预测结果…','Loading prediction results…'],
+  rendering:[97,'准备三维展示…','Preparing the 3D view…']
+};
+let aiProgress,aiPathFraction=null;
 function refreshAI(){
   refreshAccess();
   const locked=protectedModels&&!modelUnlocked();
@@ -614,9 +627,11 @@ function refreshAI(){
   $('ai-domain').dataset.domain=domain;
   $('ai-domain').textContent=t(domain==='inner_box'?'当前参数：训练范围内':domain==='outer_shell'?'当前参数：外推。超出训练范围的参数越多、偏离幅度越大，预测误差可能越大。':'参数超出允许范围或尚未填写完整。');
   $('ai-predict-label').textContent=t('预测稳态流场');
-  const phase=t(aiStage==='download'?'读取本机推理模型…':aiStage==='compile'?'准备 GPU 推理…':aiStage==='paths'?'在本机生成流线…':aiStage==='loading'?'读取预测结果…':aiStage==='rendering'?'准备三维展示…':'AI 推理与流线生成…');
-  $('ai-progress').textContent=phase;
-  $('ai-progress').setAttribute('aria-label',phase);
+  if(aiBusy){
+    const [percent,zh,en]=aiPhases[aiStage]??aiPhases.start;
+    const fraction=aiStage==='paths'?aiPathFraction:null;
+    aiProgress.update(aiStage,percent+25*(fraction??0),[zh,en],fraction);
+  }
   $('ai-status').textContent=t(aiMessage);
   $('ai-status').dataset.error=String(aiMessageError);
   if(transientMode)transientPlayer?.refresh();
@@ -674,12 +689,18 @@ function bindAI(){
     try{values=controlsFromEngineering(Array.from({length:8},(_,i)=>$('ai-u'+i).valueAsNumber));}
     catch{aiMessage='请输入允许范围内的八个参数。';aiMessageError=true;refreshAI();return;}
     const request=++caseRequest;caseAbort?.abort();caseAbort=new AbortController();
-    aiBusy=true;aiLastError=null;aiStage='inference';caseLoading=true;caseError=false;
+    aiProgress=createWorkProgress($('ai-progress'));aiPathFraction=null;
+    aiBusy=true;aiLastError=null;aiStage='start';caseLoading=true;caseError=false;
     aiMessage='完成后将显示新的流场与温度。';aiMessageError=false;
     $('selection').hidden=true;$('ai-controls').open=true;refreshAI();applyVisibility();refreshCaseUI();
     $('ai-progress').scrollIntoView({block:'nearest',behavior:'instant'});
     try{
-      const prediction=await (localAI?predictBrowserCase:predictCase)(catalog,values,String(request),caseAbort.signal,stage=>{if(request===caseRequest){aiStage=stage;refreshAI();}});
+      const prediction=await (localAI?predictBrowserCase:predictCase)(catalog,values,String(request),caseAbort.signal,(stage,status)=>{
+        if(request!==caseRequest)return;
+        aiStage=stage;
+        if(stage==='paths'&&status?.total>0)aiPathFraction=status.completed/status.total;
+        refreshAI();
+      });
       if(request!==caseRequest)return;
       aiStage='rendering';refreshAI();
       await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));

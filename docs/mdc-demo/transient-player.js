@@ -5,6 +5,7 @@ import {temperatureRGB} from './flow-math.js';
 import {PARTICLE_SAMPLES,TRAIL_STEP_S,particleGeometry,particleMaterial,particleColors,particleVertex,historyVisible} from './particle-style.js';
 import {createSteadyReferenceFlow} from './steady-reference-flow.js';
 import {solidRGB} from './solid-fields.js';
+import {createWorkProgress} from './work-progress.js';
 const $=id=>document.getElementById(id);
 const text=(zh,en)=>getLanguage()==='zh'?zh:en;
 const palette=`vec3 ramp(float t, bool solid){float x=clamp(t,0.,1.);if(solid){vec3 a=vec3(.12,.08,.31),b=vec3(.39,.16,.55),c=vec3(.74,.26,.45),d=vec3(.96,.52,.29),e=vec3(1.,.91,.58);return x<.25?mix(a,b,x*4.):x<.5?mix(b,c,x*4.-1.):x<.75?mix(c,d,x*4.-2.):mix(d,e,x*4.-3.);}vec3 a=vec3(24.,80.,255.)/255.,b=vec3(0.,169.,255.)/255.,c=vec3(32.,221.,242.)/255.,d=vec3(255.,181.,32.)/255.,e=vec3(255.,76.,12.)/255.,f=vec3(255.,24.,66.)/255.;return x<.25?mix(a,b,x/.25):x<.46?mix(b,c,(x-.25)/.21):x<.54?mix(c,d,(x-.46)/.08):x<.75?mix(d,e,(x-.54)/.21):mix(e,f,(x-.75)/.25);}`;
@@ -14,7 +15,19 @@ export function createTransientPlayer(world,onChange){
   let particles,trails,sliceMesh,solidTexture,sliceTexture;const meshes=[];
   let displayCount=2000,cpuUpdateMs=0,color;
   let reference,referenceFlow,referenceSlice,referenceLoading=false,referenceError=false,referenceRequest=0,referencePromise;
-  let initial,initialFlow,initialSlice,initialSolids;
+  let initial,initialFlow,initialSlice,initialSolids,loadProgress,loadedFrames=0,loadStage='manifest';
+  function refreshLoadProgress(){
+    if(!loading)return;
+    const fraction=loadStage==='frames'?loadedFrames/meta.frames:null;
+    const [percent,zh,en]={
+      manifest:[4,'读取瞬态数据清单…','Reading the transient manifest…'],
+      geometry:[8,'读取瞬态网格…','Loading the transient mesh…'],
+      frames:[12,'准备瞬态数据…','Preparing transient data…'],
+      endpoints:[86,'读取 P0 / P1 稳态…','Loading P0 / P1 steady fields…'],
+      rendering:[97,'准备三维展示…','Preparing the 3D view…']
+    }[loadStage];
+    loadProgress.update(loadStage,percent+70*(fraction??0),[zh,en],fraction);
+  }
   const steady=()=>phase==='initial'||phase==='target';
   const currentFlow=()=>phase==='initial'?initialFlow:referenceFlow;
   const endTime=()=>meta?.end_s??30;
@@ -28,18 +41,30 @@ export function createTransientPlayer(world,onChange){
     const mesh=new THREE.Mesh(g,mat);group.add(mesh);return mesh;
   }
   async function load(){
-    if(ready||loading)return;loading=true;error=false;refresh();onChange();
+    if(ready||loading)return;
+    const progress=loadProgress=createWorkProgress($('transient-progress'));
+    loadedFrames=0;loadStage='manifest';loading=true;error=false;refresh();onChange();
+    const setStage=stage=>{loadStage=stage;refreshLoadProgress();};
     try{
       const r=await fetch(root+'manifest.json');if(!r.ok)throw Error('manifest');meta=await r.json();if(meta.schema!=='mdc-transient-preview-v1'||!Number.isInteger(meta.frames)||meta.frames<2||meta.frames>2401||meta.dt!==.05||Math.abs((meta.frames-1)*meta.dt-meta.end_s)>1e-8||meta.solid_cells!==6360)throw Error('schema');
       if(!Number.isInteger(meta.particles)||meta.particles<1||meta.particles>10000)throw Error('particle capacity');
       displayCount=Math.min(meta.particles,meta.selection?.default_count??2000);
+      setStage('geometry');
       const [geo,sg,tgt]=await Promise.all([asset(meta.geometry_file),asset(meta.slice_geometry_file),asset(meta.target_file)]);target=tgt;
       positions=new Float32Array(meta.frames*meta.particles*4);solids=new Float32Array(meta.frames*meta.solid_cells);slices=new Float32Array(meta.frames*meta.slice_cells);valid=new Uint8Array(meta.frames*meta.particles);
       // Selected prototype is compact enough to preload in bounded 5 s blocks.
-      let loadedFrames=0;
-      await Promise.all(meta.chunks.map(async c=>{const arrays=await Promise.all([asset(c.files.particles),asset(c.files.solid),asset(c.files.slice),asset(c.files.valid,true)]);[positions,solids,slices,valid].forEach((a,i)=>a.set(arrays[i],c.first*[meta.particles*4,meta.solid_cells,meta.slice_cells,meta.particles][i]));loadedFrames+=c.frames;$('transient-message').textContent=text('准备瞬态数据','Preparing transient data')+` · ${Math.round(loadedFrames/meta.frames*100)}%`;}));
+      setStage('frames');
+      await Promise.all(meta.chunks.map(async c=>{
+        const arrays=await Promise.all([asset(c.files.particles),asset(c.files.solid),asset(c.files.slice),asset(c.files.valid,true)]);
+        if(!loading||loadProgress!==progress)return;
+        [positions,solids,slices,valid].forEach((a,i)=>a.set(arrays[i],c.first*[meta.particles*4,meta.solid_cells,meta.slice_cells,meta.particles][i]));
+        loadedFrames+=c.frames;
+        refreshLoadProgress();
+      }));
       if(!positions.every(Number.isFinite)||!solids.every(Number.isFinite)||!slices.every(Number.isFinite))throw Error('nonfinite');
+      setStage('endpoints');
       await Promise.all([loadInitial(),loadReference()]);
+      setStage('rendering');
       solidTexture=texture(meta.solid_cells);sliceTexture=texture(meta.slice_cells);
       for(const reg of meta.regions){const pos=new Float32Array(reg.count*3),ids=new Float32Array(reg.count);for(let i=0;i<reg.count;i++){const k=(reg.offset+i)*4;pos.set(geo.subarray(k,k+3),i*3);ids[i]=geo[k+3];}const m=surface(pos,ids,solidTexture,meta.ranges[reg.name==='coil'?'coil':'racks'],true);m.userData.region=reg.name;meshes.push(m);}
       const ids=new Float32Array(sg.length/3);for(let i=0;i<ids.length;i++)ids[i]=Math.floor(i/6);sliceMesh=surface(sg,ids,sliceTexture,meta.ranges.air,false);
@@ -103,6 +128,10 @@ export function createTransientPlayer(world,onChange){
     const density=$('transient-density');density.disabled=!ready;density.max=String(meta?.particles??4000);density.min=String(Math.min(500,meta?.particles??500));density.value=String(displayCount);$('transient-density-value').textContent=String(displayCount);$('transient-density-max').textContent=density.max;
     $('transient-density-note').textContent=steady()?text('粒子沿当前稳态流线运动；数量只改变粒子疏密，流线数量保持不变。','Particles follow the current steady streamlines; particle count does not change line density.'):meta?.selection?text(`已预筛选：连续 ${meta.selection.continuous_seconds} 秒低于 ${meta.selection.threshold_m_s} m/s 的轨迹不展示。粒子疏密不代表空气浓度。`,`Preselected: tracks below ${meta.selection.threshold_m_s} m/s for ${meta.selection.continuous_seconds} consecutive seconds are excluded. Density does not represent air concentration.`):text('粒子数量仅控制展示密度。','Particle count controls display density only.');
     $('transient-message').textContent=referenceLoading?text('正在读取目标稳态流场…','Loading target steady field…'):referenceError?text('目标稳态读取失败，点击目标稳态参考重试。','Target loading failed; select the reference to retry.'):error?text('数据读取失败，点击重试。','Loading failed. Retry.'):loading?text('正在准备瞬态数据…','Preparing transient data…'):phase==='initial'?text('P0 初始稳态 · 点击按钮开始工况切换','P0 steady state · start the transition when ready'):phase==='target'?text('当前为 P1 稳态 · 可重新播放工况切换','P1 steady state · replay the transition at any time'):text('真实 CFD 瞬态 · 播放结束后自动进入 P1 稳态','CFD transient · automatically continues with the P1 steady state');
+    $('transient-progress').hidden=!loading;
+    $('transient-message').hidden=loading;
+    $('transient-start').hidden=loading;
+    refreshLoadProgress();
     $('transient-start').disabled=loading||!ready&&!error;$('transient-start').textContent=error?text('重新加载','Retry'):phase==='initial'?text('开始工况切换','Start transition'):phase==='target'?text('重新播放工况切换','Replay transition'):playing?text('暂停切换','Pause transition'):time>=endTime()?text('重新播放工况切换','Replay transition'):text('继续播放','Resume');
     $('transient-animation').hidden=!steady()||!ready;$('transient-animation').textContent=playing?text('暂停粒子动画','Pause particles'):text('播放粒子动画','Play particles');
     for(const [id,value,zh,en] of [['transient-initial','initial','P0 初始稳态','P0 Initial steady'],['transient-target','target','P1 目标稳态','P1 Target steady']]){

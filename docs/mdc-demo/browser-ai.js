@@ -23,7 +23,7 @@ export async function predictBrowserCase(catalog,controls,id,signal,onStage){
     const abort=()=>fail(new DOMException('Aborted','AbortError'));
     signal.addEventListener('abort',abort,{once:true});
     current.onerror=event=>{event.preventDefault();fail(Error(event.message));};
-    current.onmessage=({data})=>{if(data.id!==id)return;if(data.status){onStage(data.status.stage);return;}if(data.error){fail(Error(data.error));return;}cleanup();resolve(data.result);};
+    current.onmessage=({data})=>{if(data.id!==id)return;if(data.status){onStage(data.status.stage,data.status);return;}if(data.error){fail(Error(data.error));return;}cleanup();resolve(data.result);};
     current.postMessage({id,controls,access});
   });
 }

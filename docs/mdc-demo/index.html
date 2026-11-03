@@ -52,6 +52,7 @@
             <button id="transient-target" aria-pressed="false">P1 Target steady</button>
           </div>
           <button id="transient-start" class="transient-primary" data-i18n="开始工况切换">Start transition</button>
+          <div id="transient-progress" class="work-progress" role="progressbar" aria-label="Transient data preparation progress" hidden><span class="work-progress-label"></span><span class="work-progress-detail"></span></div>
           <button id="transient-animation" class="transient-target" hidden>Pause particles</button>
           <p id="transient-message" role="status" class="transient-caption"></p>
           <div class="transient-stats"><div><span data-i18n="最高空气温度">Peak air temp.</span><strong id="transient-air">—</strong></div><div><span data-i18n="最高发热板温度">Peak plate temp.</span><strong id="transient-rack">—</strong></div></div>
@@ -78,7 +79,7 @@
             <p id="ai-domain" class="ai-domain" role="status"></p>
             <div class="ai-action">
               <button id="ai-predict" type="submit" disabled><span id="ai-predict-label">Predict steady field</span></button>
-              <div id="ai-progress" role="progressbar" aria-label="Prediction progress" hidden></div>
+              <div id="ai-progress" class="work-progress" role="progressbar" aria-label="Prediction progress" hidden><span class="work-progress-label"></span><span class="work-progress-detail"></span></div>
             </div>
             <p id="ai-local-note" class="ai-hint" hidden></p>
             <p id="ai-status" role="status" aria-live="polite"></p>

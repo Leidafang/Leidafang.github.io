@@ -614,7 +614,7 @@ function refreshAI(){
   $('ai-domain').dataset.domain=domain;
   $('ai-domain').textContent=t(domain==='inner_box'?'当前参数：训练范围内':domain==='outer_shell'?'当前参数：外推。超出训练范围的参数越多、偏离幅度越大，预测误差可能越大。':'参数超出允许范围或尚未填写完整。');
   $('ai-predict-label').textContent=t('预测稳态流场');
-  const phase=t(aiStage==='download'?'下载本机推理模型…':aiStage==='compile'?'准备 GPU 推理…':aiStage==='paths'?'在本机生成流线…':aiStage==='loading'?'读取预测结果…':aiStage==='rendering'?'准备三维展示…':'AI 推理与流线生成…');
+  const phase=t(aiStage==='download'?'读取本机推理模型…':aiStage==='compile'?'准备 GPU 推理…':aiStage==='paths'?'在本机生成流线…':aiStage==='loading'?'读取预测结果…':aiStage==='rendering'?'准备三维展示…':'AI 推理与流线生成…');
   $('ai-progress').textContent=phase;
   $('ai-progress').setAttribute('aria-label',phase);
   $('ai-status').textContent=t(aiMessage);

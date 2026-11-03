@@ -1,5 +1,6 @@
 // Copyright (c) 2026 广联达科技股份有限公司. See LICENSE.txt.
 import {modelAccessConfig as config} from './model-access-config.js';
+import {clearModelCache} from './model-download.js';
 import {getLanguage} from './i18n.js';
 export const protectedModels=config.enabled;
 let session=null,expiryTimer,root,busy=false,message='',failed=false;
@@ -25,21 +26,29 @@ export function refreshAccess(){
   if(!root)return;
   const open=modelUnlocked();
   root.querySelector('strong').textContent=text(open?'本机 AI 已解锁':'解锁本机 AI','Local AI '+(open?'unlocked':'locked'));
-  root.querySelector('p').textContent=text('默认展示名义 CFD 工况。输入授权密码后下载模型，在你的 GPU 上预测。','Nominal CFD is shown by default. Enter the access password to download the model and predict on your GPU.');
+  root.querySelector('p').textContent=text('授权后在你的 GPU 上预测。模型会保存在此浏览器，之后解锁可复用。','After unlocking, predictions run on your GPU. Model files are cached in this browser for reuse after unlocking again.');
   const input=root.querySelector('input');input.placeholder=text('授权密码','Access password');input.setAttribute('aria-label',input.placeholder);
   root.querySelector('form').hidden=open;input.disabled=busy;
   root.querySelector('[type=submit]').disabled=busy||!config.endpoint;
   root.querySelector('[type=submit]').textContent=text(busy?'正在验证…':'解锁',busy?'Verifying…':'Unlock');
   root.querySelector('[data-lock]').hidden=!open;root.querySelector('[data-lock]').textContent=text('锁定并返回名义工况','Lock and return to nominal CFD');
+  const clear=root.querySelector('[data-clear-model]');clear.disabled=busy;clear.textContent=text('清除模型缓存','Clear model cache');
   const status=root.querySelector('[role=status]');status.dataset.error=String(failed);
   status.textContent=!config.endpoint?text('下载服务尚未配置，当前仅展示预载工况。','Download service is not configured. Preloaded fields remain available.'):message;
 }
 export function mountModelAccess(parent){
   if(!protectedModels)return;
   root=document.createElement('section');root.className='model-access';
-  root.innerHTML='<strong></strong><p></p><form><input type="password" autocomplete="current-password" minlength="16" maxlength="256" required><button type="submit"></button></form><button type="button" data-lock></button><p role="status" aria-live="polite"></p><a href="mailto:xiongyn@glodon.com">xiongyn@glodon.com</a>';
+  root.innerHTML='<strong></strong><p></p><form><input type="password" autocomplete="current-password" minlength="16" maxlength="256" required><button type="submit"></button></form><button type="button" data-lock></button><button type="button" data-clear-model></button><p role="status" aria-live="polite"></p><a href="mailto:xiongyn@glodon.com">xiongyn@glodon.com</a>';
   parent.insertBefore(root,parent.querySelector('form'));
   root.querySelector('[data-lock]').onclick=lockModel;
+  root.querySelector('[data-clear-model]').onclick=async()=>{
+    if(busy)return;
+    busy=true;failed=false;message='';lockModel();
+    try{await clearModelCache();message=text('此浏览器的模型缓存已清除。','Model cache cleared in this browser.');}
+    catch{failed=true;message=text('无法清除缓存，请在浏览器设置中清除本站数据。','Could not clear the cache. Clear this site’s data in your browser settings.');}
+    finally{busy=false;refreshAccess();}
+  };
   root.querySelector('form').onsubmit=async event=>{
     event.preventDefault();if(busy)return;busy=true;failed=false;message='';refreshAccess();
     const input=root.querySelector('input'),password=input.value;input.value='';

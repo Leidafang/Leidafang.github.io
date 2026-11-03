@@ -27,7 +27,7 @@ export const messages = {
   "本机 GPU 已就绪；首次推理需要准备模型。": "Local GPU ready; the model will be prepared on first prediction.",
   "此设备缓冲区上限不足，可查看预计算 CFD 或瞬态演示。": "GPU buffer limit is insufficient. Precomputed CFD and transient playback remain available.",
   "未检测到可用 WebGPU，可查看预计算 CFD 或瞬态演示。": "WebGPU unavailable. Precomputed CFD and transient playback remain available.",
-  "下载本机推理模型…": "Downloading the local inference model\u2026",
+  "读取本机推理模型…": "Loading the local inference model\u2026",
   "准备 GPU 推理…": "Preparing GPU inference\u2026",
   "在本机生成流线…": "Generating streamlines on your device\u2026",
   "查看预计算 CFD": "View precomputed CFD",

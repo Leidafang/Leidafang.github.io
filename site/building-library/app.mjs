@@ -10,6 +10,8 @@ let catalog=null,entry=null,view=null,map=null,footprintLayer=null,tiles=null;
 let busy=false,ready=false,revision=0,active=null,currentAudit=null,lastError='',query='',toastTimer,basemapOn=true;
 let footprintFeatures=[],tileLoads=0,tileErrors=0;
 const parameters=new URLSearchParams(location.search);
+const release='plateau-map-20261104';
+function assetURL(path){const url=new URL(path,import.meta.url);url.searchParams.set('v',release);return url;}
 function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2500);}
 function notice(text=''){$('notice').textContent=text;$('notice').hidden=!text;lastError=text;}
 function loading(on,text='正在读取所选建筑…'){
@@ -119,7 +121,7 @@ async function selectBuilding(sample,{focus=false,scroll=false}={}){
   const started=performance.now();
   try{
     let bytes=cache.get(sample.source_id);
-    if(!bytes){bytes=await fetchBytes(new URL(sample.model,import.meta.url),controller.signal);await checkHash(bytes,sample.model_sha256);cache.set(sample.source_id,bytes);}
+    if(!bytes){bytes=await fetchBytes(assetURL(sample.model),controller.signal);await checkHash(bytes,sample.model_sha256);cache.set(sample.source_id,bytes);}
     if(ticket!==revision)return;
     const geometry=stlLoader.parse(bytes.slice(0)),audit=surfaceAudit(geometry);
     view.setGeometry(geometry);entry=sample;currentAudit=audit;updateInfo();
@@ -135,7 +137,7 @@ async function selectBuilding(sample,{focus=false,scroll=false}={}){
 function findEntry(value){const q=value.trim().toLowerCase();return catalog?.samples.find(s=>[s.sample_id,s.source_id,s.building_id].some(v=>String(v||'').toLowerCase()===q));}
 function lookup(){const value=$('lookup').value.trim(),sample=findEntry(value);if(sample){selectBuilding(sample,{focus:true,scroll:true});return;}notice(value?'当前瓦片未收录此编号。请清空检索条件，在地图点选建筑。':'直接点选地图中的有色轮廓即可查看，也可输入 P18 等本地编号。');}
 function save(blob,name){const anchor=document.createElement('a'),url=URL.createObjectURL(blob);anchor.href=url;anchor.download=name;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已准备下载');}
-function saveURL(url,name){const anchor=document.createElement('a');anchor.href=url;anchor.download=name;anchor.click();}
+function saveURL(url,name){const anchor=document.createElement('a');anchor.href=assetURL(url);anchor.download=name;anchor.click();}
 async function exportSTL(normalize=false){
   if(!entry||busy)return;if(!normalize){saveURL(entry.model,entry.sample_id+'.stl');return;}
   const {STLExporter}=await import('./vendor/exporters/STLExporter.js');
@@ -171,8 +173,8 @@ window.__buildingMapPoint=(lat,lon)=>{if(!map)return null;const point=map.latLng
 async function boot(){
   loading(true,'正在读取 PLATEAU 建筑地图…');
   try{
-    const response=await fetch(new URL('./assets/catalog.json',import.meta.url));if(!response.ok)throw Error('建筑索引读取失败');catalog=await response.json();
-    const footprints=await fetch(new URL(catalog.map.footprints,import.meta.url));if(!footprints.ok)throw Error('地图轮廓读取失败');
+    const response=await fetch(assetURL('./assets/catalog.json'));if(!response.ok)throw Error('建筑索引读取失败');catalog=await response.json();
+    const footprints=await fetch(assetURL(catalog.map.footprints));if(!footprints.ok)throw Error('地图轮廓读取失败');
     initMap(await footprints.json());view=new MeshView($('scene'),$('stage'),$('plan'));
     $('total-count').textContent=number(catalog.stats.buildings,0);
     $('coverage-note').textContent=`东京 2023 · 瓦片 53394509。共 ${catalog.stats.buildings} 栋，${catalog.stats.preview_available} 栋可预览；三维模型按点选加载。此处不是日本全国索引。`;

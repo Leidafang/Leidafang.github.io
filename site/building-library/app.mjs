@@ -1,212 +1,183 @@
 import * as THREE from './vendor/three.module.js';
 import {STLLoader} from './vendor/STLLoader.js';
 import {MeshView} from './mesh-view.mjs';
-import {canonicalBAGId,decodeCityJSON,surfaceAudit} from './cityjson.mjs';
+import {surfaceAudit} from './surface-audit.mjs';
 
 const $=id=>document.getElementById(id),number=(x,d=1)=>new Intl.NumberFormat('zh-CN',{maximumFractionDigits:d}).format(x);
-let catalog=null,entry=null,view=null,currentRaw=null,currentBuffer=null,currentAudit=null;
-let sourceFilter='all',query='',revision=0,active=null,busy=false,mode='snapshot',lastError='',renderReady=false;
-let sourceDocument=null,onlineResult=null,toastTimer;
-const stlLoader=new STLLoader(),cache=new Map();
+const stlLoader=new STLLoader(),cache=new Map(),layers=new Map();
 const downloadButtons=['download-source','download-meta','download-vtp','download-h1','download-stl'];
-
-function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3000);}
+let catalog=null,entry=null,view=null,map=null,footprintLayer=null,tiles=null;
+let busy=false,ready=false,revision=0,active=null,currentAudit=null,lastError='',query='',toastTimer,basemapOn=true;
+let footprintFeatures=[],tileLoads=0,tileErrors=0;
+const parameters=new URLSearchParams(location.search);
+function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2500);}
 function notice(text=''){$('notice').textContent=text;$('notice').hidden=!text;lastError=text;}
-function loading(on,text='正在下载单栋几何…'){
+function loading(on,text='正在读取所选建筑…'){
   busy=on;$('loading').hidden=!on;$('loading-text').textContent=text;
-  for(const name of downloadButtons)$(name).disabled=on||!entry;
-  $('download-vtp').hidden=mode!=='snapshot';
-  $('lod').disabled=on||mode!=='online';
+  for(const id of downloadButtons)$(id).disabled=on||!entry;
+  $('download-vtp').hidden=!entry?.vtp;
 }
-function begin(text){active?.abort();active=new AbortController();const ticket=++revision;notice();loading(true,text);return {ticket,controller:active,signal:active.signal,start:performance.now()};}
 async function fetchBytes(url,signal,max=16*1024*1024){
   const response=await fetch(url,{signal,credentials:'omit'});
-  if(!response.ok)throw Error(response.status===404?'未找到该编号对应的数据（HTTP 404）':`下载失败（HTTP ${response.status}）`);
-  if(Number(response.headers.get('Content-Length'))>max)throw Error('该文件超过单栋预览大小上限，请使用原始来源下载。');
-  const reader=response.body.getReader(),chunks=[];let total=0;
-  while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;
-    if(total>max){await reader.cancel();throw Error('该文件超过单栋预览大小上限。');}
-    chunks.push(value);$('loading-text').textContent=`正在读取几何 · ${number(total/1024,0)} KB`;
-  }
-  const bytes=new Uint8Array(total);let offset=0;for(const part of chunks){bytes.set(part,offset);offset+=part.length;}
-  return bytes.buffer;
+  if(!response.ok)throw Error(`文件读取失败（HTTP ${response.status}）`);
+  if(Number(response.headers.get('Content-Length'))>max)throw Error('该建筑超过单栋预览大小上限，请下载源文件。');
+  const bytes=await response.arrayBuffer();if(bytes.byteLength>max)throw Error('文件超过单栋预览大小上限。');return bytes;
 }
 async function checkHash(buffer,expected){
   const digest=await crypto.subtle.digest('SHA-256',buffer);
-  const hash=[...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
-  if(hash!==expected)throw Error('模型文件与索引校验值不一致，请刷新后重试。');
+  const actual=[...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  if(actual!==expected)throw Error('模型文件与索引不一致，请刷新后重试。');
 }
-function filtered(){
-  const height=$('height-filter').value;
-  return catalog.samples.filter(x=>
-    (sourceFilter==='all'||x.source===sourceFilter)&&
-    (!query||[x.sample_id,x.source_id,x.building_id,x.region,JSON.stringify(x.attributes)].some(v=>String(v||'').toLowerCase().includes(query)))&&
-    (height==='all'||height==='low'&&x.height_m<20||height==='mid'&&x.height_m>=20&&x.height_m<60||height==='high'&&x.height_m>=60))
-    .sort((a,b)=>$('sort').value==='height'?b.height_m-a.height_m:$('sort').value==='faces'?b.triangles-a.triangles:a.sample_id.localeCompare(b.sample_id));
-}
+function inHeight(height){const range=$('height-filter').value;return range==='all'||range==='low'&&height<20||range==='mid'&&height>=20&&height<60||range==='high'&&height>=60;}
+function filtered(){return catalog.samples.filter(s=>inHeight(s.height_m)&&(!query||[s.sample_id,s.source_id,s.building_id,s.attributes.usage_description].some(v=>String(v||'').toLowerCase().includes(query))));}
 function renderList(){
-  if(!catalog)return;const samples=filtered();$('result-count').textContent=`${samples.length} 栋`;
-  if(!samples.length){const p=document.createElement('p');p.className='empty-list';p.textContent='当前筛选无已收录模型。完整 BAG 编号可尝试官方在线读取。';$('entries').replaceChildren(p);return;}
-  $('entries').replaceChildren(...samples.map(sample=>{
-    const button=document.createElement('button');button.className='entry'+(!sample.closed?' review':'');
-    button.classList.toggle('selected',mode==='snapshot'&&entry?.sample_id===sample.sample_id);button.dataset.sample=sample.sample_id;
-    button.setAttribute('aria-pressed',String(mode==='snapshot'&&entry?.sample_id===sample.sample_id));
-    const id=document.createElement('span');id.className='entry-id';id.textContent=sample.sample_id;
-    const main=document.createElement('span');main.className='entry-main';
-    const line=document.createElement('strong');line.textContent=`${number(sample.height_m)} m · ${number(sample.triangles,0)} 面`;
-    const sub=document.createElement('small');sub.textContent=sample.source+' · LoD '+sample.source_lod;
-    const dot=document.createElement('span');dot.className='entry-quality';dot.title=sample.closed?'源记录：封闭边检查通过':'源记录：边拓扑需复核';
-    main.append(line,sub);button.append(id,main,dot);button.addEventListener('click',()=>loadSnapshot(sample));return button;
-  }));
+  if(!catalog)return;const list=filtered();$('result-count').textContent=`${list.length} 栋`;
+  const nodes=list.slice(0,60).map(sample=>{
+    const button=document.createElement('button');button.className='entry';button.dataset.sample=sample.sample_id;
+    button.classList.toggle('selected',entry?.source_id===sample.source_id);button.setAttribute('aria-pressed',String(entry?.source_id===sample.source_id));
+    const name=document.createElement('strong');name.textContent=sample.sample_id;
+    const id=document.createElement('span');id.textContent=sample.building_id||sample.source_id;
+    const height=document.createElement('small');height.textContent=number(sample.height_m)+' m';
+    button.append(name,id,height);button.addEventListener('click',()=>selectBuilding(sample,{focus:true,scroll:true}));return button;
+  });
+  if(list.length>60||!list.length){const note=document.createElement('p');note.className='empty-list';note.textContent=list.length?'列表显示前 60 栋。可在地图点选，或输入编号进一步筛选。':'当前筛选无结果，可清空条件后在地图选取。';nodes.push(note);}
+  $('entries').replaceChildren(...nodes);
 }
-function attributeLabel(attributes,key,fallback='未提供'){const value=attributes?.[key];return value===null||value===undefined||value===''?fallback:String(value);}
+function baseStyle(feature){const props=feature.properties,chosen=entry?.source_id===props.source_id;
+  return {color:chosen?'#a45c41':props.preview_available?'#6e8d9f':'#9da5ac',weight:chosen?2.5:1,
+    fillColor:chosen?'#c48662':props.preview_available?'#8faebf':'#c7ccd0',fillOpacity:chosen ? 0.78 : 0.58,
+    dashArray:props.preview_available?null:'3 3'};
+}
+function refreshMap(){
+  footprintLayer?.eachLayer(layer=>layer.setStyle(baseStyle(layer.feature)));
+  const selected=layers.get(entry?.source_id);selected?.bringToFront();
+  const visible=footprintFeatures.filter(f=>inHeight(f.properties.height_m));
+  $('map-count').textContent=`${visible.length} 栋轮廓 · ${catalog.stats.preview_available} 栋可预览`;
+}
+function renderFootprints(){
+  if(!map)return;
+  if(footprintLayer)map.removeLayer(footprintLayer);layers.clear();
+  footprintLayer=L.geoJSON(footprintFeatures.filter(f=>inHeight(f.properties.height_m)),{
+    style:baseStyle,onEachFeature(feature,layer){
+      const sample=catalog.samples.find(s=>s.source_id===feature.id);if(!sample)return;layers.set(feature.id,layer);
+      const tip=document.createElement('div');tip.textContent=`${sample.sample_id} · ${sample.building_id||'PLATEAU'} · ${number(sample.height_m)} m`;
+      layer.bindTooltip(tip,{sticky:true,direction:'top'});
+      layer.on('click',()=>selectBuilding(sample,{scroll:true}));
+      layer.on('mouseover',()=>{if(entry?.source_id!==feature.id)layer.setStyle({weight:2,fillOpacity:.8});});
+      layer.on('mouseout',()=>layer.setStyle(baseStyle(feature)));
+      layer.on('add',()=>{const path=layer.getElement();if(path){path.dataset.building=sample.sample_id;path.setAttribute('role','button');path.setAttribute('aria-label',`${sample.sample_id}，${number(sample.height_m)}米，点击预览三维`);}});
+    }
+  }).addTo(map);refreshMap();
+}
+function toggleBasemap(on){
+  if(!map||!tiles)return;
+  basemapOn=on;$('basemap').setAttribute('aria-pressed',String(on));
+  if(on&&!map.hasLayer(tiles))tiles.addTo(map);if(!on&&map.hasLayer(tiles))map.removeLayer(tiles);
+  if(!on)$('basemap-status').hidden=true;
+}
+function focusBuilding(sample=entry){
+  if(!sample?.map_bounds)return;
+  map.fitBounds(sample.map_bounds,{padding:[45,45],maxZoom:19,animate:false});
+}
+function initMap(geojson){
+  map=L.map('map',{zoomControl:true,scrollWheelZoom:true,minZoom:12,maxZoom:22,zoomSnap:0.25,zoomDelta:0.5,zoomAnimation:false,fadeAnimation:false});
+  map.attributionControl.setPrefix('<a href="https://leafletjs.com/" target="_blank" rel="noopener">Leaflet</a>');
+  tiles=L.tileLayer(catalog.map.tiles,{maxNativeZoom:18,maxZoom:22,keepBuffer:1,updateWhenIdle:true,
+    attribution:'出典：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a>'});
+  tiles.on('tileload',()=>{tileLoads++;$('basemap-status').hidden=true;});
+  tiles.on('tileerror',()=>{tileErrors++;if(basemapOn&&tileLoads===0&&tileErrors>=3)$('basemap-status').hidden=false;});
+  footprintFeatures=geojson.features;renderFootprints();
+  map.fitBounds(catalog.map.bounds,{padding:[20,20],animate:false});
+  toggleBasemap(parameters.get('basemap')!=='off');
+  new ResizeObserver(()=>map.invalidateSize({animate:false})).observe($('map'));
+}
+function attr(key,fallback='未提供'){const value=entry.attributes[key];return value===null||value===undefined||value===''?fallback:String(value);}
 function updateInfo(){
-  if(!entry)return;const attrs=entry.attributes||{};
-  $('source-label').textContent=mode==='online'?'3DBAG / OFFICIAL API':'REAL BUILDING / SOURCE SNAPSHOT';
-  $('model-title').textContent=entry.sample_id?`${entry.sample_id} · ${entry.source}`:`${entry.source} · ${entry.source_id.slice(-16)}`;
-  $('model-subtitle').textContent=`${mode==='online'?'官方在线读取':'已收录快照'} · LoD ${entry.source_lod} · ${entry.region}`;
+  $('model-title').textContent=`${entry.sample_id} · PLATEAU`;
+  $('model-subtitle').textContent=`LoD ${entry.source_lod} · ${entry.building_id||'源记录未提供建筑 ID'}`;
   $('object-id').textContent=entry.source_id;$('building-id').textContent=entry.building_id||'源数据未提供';
-  const rows=[['数据源',entry.source],['本地编号',entry.sample_id||'未收录'],['发布集 / 快照',entry.region]];
-  if(entry.source==='3DBAG'){
-    const roof=attributeLabel(attrs,'b3_dak_type');const names={flat:'平屋顶',slanted:'斜屋顶',multiple:'多种屋面'};
-    rows.push(['原库屋顶标签',names[roof]||roof],['建造年份',attributeLabel(attrs,'oorspronkelijkbouwjaar')],['点云年份',attributeLabel(attrs,'b3_pw_datum')]);
-  }else{
-    rows.push(['原库类别',attrs.class_description?`${attrs.class} · ${attrs.class_description}`:'未提供'],
-      ['用途',attrs.usage_description?`${attrs.usage} · ${attrs.usage_description}`:'未提供'],['原库地上层数',attributeLabel(attrs,'storeysAboveGround')],['源行政区码',attributeLabel(attrs,'city_code')]);
-  }
-  $('facts').replaceChildren(...rows.map(([key,value])=>{const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=value;row.append(dt,dd);return row;}));
+  const attrs=entry.attributes;
+  const rows=[['发布集 / 年度','千代田区发布集 / 2023'],['源行政区码',attr('city_code')],['地理瓦片','53394509'],
+    ['原库类别',attrs.class_description?`${attrs.class} · ${attrs.class_description}`:attr('class')],
+    ['用途',attrs.usage_description?`${attrs.usage} · ${attrs.usage_description}`:attr('usage')],
+    ['原库地上层数',attr('storeysAboveGround')],['轮廓来源',entry.footprint_source||'未提供']];
+  $('facts').replaceChildren(...rows.map(([label,value])=>{const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);return row;}));
   const dims=view.dimensions();$('metric-width').textContent=number(dims[0]);$('metric-depth').textContent=number(dims[1]);$('metric-height').textContent=number(dims[2]);
-  $('metric-faces').textContent=number(view.geometry.getAttribute('position').count/3,0);$('metric-components').textContent=String(entry.components??currentAudit.components);
-  $('height-max').textContent=number(dims[2]);
-  const q=$('quality');q.classList.toggle('review',!entry.closed);
-  q.querySelector('strong').textContent=entry.closed?(mode==='online'?'浏览器转换：封闭边检查通过':'源几何：封闭边检查通过'):'边拓扑需进一步复核';
-  q.querySelector('p').textContent=mode==='online'?`边界边 ${currentAudit.boundary_edges} · 定向冲突 ${currentAudit.winding_conflicts}；自交 / CFD 网格未验收。`:'源几何完整保留；自交及 CFD 网格未在本页验收。';
-  $('attribute-json').textContent=JSON.stringify(attrs,null,2);
-  $('source-link').href=entry.source_url;$('source-link').textContent=entry.source==='PLATEAU'?'官方 CityGML · 约128 MiB ↗':'官方建筑数据 ↗';
-  $('dataset-link').href=entry.source==='PLATEAU'?catalog.source_links.plateau_dataset:catalog.source_links['3dbag'];
-  $('download-source').textContent=entry.source==='PLATEAU'?'CityGML 片段 ↓':mode==='online'?'API JSON ↓':'CityJSON ↓';
-  const lods=mode==='online'?onlineResult.availableLods:[String(entry.source_lod)];
-  $('lod').replaceChildren(...lods.map(lod=>{const option=document.createElement('option');option.value=lod;option.textContent='LoD '+lod;return option;}));
-  $('lod').value=String(entry.source_lod);
-  loading(false);renderList();renderReady=true;
+  $('metric-faces').textContent=number(currentAudit.triangles,0);$('metric-components').textContent=String(currentAudit.components);$('height-max').textContent=number(dims[2]);
+  $('quality').classList.toggle('review',!entry.closed);
+  $('quality').querySelector('strong').textContent=entry.closed?'源几何：封闭边检查通过':'源几何：边拓扑需复核';
+  $('quality').querySelector('p').textContent='未进行额外补洞、平滑或简化；自交与 CFD 网格未在本页验收。';
+  $('attribute-json').textContent=JSON.stringify(attrs,null,2);$('source-link').href=entry.source_url;$('dataset-link').href=catalog.source_links.plateau_dataset;
+  $('download-source').textContent=entry.original_compressed?'CityGML.gz ↓':'CityGML ↓';
+  $('map-selection').textContent=`已选 ${entry.sample_id} · ${entry.building_id||entry.source_id} · 几何高度 ${number(dims[2])} m`;
+  loading(false);renderList();refreshMap();ready=true;
 }
-function commit(geometry,next,raw,buffer,nextMode,audit){
-  view.setGeometry(geometry);entry=next;currentRaw=raw;currentBuffer=buffer;mode=nextMode;currentAudit=audit;
-  updateInfo();notice();
-}
-function failure(error,request){
-  if(request.ticket!==revision||error.name==='AbortError')return;
-  notice(error.message+(entry?`；仍显示 ${entry.sample_id||entry.source_id}。`:'。'));
-  loading(false);
-}
-async function loadSnapshot(sample){
-  const request=begin(`正在读取 ${sample.sample_id} · 单栋几何`);
+async function selectBuilding(sample,{focus=false,scroll=false}={}){
+  active?.abort();const controller=new AbortController();active=controller;const ticket=++revision;notice();
+  if(!sample.preview_available){loading(false);notice(`此源几何未通过转换：${sample.conversion_error||'待复核'}。仍保留当前预览。`);return;}
+  loading(true,`正在读取 ${sample.sample_id} · 三维几何…`);
+  const started=performance.now();
   try{
-    let buffer=cache.get(sample.sample_id);
-    if(!buffer){buffer=await fetchBytes(new URL(sample.model,import.meta.url),request.signal);await checkHash(buffer,sample.model_sha256);cache.set(sample.sample_id,buffer);}
-    if(request.ticket!==revision)return;
-    $('loading-text').textContent='正在构建三维表面…';
-    const geometry=stlLoader.parse(buffer.slice(0));const audit=surfaceAudit(geometry);
-    sourceDocument=null;onlineResult=null;commit(geometry,sample,null,buffer,'snapshot',audit);
-    $('load-summary').textContent=`${sample.sample_id} · ${number(buffer.byteLength/1024)} KB · 本站来源快照 · ${number((performance.now()-request.start)/1000,2)} s`;
-  }catch(error){failure(error,request);}
+    let bytes=cache.get(sample.source_id);
+    if(!bytes){bytes=await fetchBytes(new URL(sample.model,import.meta.url),controller.signal);await checkHash(bytes,sample.model_sha256);cache.set(sample.source_id,bytes);}
+    if(ticket!==revision)return;
+    const geometry=stlLoader.parse(bytes.slice(0)),audit=surfaceAudit(geometry);
+    view.setGeometry(geometry);entry=sample;currentAudit=audit;updateInfo();
+    $('load-summary').textContent=`${sample.sample_id} · ${number(bytes.byteLength/1024)} KB · ${number((performance.now()-started)/1000,2)} s`;
+    const url=new URL(location.href);url.searchParams.set('id',sample.sample_id);history.replaceState(null,'',url);
+    if(focus){if(!inHeight(sample.height_m)){$('height-filter').value='all';renderFootprints();}focusBuilding(sample);}
+    if(scroll&&matchMedia('(max-width:760px)').matches)$('preview').scrollIntoView({block:'start',behavior:'instant'});
+  }catch(error){
+    if(ticket!==revision||error.name==='AbortError')return;
+    loading(false);notice(error.message+(entry?`；仍显示 ${entry.sample_id}。`:'。'));
+  }
 }
-function buildOnlineDocument(document,id,lod='best'){
-  const decoded=decodeCityJSON(document,lod);
-  const alias=catalog.samples.find(x=>x.source_id===id);
-  const next={sample_id:alias?.sample_id||null,source:'3DBAG',source_id:decoded.source_id,
-    building_id:id.slice(-16),source_lod:decoded.lod,region:'BAG 发号市镇 '+id.slice(-16,-12),
-    source_crs:decoded.crs,origin_m:decoded.origin,dimensions_m:decoded.dimensions,height_m:decoded.dimensions[2],
-    source_polygons:decoded.source_polygons,triangles:decoded.audit.triangles,components:decoded.audit.components,
-    closed:decoded.audit.closed,attributes:decoded.attributes,source_url:'https://api.3dbag.nl/collections/pand/items/'+id,
-    self_intersections_checked:false,cfd_accepted:false,training_eligible:false,
-    conversion:'Browser CityJSON display conversion; original rings and holes retained; no geometry repair.',
-    format_version:decoded.format_version};
-  onlineResult=decoded;commit(decoded.geometry,next,document,null,'online',decoded.audit);
-}
-async function loadOnline(input){
-  const id=canonicalBAGId(input);
-  if(!id){notice('请输入 16 位 BAG 编号或 NL.IMBAG.Pand. 开头的建筑 ID。PLATEAU 当前请从已收录编号中选择。');return;}
-  const request=begin('正在请求 3DBAG 官方 API…');
-  const timeout=setTimeout(()=>request.controller.abort(),25000);
-  try{
-    const buffer=await fetchBytes('https://api.3dbag.nl/collections/pand/items/'+id,request.signal,8*1024*1024);
-    if(request.ticket!==revision)return;
-    const document=JSON.parse(new TextDecoder().decode(buffer));
-    buildOnlineDocument(document,id);sourceDocument=document;
-    $('load-summary').textContent=`官方 API · ${number(buffer.byteLength/1024)} KB · ${number((performance.now()-request.start)/1000,2)} s`;
-  }catch(error){if(error.name==='AbortError'&&request.ticket===revision)error=new Error('请求超时或已取消，请稍后重试');failure(error,request);}
-  finally{clearTimeout(timeout);}
-}
-function findEntry(text){const q=text.trim().toLowerCase();return catalog.samples.find(x=>[x.sample_id,x.source_id,x.building_id].some(v=>String(v||'').toLowerCase()===q));}
-function lookup(){
-  const value=$('lookup').value.trim(),sample=findEntry(value);
-  if(sample){loadSnapshot(sample);return;}
-  const failed=catalog.failed_samples.find(x=>x.sample_id.toLowerCase()===value.toLowerCase());
-  if(failed){notice(`${failed.sample_id} 的源轮廓未通过转换，未生成替代模型。原始 ID：${failed.source_id}`);return;}
-  if(canonicalBAGId(value)){loadOnline(value);return;}
-  notice(value?'此编号不在当前已收录索引中。PLATEAU 需结合城市、年度和瓦片定位，不能仅凭 UUID 判断建筑不存在。':'请输入本地编号或原始建筑 ID，也可在列表中选择。');
-}
-function save(blob,name){const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('已准备下载');}
-function saveURL(url,name){const a=document.createElement('a');a.href=url;a.download=name;a.click();}
-function metadata(){return {...entry,viewer_mode:mode,units:'metres',up_axis:'Z',preview_surface_check:currentAudit,
-  download_note:'STL is local metric float32; VTP retains source-library precision. H=1 is isotropic normalization only.',training_eligible:false};}
+function findEntry(value){const q=value.trim().toLowerCase();return catalog?.samples.find(s=>[s.sample_id,s.source_id,s.building_id].some(v=>String(v||'').toLowerCase()===q));}
+function lookup(){const value=$('lookup').value.trim(),sample=findEntry(value);if(sample){selectBuilding(sample,{focus:true,scroll:true});return;}notice(value?'当前瓦片未收录此编号。请清空检索条件，在地图点选建筑。':'直接点选地图中的有色轮廓即可查看，也可输入 P18 等本地编号。');}
+function save(blob,name){const anchor=document.createElement('a'),url=URL.createObjectURL(blob);anchor.href=url;anchor.download=name;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已准备下载');}
+function saveURL(url,name){const anchor=document.createElement('a');anchor.href=url;anchor.download=name;anchor.click();}
 async function exportSTL(normalize=false){
-  if(!entry||busy)return;
-  if(!normalize&&mode==='snapshot'){saveURL(entry.model,entry.sample_id+'.stl');return;}
+  if(!entry||busy)return;if(!normalize){saveURL(entry.model,entry.sample_id+'.stl');return;}
   const {STLExporter}=await import('./vendor/exporters/STLExporter.js');
-  const mesh=new THREE.Mesh(view.geometry,new THREE.MeshBasicMaterial());
-  if(normalize){const h=view.dimensions()[2];mesh.scale.setScalar(1/h);}
-  mesh.updateMatrixWorld(true);
-  const bytes=new STLExporter().parse(mesh,{binary:true});mesh.material.dispose();
-  save(new Blob([bytes],{type:'application/octet-stream'}),`${entry.sample_id||entry.source_id}${normalize?'-H1':''}.stl`);
+  const material=new THREE.MeshBasicMaterial(),mesh=new THREE.Mesh(view.geometry,material);mesh.scale.setScalar(1/view.dimensions()[2]);mesh.updateMatrixWorld(true);
+  const bytes=new STLExporter().parse(mesh,{binary:true});material.dispose();save(new Blob([bytes],{type:'application/octet-stream'}),entry.sample_id+'-H1.stl');
 }
-
+$('fit-map').addEventListener('click',()=>map?.fitBounds(catalog.map.bounds,{padding:[20,20],animate:false}));
+$('focus-building').addEventListener('click',()=>{if(entry&&!inHeight(entry.height_m)){$('height-filter').value='all';renderFootprints();renderList();}focusBuilding();});
+$('basemap').addEventListener('click',()=>toggleBasemap(!basemapOn));
+$('back-map').addEventListener('click',()=>$('map').scrollIntoView({block:'start',behavior:'instant'}));
+$('height-filter').addEventListener('change',()=>{renderFootprints();renderList();});
 $('lookup-form').addEventListener('submit',event=>{event.preventDefault();lookup();});
 $('lookup').addEventListener('input',()=>{query=$('lookup').value.trim().toLowerCase();renderList();});
-$('height-filter').addEventListener('change',renderList);$('sort').addEventListener('change',renderList);
-document.querySelectorAll('[data-source]').forEach(button=>button.addEventListener('click',()=>{
-  sourceFilter=button.dataset.source;query='';$('lookup').value='';
-  document.querySelectorAll('[data-source]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
-  renderList();const first=filtered()[0];if(first&&(sourceFilter!=='all'&&entry?.source!==sourceFilter))loadSnapshot(first);
-}));
-$('load-online').addEventListener('click',()=>{
-  const value=$('lookup').value.trim(),sample=findEntry(value);
-  loadOnline(sample?.source==='3DBAG'?sample.source_id:canonicalBAGId(value)||(!value&&entry?.source==='3DBAG'?entry.source_id:value));
-});
-$('try-online').addEventListener('click',()=>{$('lookup').value='0503100000032914';query='';renderList();loadOnline($('lookup').value);});
-$('lod').addEventListener('change',()=>{
-  if(mode!=='online'||!sourceDocument)return;
-  try{const id=entry.source_id;buildOnlineDocument(sourceDocument,id,$('lod').value);$('load-summary').textContent='已下载的官方数据 · 切换 LoD，无额外网络请求';}
-  catch(error){notice(error.message);}
-});
-$('copy-id').addEventListener('click',async()=>{if(!entry)return;try{await navigator.clipboard.writeText(entry.source_id);toast('已复制原始 ID');}catch{const range=document.createRange();range.selectNodeContents($('object-id'));const selection=getSelection();selection.removeAllRanges();selection.addRange(range);toast('已选中原始 ID，可手动复制');}});
+$('copy-id').addEventListener('click',async()=>{if(!entry)return;try{await navigator.clipboard.writeText(entry.source_id);toast('已复制原始 ID');}catch{const range=document.createRange();range.selectNodeContents($('object-id'));getSelection().removeAllRanges();getSelection().addRange(range);toast('已选中原始 ID，可手动复制');}});
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>view?.fit(button.dataset.view)));
 $('reset-view').addEventListener('click',()=>view?.fit('iso'));
-$('wireframe').addEventListener('click',()=>{if(!view)return;view.setWire(!view.wire);$('wireframe').setAttribute('aria-pressed',String(view.wire));});
-$('height-color').addEventListener('click',()=>{if(!view)return;view.setColor(!view.colored);$('height-color').setAttribute('aria-pressed',String(view.colored));$('height-legend').hidden=!view.colored;});
-$('rotate').addEventListener('click',()=>{if(!view)return;view.controls.autoRotate=!view.controls.autoRotate;$('rotate').setAttribute('aria-pressed',String(view.controls.autoRotate));});
+$('wireframe').addEventListener('click',()=>{if(view){view.setWire(!view.wire);$('wireframe').setAttribute('aria-pressed',String(view.wire));}});
+$('height-color').addEventListener('click',()=>{if(view){view.setColor(!view.colored);$('height-color').setAttribute('aria-pressed',String(view.colored));$('height-legend').hidden=!view.colored;}});
+$('rotate').addEventListener('click',()=>{if(view){view.controls.autoRotate=!view.controls.autoRotate;$('rotate').setAttribute('aria-pressed',String(view.controls.autoRotate));}});
 $('screenshot').addEventListener('click',()=>view?.screenshot(blob=>{if(blob)save(blob,`${entry?.sample_id||'building'}-view.png`);}));
-$('download-stl').addEventListener('click',()=>exportSTL().catch(error=>notice('导出失败：'+error.message)));$('download-h1').addEventListener('click',()=>exportSTL(true).catch(error=>notice('导出失败：'+error.message)));
-$('download-meta').addEventListener('click',()=>{if(entry)save(new Blob([JSON.stringify(metadata(),null,2)+'\n'],{type:'application/json'}),`${entry.sample_id||entry.source_id}-metadata.json`);});
+$('download-stl').addEventListener('click',()=>exportSTL().catch(error=>notice(error.message)));
+$('download-h1').addEventListener('click',()=>exportSTL(true).catch(error=>notice(error.message)));
 $('download-vtp').addEventListener('click',()=>{if(entry?.vtp)saveURL(entry.vtp,entry.sample_id+'.vtp');});
-$('download-source').addEventListener('click',()=>{
-  if(mode==='snapshot')saveURL(entry.original,entry.sample_id+(entry.source==='PLATEAU'?'.gml':'.city.json'));
-  else save(new Blob([JSON.stringify(currentRaw,null,2)+'\n'],{type:'application/json'}),entry.source_id+'.api.json');
-});
-const mobile=matchMedia('(max-width:620px)');function foldList(){$('sample-list').open=!mobile.matches;}mobile.addEventListener('change',foldList);foldList();
-window.__buildingLibrary=()=>({ready:renderReady,busy,mode,sample_id:entry?.sample_id,source:entry?.source,source_id:entry?.source_id,
-  building_id:entry?.building_id,lod:entry?.source_lod,dimensions:view?.dimensions(),triangles:view?.geometry?.getAttribute('position').count/3,
-  audit:currentAudit,attributes:entry?.attributes,revision,error:lastError,renderCount:view?.renderCount||0,
-  view:view?.mode,wire:view?.wire,heightColor:view?.colored,sourceCount:catalog?.samples.length,visibleCount:catalog?filtered().length:0});
-
+$('download-source').addEventListener('click',()=>{if(entry&&!busy)saveURL(entry.original,entry.sample_id+(entry.original_compressed?'.gml.gz':'.gml'));});
+$('download-meta').addEventListener('click',()=>{if(entry&&!busy)save(new Blob([JSON.stringify({...entry,units:'metres',up_axis:'Z',preview_surface_check:currentAudit,training_eligible:false},null,2)+'\n'],{type:'application/json'}),entry.sample_id+'-metadata.json');});
+window.__buildingLibrary=()=>({ready,busy,mode:'plateau-map',sample_id:entry?.sample_id,source:entry?.source,source_id:entry?.source_id,
+  building_id:entry?.building_id,attributes:entry?.attributes,dimensions:view?.dimensions(),triangles:currentAudit?.triangles,audit:currentAudit,
+  sourceCount:catalog?.samples.length,footprintCount:footprintFeatures.length,mapLayers:layers.size,mapSelected:entry?.source_id,
+  basemapOn,tileLoads,tileErrors,mapZoom:map?.getZoom(),mapCenter:map?.getCenter(),revision,error:lastError,
+  view:view?.mode,wire:view?.wire,heightColor:view?.colored,renderCount:view?.renderCount||0,
+  visibleCount:catalog?filtered().length:0});
+window.__buildingMapPoint=(lat,lon)=>{if(!map)return null;const point=map.latLngToContainerPoint([lat,lon]),rect=$('map').getBoundingClientRect();return {x:rect.left+point.x,y:rect.top+point.y,inside:point.x>=0&&point.x<rect.width&&point.y>=0&&point.y<rect.height};};
 async function boot(){
-  loading(true,'正在读取几何索引…');
+  loading(true,'正在读取 PLATEAU 建筑地图…');
   try{
-    const response=await fetch(new URL('./assets/catalog.json',import.meta.url));if(!response.ok)throw Error('几何索引读取失败');catalog=await response.json();
-    renderList();view=new MeshView($('scene'),$('stage'),$('plan'));
-    const initial=new URLSearchParams(location.search).get('id');
-    if(initial){loading(false);$('lookup').value=initial;lookup();}else await loadSnapshot(catalog.samples.find(x=>x.sample_id==='B01'));
-  }catch(error){notice('查看器初始化失败：'+error.message);loading(false);}
+    const response=await fetch(new URL('./assets/catalog.json',import.meta.url));if(!response.ok)throw Error('建筑索引读取失败');catalog=await response.json();
+    const footprints=await fetch(new URL(catalog.map.footprints,import.meta.url));if(!footprints.ok)throw Error('地图轮廓读取失败');
+    initMap(await footprints.json());view=new MeshView($('scene'),$('stage'),$('plan'));
+    $('total-count').textContent=number(catalog.stats.buildings,0);
+    $('coverage-note').textContent=`东京 2023 · 瓦片 53394509。共 ${catalog.stats.buildings} 栋，${catalog.stats.preview_available} 栋可预览；三维模型按点选加载。此处不是日本全国索引。`;
+    renderList();const initial=parameters.get('id'),sample=initial?findEntry(initial):catalog.samples.find(s=>s.sample_id==='P01')||catalog.samples[0];
+    if(sample)await selectBuilding(sample,{focus:Boolean(initial)});else{loading(false);notice('此编号不在当前 PLATEAU 瓦片中，请直接在地图选建筑。');}
+  }catch(error){loading(false);notice('查看器初始化失败：'+error.message);}
 }
 boot();

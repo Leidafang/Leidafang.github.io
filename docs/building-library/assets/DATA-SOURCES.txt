@@ -1,0 +1,6 @@
+3DBAG / PLATEAU building geometry viewer
+
+3DBAG: https://docs.3dbag.nl/en/ ; CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ .
+PLATEAU: Project PLATEAU / Chiyoda-ku 2023; https://www.geospatial.jp/ckan/dataset/plateau-13101-chiyoda-ku-2023 . Use under the original PLATEAU site policy: https://www.mlit.go.jp/plateau/site-policy/ .
+
+These are selected real-building reconstructions, not procedurally invented buildings. The source geometries were triangulated and translated into local metric coordinates by the existing library workflow. No additional repair or simplification is applied here. Original-coordinate CityJSON/CityGML building subsets and precision-preserving VTP are provided for provenance. Referenced textures and complete code lists belong to the original dataset. STL preview coordinates are float32, Z-up and metres. Building identity must retain source, release/region, and original ID. Local B/P numbers are only sample aliases. These geometries are not accepted CFD meshes or training labels.

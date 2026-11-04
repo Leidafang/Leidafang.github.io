@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="按编号浏览 3DBAG 与 PLATEAU 真实建筑几何，查看原始 ID、来源、LoD 和质量记录；支持 3DBAG 官方在线查询与模型下载。">
+  <meta name="theme-color" content="#f5f6f7"><title>真实建筑几何库 · Leidafang</title>
+  <link rel="canonical" href="https://leidafang.github.io/building-library/">
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../building-geometry/style.css"><link rel="stylesheet" href="./style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#viewer">跳到建筑查看器</a>
+  <header class="topbar"><a class="brand" href="../"><img src="./mark.svg" width="36" height="36" alt=""><span>AI <i>×</i> CFD<small>Leidafang 的研究笔记</small></span></a><nav aria-label="导航"><a href="../">研究主页</a><a href="../building-geometry/">参数化生成 ↗</a><a href="#identity">编号说明 ↓</a></nav></header>
+  <main>
+    <section class="intro"><div><div class="eyebrow"><span></span> REAL BUILDINGS / 02</div><h1>真实建筑，逐栋看。</h1><p>从原始编号追溯一栋建筑，转动几何，查看屋顶、退台与真实体量。</p></div><div class="intro-meta"><span><b>58</b><small>已收录几何</small></span><span><b>02</b><small>真实建筑来源</small></span><span><b>ID</b><small>编号检索与下载</small></span></div></section>
+
+    <section id="viewer" class="library-shell" aria-label="真实建筑查看器">
+      <aside class="library-index">
+        <div class="panel-head"><span class="eyebrow">FIND A BUILDING</span><span class="live-dot"></span></div>
+        <div class="source-tabs" role="group" aria-label="筛选数据库"><button data-source="all" class="active" aria-pressed="true">全部 <small>58</small></button><button data-source="3DBAG" aria-pressed="false">3DBAG</button><button data-source="PLATEAU" aria-pressed="false">PLATEAU</button></div>
+        <form id="lookup-form"><label class="field-label" for="lookup">本地编号 / 原始建筑 ID</label><input id="lookup" autocomplete="off" spellcheck="false" placeholder="B12、P18、16 位 BAG 编号…" aria-describedby="id-help"><button class="button primary wide" type="submit">加载所选编号 <span>↗</span></button></form>
+        <p id="id-help" class="small-note">B / P 为本地样本编号。原始 ID、建筑 ID 和采集地区可同时检索。</p>
+        <div class="online-box"><div><span class="status-dot"></span><strong>3DBAG 官方在线读取</strong></div><p>输入完整 BAG ID 或 16 位编号，按需读取原库模型。</p><button id="load-online" class="button secondary wide">从官方 API 下载并预览</button><button id="try-online" class="text-link" type="button">试一个未收录的官方编号 ↗</button></div>
+        <div id="notice" class="notice" role="status" hidden></div>
+        <div class="filter-row"><div><label for="height-filter">高度</label><select id="height-filter"><option value="all">全部高度</option><option value="low">低于 20 m</option><option value="mid">20–60 m</option><option value="high">60 m 及以上</option></select></div><div><label for="sort">排序</label><select id="sort"><option value="id">本地编号</option><option value="height">高度优先</option><option value="faces">面数优先</option></select></div></div>
+        <details id="sample-list" open><summary><span>已收录模型</span><span id="result-count">58 栋</span></summary><div id="entries" class="entries" aria-label="建筑编号列表"></div></details>
+        <p class="index-foot">3DBAG 28 栋 · PLATEAU 30 栋<br>B04 / B05 源轮廓转换失败，未提供替代几何。<br>当前列表是形态覆盖选样，不是两国全库索引。</p>
+      </aside>
+
+      <div class="library-view">
+        <div id="stage" class="stage">
+          <canvas id="scene" tabindex="0" aria-label="三维建筑模型，拖动旋转，滚轮缩放，右键平移"></canvas>
+          <div class="scene-heading"><span id="source-label" class="engine-label">REAL BUILDING / SOURCE SNAPSHOT</span><h2 id="model-title">正在读取建筑…</h2><p id="model-subtitle">3DBAG / PLATEAU</p></div>
+          <div class="view-buttons" role="group" aria-label="相机视图"><button class="active" data-view="iso" aria-pressed="true">立体</button><button data-view="top" aria-pressed="false">顶视</button><button data-view="front" aria-pressed="false">正视</button><button id="reset-view" aria-label="重置视角">↺</button></div>
+          <div id="loading" class="loading" role="status"><i></i><span id="loading-text">正在下载单栋几何…</span></div>
+          <div id="height-legend" class="height-legend" hidden><span>几何高度 / m</span><div></div><p><span>0</span><span id="height-max">—</span></p></div>
+          <div class="stage-bottom"><span id="grid-label" class="gesture">米制 · 拖动旋转 · 滚轮缩放</span><div><button id="height-color" aria-pressed="false">高度着色</button><button id="wireframe" aria-pressed="false">线框</button><button id="rotate" aria-pressed="false">自动旋转</button><button id="screenshot">PNG ↓</button></div></div>
+        </div>
+        <div class="metrics"><div><small>宽度</small><strong id="metric-width">—</strong><span>m</span></div><div><small>进深</small><strong id="metric-depth">—</strong><span>m</span></div><div><small>几何高度</small><strong id="metric-height">—</strong><span>m</span></div><div><small>三角面</small><strong id="metric-faces">—</strong><span>faces</span></div><div><small>连通片</small><strong id="metric-components">—</strong><span>parts</span></div></div>
+        <div class="library-export"><div><span id="load-state" class="status-dot"></span><span id="load-summary">按需装入单栋模型</span></div><div><button id="download-source">源数据 ↓</button><button id="download-meta">元数据 ↓</button><button id="download-vtp">VTP ↓</button><button id="download-h1">H=1 STL ↓</button><button id="download-stl" class="button primary">米制 STL ↓</button></div></div>
+      </div>
+
+      <aside class="library-info">
+        <span class="eyebrow">IDENTITY & PROVENANCE</span>
+        <div class="identity-block"><div><label>原始对象 ID</label><button id="copy-id" title="复制原始 ID" aria-label="复制原始 ID">复制</button></div><code id="object-id">—</code></div>
+        <div class="secondary-id"><span>关联建筑 ID</span><code id="building-id">—</code></div>
+        <dl id="facts" class="facts"></dl>
+        <div class="lod-picker"><label for="lod">显示细节等级</label><select id="lod" disabled><option>—</option></select></div>
+        <div id="quality" class="quality"><span class="status-dot"></span><div><strong>正在核对几何记录</strong><p>表面检查与 CFD 验收分别记录。</p></div></div>
+        <div class="source-actions"><a id="source-link" target="_blank" rel="noopener">原始发布来源 ↗</a><a id="dataset-link" target="_blank" rel="noopener">数据库说明 ↗</a></div>
+        <details class="parameter-details"><summary>查看完整属性</summary><pre id="attribute-json"></pre></details>
+        <div class="plan-panel"><div><span>XY 投影轮廓</span><small>等比 · m</small></div><canvas id="plan" width="440" height="280" aria-label="当前建筑的 XY 投影轮廓"></canvas></div>
+      </aside>
+    </section>
+
+    <section class="identity-section" id="identity"><div class="section-heading"><div><span class="eyebrow">READ THE IDENTIFIERS</span><h2>编号是身份，不是建筑形状。</h2><p>数据库按地理区域与建筑对象组织。用途、屋顶、年代和 LoD 是属性；本地 B/P 编号是选样别名。</p></div></div><div class="identity-cards"><article><span class="eyebrow">3DBAG · NETHERLANDS</span><h3>一个 BAG 建筑对象</h3><code>NL.IMBAG.Pand.<b>0503</b><i>10</i>0000004244</code><p>16 位数字由发号市镇代码 4 位、对象类型 2 位、序号 10 位组成；<strong>10 表示 Pand（建筑对象）</strong>。编号不表示高低层、屋顶或复杂度。</p><a href="https://www.amsterdam.nl/stelselpedia/bag-index/catalogus-bag/unieke-identificatie-van-het-object/" target="_blank" rel="noopener">官方编号说明 ↗</a></article><article><span class="eyebrow">PLATEAU · JAPAN</span><h3>区分对象 ID 与建筑 ID</h3><code>bldg_d23b8d7e-…<br>13101-bldg-4530</code><p><strong>gml:id</strong> 识别当前数据集里的对象，更新年度时可能改变。建筑 ID、城市代码、年度与源瓦片应一并保留，用于追溯和关联。</p><a href="https://www.mlit.go.jp/plateau/learning/tpc03-2/" target="_blank" rel="noopener">官方 CityGML 结构说明 ↗</a></article><article><span class="eyebrow">OUR SAMPLE INDEX</span><h3>B12 / P18 是本地别名</h3><code>B → 3DBAG<br>P → PLATEAU</code><p>各取 30 栋作形态覆盖选样，其中 58 栋完成转换。编号是选样次序，<strong>不代表数据库分类，也不是复杂度排名</strong>。同一编号须绑定当前清单版本。</p><a href="./assets/catalog.json" download>下载本页索引 ↗</a></article></div></section>
+    <details class="about"><summary>数据范围、转换与质量说明</summary><div><p>已收录模型来自 2026-10-14 的项目采样快照：3DBAG 为 Delft / Rotterdam 的局部窗口，PLATEAU 为千代田区发布的 2023 年度、53394509 瓦片。发布集城市与建筑属性中的行政区码分别保留，不能默认二者相同。使用现有源几何，保留庭院和原始体量，不在本页额外补洞、平滑或简化。</p><p>3DBAG 官方在线模式按 ID 请求 API，可选择接口返回的 LoD。LoD 表示几何表达细节，不是建筑类别；同一栋建筑在不同 LoD 下的屋顶和包围高度可能不同。PLATEAU 首版预览限已收录 30 栋；官方完整 CityGML 按城市 / 年度 / 瓦片发布，原瓦片约 128 MiB，不在打开本页时自动整包下载。</p><p>STL 使用本地米制、Z 向上坐标，预览为 float32；VTP 保留原几何库的数值精度。原始 CityJSON / CityGML 建筑片段保留原始坐标。H=1 STL 仅做等比缩放，不能视为已验证的 CFD 相似性。</p><p>55 栋源几何通过既有封闭边检查，3 栋仍需复核；自交和 CFD 体网格并未在本页验收。在线模型另显示浏览器三角化后的边检查，不替代正式几何质量报告。高度色彩只表示几何高度，不是 CFD 场。</p><p><a href="./assets/DATA-SOURCES.txt">来源与使用说明</a> · <a href="https://docs.3dbag.nl/en/schema/attributes/" target="_blank" rel="noopener">3DBAG 属性表</a> · <a href="https://www.mlit.go.jp/plateau/site-policy/" target="_blank" rel="noopener">PLATEAU 数据政策</a> · <a href="./vendor/THREE-LICENSE.txt">Three.js License</a></p></div></details>
+  </main>
+  <footer><a href="../">AI × CFD <span>/</span> Leidafang</a><span>真实建筑几何库 · 2026.11</span><a href="../building-geometry/">参数化几何实验室 ↗</a></footer>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p>启用 JavaScript 可按编号交互预览。<a href="./assets/catalog.json">查看几何索引</a>。</p></noscript>
+</body>
+</html>

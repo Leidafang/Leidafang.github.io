@@ -1,0 +1,68 @@
+{
+  "id": "A05",
+  "name_zh": "组合平面平屋顶",
+  "name_en": "Composite / Flat",
+  "parameters": {
+    "floorplan": {
+      "type": "COMPOSITE",
+      "width": 8,
+      "length": 8,
+      "tl1": 8,
+      "tl2": 0,
+      "tl3": 0,
+      "tl4": 6,
+      "tail_angle": 0
+    },
+    "floors": 5,
+    "floor_height": 3.2,
+    "roof": {
+      "thickness": 0.15,
+      "outset": 0.15,
+      "add_border": false,
+      "type": "FLAT"
+    }
+  },
+  "dimensions_m": [
+    16.299999713897705,
+    14.299999713897705,
+    16.149999618530273
+  ],
+  "footprint_xy_m": [
+    [
+      -4.0,
+      -4.0
+    ],
+    [
+      12.0,
+      -4.0
+    ],
+    [
+      12.0,
+      4.0
+    ],
+    [
+      4.0,
+      4.0
+    ],
+    [
+      4.0,
+      10.0
+    ],
+    [
+      -4.0,
+      10.0
+    ]
+  ],
+  "footprint_area_m2": 176.0,
+  "volume_m3": 2843.763429081918,
+  "triangles": 92,
+  "geometry_checks": {
+    "closed_edge_topology": true,
+    "ground_cap_added": true,
+    "self_intersection_check": false,
+    "cfd_mesh_check": false
+  },
+  "glb": "./assets/samples/A05/building.glb",
+  "stl": "./assets/samples/A05/building.stl",
+  "preview": "./assets/previews/A05.webp"
+}

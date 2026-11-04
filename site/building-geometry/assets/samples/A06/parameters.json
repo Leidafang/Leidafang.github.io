@@ -1,0 +1,95 @@
+{
+  "id": "A06",
+  "name_zh": "H 形平屋顶",
+  "name_en": "H-shaped / Flat",
+  "parameters": {
+    "floorplan": {
+      "type": "H-SHAPED",
+      "width": 10,
+      "length": 6,
+      "tl1": 7,
+      "tl2": 7,
+      "tl3": 7,
+      "tl4": 7,
+      "tw1": 4,
+      "tw2": 4,
+      "tw3": 4,
+      "tw4": 4
+    },
+    "floors": 5,
+    "floor_height": 3.2,
+    "roof": {
+      "thickness": 0.15,
+      "outset": 0.15,
+      "add_border": false,
+      "type": "FLAT"
+    }
+  },
+  "dimensions_m": [
+    12.300000190734863,
+    20.299999237060547,
+    16.149999618530273
+  ],
+  "footprint_xy_m": [
+    [
+      -6.0,
+      10.0
+    ],
+    [
+      -6.0,
+      -10.0
+    ],
+    [
+      -2.0,
+      -10.0
+    ],
+    [
+      -2.0,
+      -3.0
+    ],
+    [
+      2.0,
+      -3.0
+    ],
+    [
+      2.0,
+      -10.0
+    ],
+    [
+      6.0,
+      -10.0
+    ],
+    [
+      6.0,
+      10.0
+    ],
+    [
+      2.0,
+      10.0
+    ],
+    [
+      2.0,
+      3.0
+    ],
+    [
+      -2.0,
+      3.0
+    ],
+    [
+      -2.0,
+      10.0
+    ]
+  ],
+  "footprint_area_m2": 184.0,
+  "volume_m3": 2973.683424113276,
+  "triangles": 188,
+  "geometry_checks": {
+    "closed_edge_topology": true,
+    "ground_cap_added": true,
+    "self_intersection_check": false,
+    "cfd_mesh_check": false
+  },
+  "glb": "./assets/samples/A06/building.glb",
+  "stl": "./assets/samples/A06/building.stl",
+  "preview": "./assets/previews/A06.webp"
+}

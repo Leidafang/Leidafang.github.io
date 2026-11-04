@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="探索参数化建筑几何：查看 Building Tools 原始模型，调整平面、尺寸与屋顶，导出 STL、GLB 和生成参数。">
+  <meta name="theme-color" content="#f5f6f7">
+  <link rel="canonical" href="https://leidafang.github.io/building-geometry/">
+  <meta property="og:title" content="建筑几何实验室 · Leidafang">
+  <meta property="og:description" content="查看 Building Tools 原始模型，实时调整建筑体量，导出 STL、GLB 与生成参数。">
+  <meta property="og:url" content="https://leidafang.github.io/building-geometry/">
+  <meta property="og:type" content="website">
+  <title>建筑几何实验室 · Leidafang</title>
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#lab" data-i18n="skip">跳到几何实验室</a>
+  <header class="topbar">
+    <a class="brand" href="../"><img src="./mark.svg" width="30" height="30" alt=""><span>AI <i>×</i> CFD<small data-i18n="brand">Leidafang 的研究笔记</small></span></a>
+    <nav aria-label="导航"><a href="../" data-i18n="home">研究主页</a><a href="../mdc-demo/" data-i18n="mdc">数据中心 Demo ↗</a><button id="language" type="button" aria-label="Switch to English">EN</button></nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div><div class="eyebrow"><span></span> GEOMETRY / 01</div><h1 data-i18n="title">建筑几何，从参数开始。</h1><p data-i18n="intro">转动一栋建筑，改变一组参数。探索平面、体量与屋顶如何一起定义形状。</p></div>
+      <div class="intro-meta"><span><b>08</b><small data-i18n="originalCount">源码生成样例</small></span><span><b>04</b><small data-i18n="familyCount">可调平面类型</small></span><span><b>3D</b><small data-i18n="exportIntro">预览与模型导出</small></span></div>
+    </section>
+
+    <section id="lab" class="lab" aria-label="建筑几何实验室">
+      <aside class="inspector">
+        <div class="panel-head"><span class="eyebrow">EXPLORE A SHAPE</span><span class="live-dot"></span></div>
+        <div class="mode-tabs" role="group" aria-label="几何来源"><button id="mode-original" class="active" aria-pressed="true" data-i18n="originalMode">源码样例</button><button id="mode-workshop" aria-pressed="false" data-i18n="workshopMode">参数工坊</button></div>
+        <div id="original-panel">
+          <div class="source-badge">BUILDING TOOLS <span>v1.0.13</span></div>
+          <h2 id="original-title">H 形四坡屋顶</h2><p class="panel-copy" data-i18n="originalCopy">在 Blender 中运行原始插件生成。选择下方样例，可查看不同平面与屋顶的实际输出。</p>
+          <dl id="original-facts" class="facts"></dl>
+          <details class="parameter-details"><summary data-i18n="exactParams">查看完整生成参数</summary><pre id="original-json"></pre></details>
+          <button id="open-workshop" class="button secondary wide" data-i18n="startEditing">进入参数工坊 ↗</button>
+        </div>
+        <div id="workshop-panel" hidden>
+          <label class="field-label" for="shape" data-i18n="footprintType">平面类型</label>
+          <select id="shape"><option value="rectangle" data-i18n="rectangle">矩形</option><option value="circle" data-i18n="circle">圆形</option><option value="lshape" data-i18n="lshape">L 形组合</option><option value="hshape" selected data-i18n="hshape">H 形</option></select>
+          <div class="control" data-control="width"><label for="width" data-i18n="width">总宽 W</label><div><input id="width-number" type="number" min="8" max="48" step="0.5" value="16" aria-label="总宽，米"><span>m</span></div><input id="width" type="range" min="8" max="48" step="0.5" value="16"></div>
+          <div class="control" data-control="depth"><label for="depth" data-i18n="depth">进深 D</label><div><input id="depth-number" type="number" min="8" max="48" step="0.5" value="24" aria-label="进深，米"><span>m</span></div><input id="depth" type="range" min="8" max="48" step="0.5" value="24"></div>
+          <div class="control" data-control="floors"><label for="floors" data-i18n="floors">楼层数</label><div><input id="floors-number" type="number" min="1" max="16" step="1" value="5" aria-label="楼层数"><span data-i18n="storeys">层</span></div><input id="floors" type="range" min="1" max="16" step="1" value="5"></div>
+          <div class="control" data-control="floorHeight"><label for="floorHeight" data-i18n="floorHeight">层高</label><div><input id="floorHeight-number" type="number" min="2.5" max="5" step="0.1" value="3.2" aria-label="层高，米"><span>m</span></div><input id="floorHeight" type="range" min="2.5" max="5" step="0.1" value="3.2"></div>
+          <div class="control" data-control="arm"><label for="arm" data-i18n="arm">翼部 / 连廊宽度</label><div><input id="arm-number" type="number" min="1.5" max="7" step="0.1" value="4" aria-label="翼部与连廊宽度，米"><span>m</span></div><input id="arm" type="range" min="1.5" max="7" step="0.1" value="4"></div>
+          <div id="roof-control"><label class="field-label" for="roof" data-i18n="roof">屋顶</label><select id="roof"><option value="flat" data-i18n="flat">平屋顶</option><option value="gable" data-i18n="gable">双坡屋顶</option><option value="hip" data-i18n="hip">四坡屋顶</option></select></div>
+          <div class="control" data-control="roofHeight"><label for="roofHeight" data-i18n="roofHeight">屋顶高度</label><div><input id="roofHeight-number" type="number" min="0.5" max="8" step="0.1" value="3" aria-label="屋顶高度，米"><span>m</span></div><input id="roofHeight" type="range" min="0.5" max="8" step="0.1" value="3"></div>
+          <button id="shuffle" class="button secondary wide"><span>⤨</span><span data-i18n="shuffle">换一组参数</span></button>
+          <p class="small-note" data-i18n="workshopCopy">轻量浏览器生成器，参数变化即时可见。组合平面使用平屋顶；与原插件输出分别标注。</p>
+        </div>
+        <div class="plan-panel"><div><span data-i18n="plan">平面轮廓</span><small>XY · m</small></div><svg id="plan" viewBox="0 0 240 150" role="img" aria-label="当前建筑平面轮廓"></svg></div>
+      </aside>
+
+      <div class="viewport-column">
+        <div id="stage" class="stage">
+          <img id="poster" src="./assets/previews/A07.webp" alt="H 形四坡屋顶建筑预览">
+          <canvas id="scene" tabindex="0" aria-label="三维建筑，拖动旋转、滚轮缩放、右键平移"></canvas>
+          <div class="scene-heading"><span id="engine-label" class="engine-label">BUILDING TOOLS / ORIGINAL</span><h2 id="scene-title">A07 · H 形四坡屋顶</h2><p id="scene-subtitle">Blender 4.0.2 · m</p></div>
+          <div class="view-buttons" role="group" aria-label="相机视图"><button class="active" data-view="iso" aria-pressed="true" data-i18n="iso">立体</button><button data-view="top" aria-pressed="false" data-i18n="top">顶视</button><button data-view="front" aria-pressed="false" data-i18n="front">正视</button><button id="reset-view" title="重置视角" aria-label="重置视角">↺</button></div>
+          <div id="loading" class="loading" role="status"><i></i><span data-i18n="loading">正在装入几何…</span></div>
+          <div class="axis-key" aria-hidden="true"><span>X</span><span>Y</span><span>Z ↑</span></div>
+          <div class="stage-bottom"><span class="gesture" data-i18n="gesture">拖动旋转 · 滚轮缩放 · 右键平移</span><div><button id="wireframe" aria-pressed="false" data-i18n="wireframe">线框</button><button id="rotate" aria-pressed="false" data-i18n="rotate">自动旋转</button><button id="screenshot" title="下载当前视图 PNG" aria-label="下载当前视图 PNG">PNG ↓</button></div></div>
+        </div>
+        <div class="metrics" aria-live="polite"><div><small data-i18n="bboxWidth">包围盒宽</small><strong id="metric-width">—</strong><span>m</span></div><div><small data-i18n="bboxDepth">包围盒深</small><strong id="metric-depth">—</strong><span>m</span></div><div><small data-i18n="height">总高度</small><strong id="metric-height">—</strong><span>m</span></div><div><small data-i18n="footprintArea">占地面积</small><strong id="metric-area">—</strong><span>m²</span></div><div><small data-i18n="volume">几何体积</small><strong id="metric-volume">—</strong><span>m³</span></div></div>
+        <div class="export-row"><div><span class="status-dot"></span><span id="geometry-state" data-i18n="geometryOnly">几何展示 · CFD 网格尚未验证</span></div><div class="downloads"><button id="download-json">JSON ↓</button><button id="download-glb">GLB ↓</button><button id="download-stl" class="button primary" data-i18n="downloadSTL">导出 STL ↓</button></div></div>
+      </div>
+    </section>
+
+    <section class="gallery-section" id="examples">
+      <div class="section-heading"><div><span class="eyebrow">THE ORIGINAL COLLECTION</span><h2 data-i18n="collectionTitle">同一个生成器，八种建筑形状。</h2><p data-i18n="collectionCopy">这些模型来自 Building Tools 的真实生成结果。点击任意样例，在上方旋转查看。</p></div><a class="text-link" href="./assets/building-tools-originals.zip" download data-i18n="downloadAll">下载全部原始样例 ↗</a></div>
+      <div id="gallery" class="gallery" aria-label="Building Tools 原始样例"></div>
+    </section>
+
+    <section class="context-section">
+      <div><span class="eyebrow">WHY GEOMETRY COMES FIRST</span><h2 data-i18n="contextTitle">先探索形状，再准备流场数据。</h2><p data-i18n="contextCopy">可控的几何变化，让数据覆盖变得具体。建筑高度、长宽比例、凹口和屋顶，都是值得单独观察的设计变量。</p><a href="../#urban" class="text-link" data-i18n="researchLink">回到建筑风环境研究 ↗</a></div>
+      <div class="context-list"><article><span>01</span><div><h3 data-i18n="step1">定义几何空间</h3><p data-i18n="step1Copy">确定建筑类型与尺寸范围，保留每个样本的生成参数。</p></div></article><article><span>02</span><div><h3 data-i18n="step2">检查表面与网格</h3><p data-i18n="step2Copy">封闭表面只是起点；自交、细小特征和体网格质量仍需检查。</p></div></article><article><span>03</span><div><h3 data-i18n="step3">计算并检验泛化</h3><p data-i18n="step3Copy">结合来流等条件制备 CFD 数据，按几何分组验证模型。</p></div></article></div>
+    </section>
+    <details class="about"><summary data-i18n="about">关于生成方式与使用范围</summary><div><p data-i18n="aboutOriginal">源码样例：Building Tools v1.0.13 / Blender 4.0.2，已补齐接地底面。STL 使用米制、Z 向上；GLB 遵循 glTF 的 Y 向上约定。封闭边拓扑已检查，自交和 CFD 体网格未验收。</p><p data-i18n="aboutWorkshop">参数工坊：独立的浏览器轻量实现，提供矩形、圆形、L 形与 H 形体量。矩形支持三种屋顶，其余平面使用平屋顶；导出参数注明 browser-workshop-v1，不作为原 Blender 插件的执行结果。</p><p><a href="https://github.com/ranjian0/building_tools" target="_blank" rel="noopener">Building Tools ↗</a> · <a href="./assets/BUILDING-TOOLS-LICENSE.txt">MIT License</a> · <a href="./vendor/THREE-LICENSE.txt">Three.js License</a></p></div></details>
+  </main>
+  <footer><a href="../">AI × CFD <span> / </span> Leidafang</a><span data-i18n="footer">建筑几何实验室 · 2026.11</span><a href="https://github.com/Leidafang" target="_blank" rel="noopener">GitHub ↗</a></footer>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p>启用 JavaScript 可交互查看和调整几何。<a href="./assets/building-tools-originals.zip">下载八个原始建筑模型</a>。</p></noscript>
+</body>
+</html>

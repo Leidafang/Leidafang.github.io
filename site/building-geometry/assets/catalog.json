@@ -1,0 +1,840 @@
+{
+  "source": {
+    "project": "Building Tools",
+    "version": "v1.0.13",
+    "blender": "4.0.2",
+    "license": "MIT",
+    "repository": "https://github.com/ranjian0/building_tools",
+    "adaptation": "Planar bottom boundary capped for closed source examples; original footprint and roof retained."
+  },
+  "samples": [
+    {
+      "id": "A01",
+      "name_zh": "矩形平屋顶",
+      "name_en": "Rectangular / Flat",
+      "parameters": {
+        "floorplan": {
+          "type": "RECTANGULAR",
+          "width": 18,
+          "length": 12
+        },
+        "floors": 6,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "FLAT"
+        }
+      },
+      "dimensions_m": [
+        18.299999237060547,
+        12.300000190734863,
+        19.350000381469727
+      ],
+      "footprint_xy_m": [
+        [
+          9.0,
+          -6.0
+        ],
+        [
+          9.0,
+          6.0
+        ],
+        [
+          -9.0,
+          6.0
+        ],
+        [
+          -9.0,
+          -6.0
+        ]
+      ],
+      "footprint_area_m2": 216.0,
+      "volume_m3": 4180.963578045846,
+      "triangles": 68,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A01/building.glb",
+      "stl": "./assets/samples/A01/building.stl",
+      "preview": "./assets/previews/A01.webp"
+    },
+    {
+      "id": "A02",
+      "name_zh": "矩形双坡屋顶",
+      "name_en": "Rectangular / Gable",
+      "parameters": {
+        "floorplan": {
+          "type": "RECTANGULAR",
+          "width": 18,
+          "length": 12
+        },
+        "floors": 3,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "GABLE",
+          "gable_type": "BOX",
+          "height": 4
+        }
+      },
+      "dimensions_m": [
+        18.299999237060547,
+        12.300000190734863,
+        13.75
+      ],
+      "footprint_xy_m": [
+        [
+          9.0,
+          -6.0
+        ],
+        [
+          9.0,
+          6.0
+        ],
+        [
+          -9.0,
+          6.0
+        ],
+        [
+          -9.0,
+          -6.0
+        ]
+      ],
+      "footprint_area_m2": 216.0,
+      "volume_m3": 2557.5434838609713,
+      "triangles": 52,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A02/building.glb",
+      "stl": "./assets/samples/A02/building.stl",
+      "preview": "./assets/previews/A02.webp"
+    },
+    {
+      "id": "A03",
+      "name_zh": "矩形四坡屋顶",
+      "name_en": "Rectangular / Hip",
+      "parameters": {
+        "floorplan": {
+          "type": "RECTANGULAR",
+          "width": 18,
+          "length": 12
+        },
+        "floors": 3,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "HIP",
+          "height": 4
+        }
+      },
+      "dimensions_m": [
+        18.299999237060547,
+        12.300000190734863,
+        13.75
+      ],
+      "footprint_xy_m": [
+        [
+          9.0,
+          -6.0
+        ],
+        [
+          9.0,
+          6.0
+        ],
+        [
+          -9.0,
+          6.0
+        ],
+        [
+          -9.0,
+          -6.0
+        ]
+      ],
+      "footprint_area_m2": 216.0,
+      "volume_m3": 2456.6834807329196,
+      "triangles": 48,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A03/building.glb",
+      "stl": "./assets/samples/A03/building.stl",
+      "preview": "./assets/previews/A03.webp"
+    },
+    {
+      "id": "A04",
+      "name_zh": "圆形平屋顶",
+      "name_en": "Circular / Flat",
+      "parameters": {
+        "floorplan": {
+          "type": "CIRCULAR",
+          "radius": 8,
+          "segments": 64
+        },
+        "floors": 6,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "FLAT"
+        }
+      },
+      "dimensions_m": [
+        16.30036163330078,
+        16.30036163330078,
+        19.350000381469727
+      ],
+      "footprint_xy_m": [
+        [
+          7.961477756500244,
+          -0.7841371297836304
+        ],
+        [
+          8.0,
+          0.0
+        ],
+        [
+          7.961477756500244,
+          0.7841371297836304
+        ],
+        [
+          7.846282005310059,
+          1.5607225894927979
+        ],
+        [
+          7.65552282333374,
+          2.322277545928955
+        ],
+        [
+          7.391036033630371,
+          3.0614676475524902
+        ],
+        [
+          7.055369853973389,
+          3.7711739540100098
+        ],
+        [
+          6.651756763458252,
+          4.444561958312988
+        ],
+        [
+          6.184083461761475,
+          5.075146675109863
+        ],
+        [
+          5.656854152679443,
+          5.656854152679443
+        ],
+        [
+          5.075146675109863,
+          6.184083461761475
+        ],
+        [
+          4.444561958312988,
+          6.651756763458252
+        ],
+        [
+          3.7711739540100098,
+          7.055369853973389
+        ],
+        [
+          3.0614676475524902,
+          7.391036033630371
+        ],
+        [
+          2.322277545928955,
+          7.65552282333374
+        ],
+        [
+          1.5607225894927979,
+          7.846282005310059
+        ],
+        [
+          0.7841371297836304,
+          7.961477756500244
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          -0.7841371297836304,
+          7.961477756500244
+        ],
+        [
+          -1.5607225894927979,
+          7.846282005310059
+        ],
+        [
+          -2.322277545928955,
+          7.65552282333374
+        ],
+        [
+          -3.0614676475524902,
+          7.391036033630371
+        ],
+        [
+          -3.7711739540100098,
+          7.055369853973389
+        ],
+        [
+          -4.444561958312988,
+          6.651756763458252
+        ],
+        [
+          -5.075146675109863,
+          6.184083461761475
+        ],
+        [
+          -5.656854152679443,
+          5.656854152679443
+        ],
+        [
+          -6.184083461761475,
+          5.075146675109863
+        ],
+        [
+          -6.651756763458252,
+          4.444561958312988
+        ],
+        [
+          -7.055369853973389,
+          3.7711739540100098
+        ],
+        [
+          -7.391036033630371,
+          3.0614676475524902
+        ],
+        [
+          -7.65552282333374,
+          2.322277545928955
+        ],
+        [
+          -7.846282005310059,
+          1.5607225894927979
+        ],
+        [
+          -7.961477756500244,
+          0.7841371297836304
+        ],
+        [
+          -8.0,
+          0.0
+        ],
+        [
+          -7.961477756500244,
+          -0.7841371297836304
+        ],
+        [
+          -7.846282005310059,
+          -1.5607225894927979
+        ],
+        [
+          -7.65552282333374,
+          -2.322277545928955
+        ],
+        [
+          -7.391036033630371,
+          -3.0614676475524902
+        ],
+        [
+          -7.055369853973389,
+          -3.7711739540100098
+        ],
+        [
+          -6.651756763458252,
+          -4.444561958312988
+        ],
+        [
+          -6.184083461761475,
+          -5.075146675109863
+        ],
+        [
+          -5.656854152679443,
+          -5.656854152679443
+        ],
+        [
+          -5.075146675109863,
+          -6.184083461761475
+        ],
+        [
+          -4.444561958312988,
+          -6.651756763458252
+        ],
+        [
+          -3.7711739540100098,
+          -7.055369853973389
+        ],
+        [
+          -3.0614676475524902,
+          -7.391036033630371
+        ],
+        [
+          -2.322277545928955,
+          -7.65552282333374
+        ],
+        [
+          -1.5607225894927979,
+          -7.846282005310059
+        ],
+        [
+          -0.7841371297836304,
+          -7.961477756500244
+        ],
+        [
+          0.0,
+          -8.0
+        ],
+        [
+          0.7841371297836304,
+          -7.961477756500244
+        ],
+        [
+          1.5607225894927979,
+          -7.846282005310059
+        ],
+        [
+          2.322277545928955,
+          -7.65552282333374
+        ],
+        [
+          3.0614676475524902,
+          -7.391036033630371
+        ],
+        [
+          3.7711739540100098,
+          -7.055369853973389
+        ],
+        [
+          4.444561958312988,
+          -6.651756763458252
+        ],
+        [
+          5.075146675109863,
+          -6.184083461761475
+        ],
+        [
+          5.656854152679443,
+          -5.656854152679443
+        ],
+        [
+          6.184083461761475,
+          -5.075146675109863
+        ],
+        [
+          6.651756763458252,
+          -4.444561958312988
+        ],
+        [
+          7.055369853973389,
+          -3.7711739540100098
+        ],
+        [
+          7.391036033630371,
+          -3.0614676475524902
+        ],
+        [
+          7.65552282333374,
+          -2.322277545928955
+        ],
+        [
+          7.846282005310059,
+          -1.5607225894927979
+        ]
+      ],
+      "footprint_area_m2": 200.73910052105975,
+      "volume_m3": 3885.4427987475733,
+      "triangles": 1148,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A04/building.glb",
+      "stl": "./assets/samples/A04/building.stl",
+      "preview": "./assets/previews/A04.webp"
+    },
+    {
+      "id": "A05",
+      "name_zh": "组合平面平屋顶",
+      "name_en": "Composite / Flat",
+      "parameters": {
+        "floorplan": {
+          "type": "COMPOSITE",
+          "width": 8,
+          "length": 8,
+          "tl1": 8,
+          "tl2": 0,
+          "tl3": 0,
+          "tl4": 6,
+          "tail_angle": 0
+        },
+        "floors": 5,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "FLAT"
+        }
+      },
+      "dimensions_m": [
+        16.299999713897705,
+        14.299999713897705,
+        16.149999618530273
+      ],
+      "footprint_xy_m": [
+        [
+          -4.0,
+          -4.0
+        ],
+        [
+          12.0,
+          -4.0
+        ],
+        [
+          12.0,
+          4.0
+        ],
+        [
+          4.0,
+          4.0
+        ],
+        [
+          4.0,
+          10.0
+        ],
+        [
+          -4.0,
+          10.0
+        ]
+      ],
+      "footprint_area_m2": 176.0,
+      "volume_m3": 2843.763429081918,
+      "triangles": 92,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A05/building.glb",
+      "stl": "./assets/samples/A05/building.stl",
+      "preview": "./assets/previews/A05.webp"
+    },
+    {
+      "id": "A06",
+      "name_zh": "H 形平屋顶",
+      "name_en": "H-shaped / Flat",
+      "parameters": {
+        "floorplan": {
+          "type": "H-SHAPED",
+          "width": 10,
+          "length": 6,
+          "tl1": 7,
+          "tl2": 7,
+          "tl3": 7,
+          "tl4": 7,
+          "tw1": 4,
+          "tw2": 4,
+          "tw3": 4,
+          "tw4": 4
+        },
+        "floors": 5,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "FLAT"
+        }
+      },
+      "dimensions_m": [
+        12.300000190734863,
+        20.299999237060547,
+        16.149999618530273
+      ],
+      "footprint_xy_m": [
+        [
+          -6.0,
+          10.0
+        ],
+        [
+          -6.0,
+          -10.0
+        ],
+        [
+          -2.0,
+          -10.0
+        ],
+        [
+          -2.0,
+          -3.0
+        ],
+        [
+          2.0,
+          -3.0
+        ],
+        [
+          2.0,
+          -10.0
+        ],
+        [
+          6.0,
+          -10.0
+        ],
+        [
+          6.0,
+          10.0
+        ],
+        [
+          2.0,
+          10.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          -2.0,
+          3.0
+        ],
+        [
+          -2.0,
+          10.0
+        ]
+      ],
+      "footprint_area_m2": 184.0,
+      "volume_m3": 2973.683424113276,
+      "triangles": 188,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A06/building.glb",
+      "stl": "./assets/samples/A06/building.stl",
+      "preview": "./assets/previews/A06.webp"
+    },
+    {
+      "id": "A07",
+      "name_zh": "H 形四坡屋顶",
+      "name_en": "H-shaped / Hip",
+      "parameters": {
+        "floorplan": {
+          "type": "H-SHAPED",
+          "width": 10,
+          "length": 6,
+          "tl1": 7,
+          "tl2": 7,
+          "tl3": 7,
+          "tl4": 7,
+          "tw1": 4,
+          "tw2": 4,
+          "tw3": 4,
+          "tw4": 4
+        },
+        "floors": 5,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "HIP",
+          "height": 3
+        }
+      },
+      "dimensions_m": [
+        12.300000190734863,
+        20.299999237060547,
+        19.14999771118164
+      ],
+      "footprint_xy_m": [
+        [
+          6.0,
+          10.0
+        ],
+        [
+          2.0,
+          10.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          -2.0,
+          3.0
+        ],
+        [
+          -2.0,
+          10.0
+        ],
+        [
+          -6.0,
+          10.0
+        ],
+        [
+          -6.0,
+          -10.0
+        ],
+        [
+          -2.0,
+          -10.0
+        ],
+        [
+          -2.0,
+          -3.0
+        ],
+        [
+          2.0,
+          -3.0
+        ],
+        [
+          2.0,
+          -10.0
+        ],
+        [
+          6.0,
+          -10.0
+        ]
+      ],
+      "footprint_area_m2": 184.0,
+      "volume_m3": 3193.339878721682,
+      "triangles": 208,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A07/building.glb",
+      "stl": "./assets/samples/A07/building.stl",
+      "preview": "./assets/previews/A07.webp"
+    },
+    {
+      "id": "A08",
+      "name_zh": "随机扩展平屋顶",
+      "name_en": "Random extensions / Flat",
+      "parameters": {
+        "floorplan": {
+          "type": "RANDOM",
+          "width": 12,
+          "length": 12,
+          "seed": 42,
+          "random_extension_amount": false,
+          "extension_amount": 3
+        },
+        "floors": 5,
+        "floor_height": 3.2,
+        "roof": {
+          "thickness": 0.15,
+          "outset": 0.15,
+          "add_border": false,
+          "type": "FLAT"
+        }
+      },
+      "dimensions_m": [
+        16.24588441848755,
+        19.969582557678223,
+        16.149999618530273
+      ],
+      "footprint_xy_m": [
+        [
+          -9.945884704589844,
+          -2.0
+        ],
+        [
+          -6.0,
+          -2.0
+        ],
+        [
+          -6.0,
+          -6.0
+        ],
+        [
+          -2.0,
+          -6.0
+        ],
+        [
+          -2.0,
+          -7.874551773071289
+        ],
+        [
+          2.0,
+          -7.874551773071289
+        ],
+        [
+          2.0,
+          -6.0
+        ],
+        [
+          6.0,
+          -6.0
+        ],
+        [
+          6.0,
+          6.0
+        ],
+        [
+          4.060196876525879,
+          6.0
+        ],
+        [
+          4.060196876525879,
+          11.795031547546387
+        ],
+        [
+          -4.060196876525879,
+          11.795031547546387
+        ],
+        [
+          -4.060196876525879,
+          6.0
+        ],
+        [
+          -6.0,
+          6.0
+        ],
+        [
+          -6.0,
+          2.0
+        ],
+        [
+          -9.945884704589844,
+          2.0
+        ]
+      ],
+      "footprint_area_m2": 214.33968388807807,
+      "volume_m3": 3463.2020047980313,
+      "triangles": 252,
+      "geometry_checks": {
+        "closed_edge_topology": true,
+        "ground_cap_added": true,
+        "self_intersection_check": false,
+        "cfd_mesh_check": false
+      },
+      "glb": "./assets/samples/A08/building.glb",
+      "stl": "./assets/samples/A08/building.stl",
+      "preview": "./assets/previews/A08.webp"
+    }
+  ]
+}

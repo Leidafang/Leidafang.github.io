@@ -1,0 +1,55 @@
+{
+  "id": "A01",
+  "name_zh": "矩形平屋顶",
+  "name_en": "Rectangular / Flat",
+  "parameters": {
+    "floorplan": {
+      "type": "RECTANGULAR",
+      "width": 18,
+      "length": 12
+    },
+    "floors": 6,
+    "floor_height": 3.2,
+    "roof": {
+      "thickness": 0.15,
+      "outset": 0.15,
+      "add_border": false,
+      "type": "FLAT"
+    }
+  },
+  "dimensions_m": [
+    18.299999237060547,
+    12.300000190734863,
+    19.350000381469727
+  ],
+  "footprint_xy_m": [
+    [
+      9.0,
+      -6.0
+    ],
+    [
+      9.0,
+      6.0
+    ],
+    [
+      -9.0,
+      6.0
+    ],
+    [
+      -9.0,
+      -6.0
+    ]
+  ],
+  "footprint_area_m2": 216.0,
+  "volume_m3": 4180.963578045846,
+  "triangles": 68,
+  "geometry_checks": {
+    "closed_edge_topology": true,
+    "ground_cap_added": true,
+    "self_intersection_check": false,
+    "cfd_mesh_check": false
+  },
+  "glb": "./assets/samples/A01/building.glb",
+  "stl": "./assets/samples/A01/building.stl",
+  "preview": "./assets/previews/A01.webp"
+}

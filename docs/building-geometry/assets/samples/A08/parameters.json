@@ -1,0 +1,106 @@
+{
+  "id": "A08",
+  "name_zh": "随机扩展平屋顶",
+  "name_en": "Random extensions / Flat",
+  "parameters": {
+    "floorplan": {
+      "type": "RANDOM",
+      "width": 12,
+      "length": 12,
+      "seed": 42,
+      "random_extension_amount": false,
+      "extension_amount": 3
+    },
+    "floors": 5,
+    "floor_height": 3.2,
+    "roof": {
+      "thickness": 0.15,
+      "outset": 0.15,
+      "add_border": false,
+      "type": "FLAT"
+    }
+  },
+  "dimensions_m": [
+    16.24588441848755,
+    19.969582557678223,
+    16.149999618530273
+  ],
+  "footprint_xy_m": [
+    [
+      -9.945884704589844,
+      -2.0
+    ],
+    [
+      -6.0,
+      -2.0
+    ],
+    [
+      -6.0,
+      -6.0
+    ],
+    [
+      -2.0,
+      -6.0
+    ],
+    [
+      -2.0,
+      -7.874551773071289
+    ],
+    [
+      2.0,
+      -7.874551773071289
+    ],
+    [
+      2.0,
+      -6.0
+    ],
+    [
+      6.0,
+      -6.0
+    ],
+    [
+      6.0,
+      6.0
+    ],
+    [
+      4.060196876525879,
+      6.0
+    ],
+    [
+      4.060196876525879,
+      11.795031547546387
+    ],
+    [
+      -4.060196876525879,
+      11.795031547546387
+    ],
+    [
+      -4.060196876525879,
+      6.0
+    ],
+    [
+      -6.0,
+      6.0
+    ],
+    [
+      -6.0,
+      2.0
+    ],
+    [
+      -9.945884704589844,
+      2.0
+    ]
+  ],
+  "footprint_area_m2": 214.33968388807807,
+  "volume_m3": 3463.2020047980313,
+  "triangles": 252,
+  "geometry_checks": {
+    "closed_edge_topology": true,
+    "ground_cap_added": true,
+    "self_intersection_check": false,
+    "cfd_mesh_check": false
+  },
+  "glb": "./assets/samples/A08/building.glb",
+  "stl": "./assets/samples/A08/building.stl",
+  "preview": "./assets/previews/A08.webp"
+}

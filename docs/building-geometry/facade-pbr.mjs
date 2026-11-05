@@ -1,6 +1,7 @@
 import * as THREE from './vendor/three.module.js';
+import {roofDetailClearance,DETAIL_CLEARANCE_VERSION,DETAIL_CLEARANCE} from './roof-detail-clearance.mjs?v=roof-clearance-20261105';
 
-export const MATERIAL_VERSION='architectural-pbr-v2';
+export const MATERIAL_VERSION='architectural-pbr-v3';
 export const LOOKS=[{id:'auto',zh:'自动匹配建筑',en:'Match building'},{id:'office',zh:'办公玻璃',en:'Office glazing'},{id:'residential',zh:'浅色住宅',en:'Light residential'},{id:'brick',zh:'暖色砖石',en:'Warm masonry'}];
 const palettes={
   office:{wall:'#65717a',frame:'#9ba6ad',glass:'#577580',band:'#485a68',width:.94,height:.83,metal:.72},
@@ -43,7 +44,7 @@ export function atticVent(b){
 export function resolveLook(metadata,choice='auto'){
   if(choice!=='auto')return choice;
   const p=metadata.parameters;
-  if(['podium','twin'].includes(p.family))return 'office';
+  if(['podium','twin'].includes(p.family))return ['gabled','hipped'].includes(p.roof)?'residential':'office';
   if(p.family==='court')return 'brick';
   if(p.family==='bar'&&p.roof!=='flat')return 'residential';
   if(p.family==='bar')return 'residential';
@@ -176,9 +177,9 @@ export class FacadeMaterials{
 
 // Shallow display geometry catches real light at the glass surrounds and sills.
 // It is kept outside the native mesh/export root and is never a CFD opening.
-export function facadeRelief(bases,style){
+export function facadeRelief(bases,style,sourceMeshes=[]){
   const group=new THREE.Group();group.name='display-only-facade-relief';group.userData.displayOnly=true;
-  const frames=[],sills=[],fascias=[],gutters=[],ventPanels=[],palette=palettes[style],axis=new THREE.Vector3(0,0,1),stats={pitchedWalls:0,cornices:0,eaveSegments:0,gutters:0,atticVents:0};
+  const frames=[],sills=[],fascias=[],gutters=[],ventPanels=[],palette=palettes[style],axis=new THREE.Vector3(0,0,1),stats={pitchedWalls:0,cornices:0,eaveSegments:0,gutters:0,atticVents:0,roofClippedInstances:0,roofHiddenInstances:0,clearanceVersion:DETAIL_CLEARANCE_VERSION,clearance:DETAIL_CLEARANCE};
   const add=(list,b,u,z,width,height,depth)=>{
     const normal=b.normal,position=new THREE.Vector3(b.a[0]+b.tx*u+normal[0]*depth*.45,b.a[1]+b.ty*u+normal[1]*depth*.45,z),rotation=new THREE.Quaternion().setFromAxisAngle(axis,Math.atan2(b.ty,b.tx));
     list.push(new THREE.Matrix4().compose(position,rotation,new THREE.Vector3(width,depth,height)));
@@ -189,7 +190,7 @@ export function facadeRelief(bases,style){
     if(up.z<0){direction.negate();up.negate();}
     const rotation=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(direction,outward,up));
     const position=start.add(end).multiplyScalar(.5).addScaledVector(outward,depth*.45).addScaledVector(up,-height*.5);
-    list.push(new THREE.Matrix4().compose(position,rotation,new THREE.Vector3(length+.0015,depth,height)));
+    list.push(new THREE.Matrix4().compose(position,rotation,new THREE.Vector3(length,depth,height)));
   };
   for(const b of bases){
     const body=b.height,total=b.part.height-b.base,cellW=b.length/b.columns,cellH=body/b.rows,podium=b.part.id==='podium',pitched=b.part.roof!=='flat';
@@ -206,15 +207,16 @@ export function facadeRelief(bases,style){
         add(frames,b,u,bottom+h-frame/2,w,Math.max(.00065,frame),.0025);
       }
     }
-    if(!pitched){add(sills,b,b.length/2,b.base+body-.001,b.length,.004,.006);continue;}
+    if(!pitched){add(sills,b,b.length/2,b.base+body-.002-DETAIL_CLEARANCE,b.length,.004,.006);continue;}
     stats.pitchedWalls++;stats.cornices++;
     // A continuous head course ties the last storey to its attic material.
-    add(sills,b,b.length/2,b.base+body,b.length,total*.010,total*.012);
-    add(frames,b,b.length/2,b.base+body+total*.005,b.length,total*.0025,total*.014);
+    const courseHeight=Math.min(total*.006,cellH*.08),lipHeight=Math.min(total*.0025,cellH*.035);
+    add(sills,b,b.length/2,b.base+body-courseHeight/2-DETAIL_CLEARANCE,b.length,courseHeight,total*.012);
+    add(frames,b,b.length/2,b.base+body-lipHeight/2-DETAIL_CLEARANCE,b.length,lipHeight,total*.014);
     for(let i=1;i<b.roofProfile.length;i++){
       const a=b.roofProfile[i-1].position,c=b.roofProfile[i].position,slope=Math.abs(c[2]-a[2])/Math.hypot(c[0]-a[0],c[1]-a[1]);
       beam(fascias,a,c,b.normal,Math.min(.017,total*.018),Math.min(.012,total*.014));stats.eaveSegments++;
-      if(slope<.08){beam(gutters,a,c,b.normal,Math.min(.022,total*.024),total*.003);stats.gutters++;}
+      if(slope<.08&&Math.min(a[2],c[2])<=b.base+body+1e-4){beam(gutters,a,c,b.normal,Math.min(.022,total*.024),total*.003);stats.gutters++;}
     }
     const vent=atticVent(b);
     if(vent){
@@ -227,12 +229,22 @@ export function facadeRelief(bases,style){
       for(let i=1;i<6;i++)add(frames,b,vent.u,vent.z-vent.height/2+i*vent.height/6,vent.width,vent.height*.045,total*.0035);
     }
   }
-  const geometry=new THREE.BoxGeometry(1,1,1);
-  for(const [matrices,color,metalness,roughness] of [[frames,palette.frame,palette.metal,.36],[sills,style==='office'?'#a3a9a6':palette.frame,.06,.78],[fascias,style==='office'||style==='stone'?'#52656c':'#786858',.30,.57],[gutters,'#657780',.65,.38],[ventPanels,'#354346',.12,.70]]){
+  const geometry=new THREE.BoxGeometry(1,1,1),clearance=roofDetailClearance(sourceMeshes);let boxUsed=false;
+  for(const [name,matrices,color,metalness,roughness] of [['frames',frames,palette.frame,palette.metal,.36],['sills',sills,style==='office'?'#a3a9a6':palette.frame,.06,.78],['fascias',fascias,style==='office'||style==='stone'?'#52656c':'#786858',.30,.57],['gutters',gutters,'#657780',.65,.38],['vents',ventPanels,'#354346',.12,.70]]){
     if(!matrices.length)continue;
-    const mesh=new THREE.InstancedMesh(geometry,new THREE.MeshStandardMaterial({color,metalness,roughness,envMapIntensity:.85}),matrices.length);
-    matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
+    const ordinary=[],positions=[],normals=[];
+    for(const matrix of matrices){const clipped=clearance(matrix);if(!clipped)ordinary.push(matrix);else if(!clipped.positions.length)stats.roofHiddenInstances++;else{stats.roofClippedInstances++;positions.push(...clipped.positions);normals.push(...clipped.normals);}}
+    const material=new THREE.MeshStandardMaterial({color,metalness,roughness,envMapIntensity:.85});
+    if(ordinary.length){
+      boxUsed=true;const mesh=new THREE.InstancedMesh(geometry,material,ordinary.length);mesh.name=name;
+      ordinary.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
+    }
+    if(positions.length){
+      const clippedGeometry=new THREE.BufferGeometry();clippedGeometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));clippedGeometry.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));
+      const mesh=new THREE.Mesh(clippedGeometry,material);mesh.name=name+'-roof-clipped';mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
+    }else if(!ordinary.length)material.dispose();
   }
+  if(!boxUsed)geometry.dispose();
   group.userData.stats={...stats,instances:frames.length+sills.length+fascias.length+gutters.length+ventPanels.length};
   return group;
 }

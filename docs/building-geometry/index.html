@@ -3,87 +3,68 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="探索参数化建筑几何：查看 Building Tools 原始模型，调整平面、尺寸与屋顶，导出 STL、GLB 和生成参数。">
+  <meta name="description" content="用八个连续的无量纲形状参数探索三段建筑：固定总高 H=1，实时调整比例、退台和高度分配，导出几何与参数。">
   <meta name="theme-color" content="#f5f6f7">
   <link rel="canonical" href="https://leidafang.github.io/building-geometry/">
-  <meta property="og:title" content="建筑几何实验室 · Leidafang">
-  <meta property="og:description" content="查看 Building Tools 原始模型，实时调整建筑体量，导出 STL、GLB 与生成参数。">
+  <meta property="og:title" content="8 维建筑形状实验室 · Leidafang">
+  <meta property="og:description" content="八个参数，三段体量。探索归一化建筑形状的连续变化。">
   <meta property="og:url" content="https://leidafang.github.io/building-geometry/">
-  <meta property="og:type" content="website">
-  <title>建筑几何实验室 · Leidafang</title>
+  <title>8 维建筑形状实验室 · Leidafang</title>
   <link rel="icon" href="./mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./shape8.css?v=shape8-20261105">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-  <script type="module" src="./app.mjs"></script>
+  <script type="module" src="./shape8-app.mjs?v=shape8-20261105"></script>
 </head>
 <body>
-  <a class="skip" href="#lab" data-i18n="skip">跳到几何实验室</a>
+  <a class="skip" href="#lab" data-i18n="skip">跳到参数实验室</a>
   <header class="topbar">
-    <a class="brand" href="../"><img src="./mark.svg" width="30" height="30" alt=""><span>AI <i>×</i> CFD<small data-i18n="brand">Leidafang 的研究笔记</small></span></a>
-    <nav aria-label="导航"><a href="../" data-i18n="home">研究主页</a><a href="../mdc-demo/" data-i18n="mdc">数据中心 Demo ↗</a><button id="language" type="button" aria-label="Switch to English">EN</button></nav>
+    <a class="brand" href="../"><img src="./mark.svg" width="34" height="34" alt=""><span>AI <i>×</i> CFD<small data-i18n="brand">Leidafang 的研究笔记</small></span></a>
+    <nav aria-label="导航"><a href="../" data-i18n="home">研究主页</a><a href="../building-library/?v=plateau-map-20261104" data-i18n="library">真实建筑地图 ↗</a><button id="language" type="button" aria-label="Switch to English">EN</button></nav>
   </header>
-
   <main>
     <section class="intro">
-      <div><div class="eyebrow"><span></span> GEOMETRY / 01</div><h1 data-i18n="title">建筑几何，从参数开始。</h1><p data-i18n="intro">转动一栋建筑，改变一组参数。探索平面、体量与屋顶如何一起定义形状。</p></div>
-      <div class="intro-meta"><span><b>08</b><small data-i18n="originalCount">源码生成样例</small></span><span><b>04</b><small data-i18n="familyCount">可调平面类型</small></span><span><b>3D</b><small data-i18n="exportIntro">预览与模型导出</small></span></div>
+      <div><div class="eyebrow"><span></span> BUILDING SHAPES / 8D</div><h1 data-i18n="title">八个参数，一栋建筑。</h1><p data-i18n="intro">固定总高 H = 1，让比例、退台与高度分配定义形状。拖动参数，观察同一个连续设计空间里的变化。</p></div>
+      <div class="intro-meta"><span><b>08</b><small data-i18n="dimensions">独立形状参数</small></span><span><b>03</b><small data-i18n="bands">堆叠体量</small></span><span><b>H = 1</b><small data-i18n="normalized">等比归一化</small></span></div>
     </section>
-
-    <section id="lab" class="lab" aria-label="建筑几何实验室">
+    <section class="lab" id="lab" aria-label="八维建筑参数实验室">
       <aside class="inspector">
-        <div class="panel-head"><span class="eyebrow">EXPLORE A SHAPE</span><span class="live-dot"></span></div>
-        <div class="mode-tabs" role="group" aria-label="几何来源"><button id="mode-original" class="active" aria-pressed="true" data-i18n="originalMode">源码样例</button><button id="mode-workshop" aria-pressed="false" data-i18n="workshopMode">参数工坊</button></div>
-        <div id="original-panel">
-          <div class="source-badge">BUILDING TOOLS <span>v1.0.13</span></div>
-          <h2 id="original-title">H 形四坡屋顶</h2><p class="panel-copy" data-i18n="originalCopy">在 Blender 中运行原始插件生成。选择下方样例，可查看不同平面与屋顶的实际输出。</p>
-          <dl id="original-facts" class="facts"></dl>
-          <details class="parameter-details"><summary data-i18n="exactParams">查看完整生成参数</summary><pre id="original-json"></pre></details>
-          <button id="open-workshop" class="button secondary wide" data-i18n="startEditing">进入参数工坊 ↗</button>
-        </div>
-        <div id="workshop-panel" hidden>
-          <label class="field-label" for="shape" data-i18n="footprintType">平面类型</label>
-          <select id="shape"><option value="rectangle" data-i18n="rectangle">矩形</option><option value="circle" data-i18n="circle">圆形</option><option value="lshape" data-i18n="lshape">L 形组合</option><option value="hshape" selected data-i18n="hshape">H 形</option></select>
-          <div class="control" data-control="width"><label for="width" data-i18n="width">总宽 W</label><div><input id="width-number" type="number" min="8" max="48" step="0.5" value="16" aria-label="总宽，米"><span>m</span></div><input id="width" type="range" min="8" max="48" step="0.5" value="16"></div>
-          <div class="control" data-control="depth"><label for="depth" data-i18n="depth">进深 D</label><div><input id="depth-number" type="number" min="8" max="48" step="0.5" value="24" aria-label="进深，米"><span>m</span></div><input id="depth" type="range" min="8" max="48" step="0.5" value="24"></div>
-          <div class="control" data-control="floors"><label for="floors" data-i18n="floors">楼层数</label><div><input id="floors-number" type="number" min="1" max="16" step="1" value="5" aria-label="楼层数"><span data-i18n="storeys">层</span></div><input id="floors" type="range" min="1" max="16" step="1" value="5"></div>
-          <div class="control" data-control="floorHeight"><label for="floorHeight" data-i18n="floorHeight">层高</label><div><input id="floorHeight-number" type="number" min="2.5" max="5" step="0.1" value="3.2" aria-label="层高，米"><span>m</span></div><input id="floorHeight" type="range" min="2.5" max="5" step="0.1" value="3.2"></div>
-          <div class="control" data-control="arm"><label for="arm" data-i18n="arm">翼部 / 连廊宽度</label><div><input id="arm-number" type="number" min="1.5" max="7" step="0.1" value="4" aria-label="翼部与连廊宽度，米"><span>m</span></div><input id="arm" type="range" min="1.5" max="7" step="0.1" value="4"></div>
-          <div id="roof-control"><label class="field-label" for="roof" data-i18n="roof">屋顶</label><select id="roof"><option value="flat" data-i18n="flat">平屋顶</option><option value="gable" data-i18n="gable">双坡屋顶</option><option value="hip" data-i18n="hip">四坡屋顶</option></select></div>
-          <div class="control" data-control="roofHeight"><label for="roofHeight" data-i18n="roofHeight">屋顶高度</label><div><input id="roofHeight-number" type="number" min="0.5" max="8" step="0.1" value="3" aria-label="屋顶高度，米"><span>m</span></div><input id="roofHeight" type="range" min="0.5" max="8" step="0.1" value="3"></div>
-          <button id="shuffle" class="button secondary wide"><span>⤨</span><span data-i18n="shuffle">换一组参数</span></button>
-          <p class="small-note" data-i18n="workshopCopy">轻量浏览器生成器，参数变化即时可见。组合平面使用平屋顶；与原插件输出分别标注。</p>
-        </div>
-        <div class="plan-panel"><div><span data-i18n="plan">平面轮廓</span><small>XY · m</small></div><svg id="plan" viewBox="0 0 240 150" role="img" aria-label="当前建筑平面轮廓"></svg></div>
+        <div class="panel-head"><div><span class="eyebrow">SHAPE PARAMETERS</span><h2 data-i18n="controlsTitle">从比例到退台</h2></div><span class="live"><i></i> LIVE</span></div>
+        <div id="controls"></div>
+        <div class="height-remainder"><span><i class="swatch top"></i><span data-i18n="remaining">顶部高度 · 自动确定</span></span><strong id="height3">0.33</strong><small>h₃ / H = 1 − h₁ / H − h₂ / H</small></div>
+        <p class="range-note" data-i18n="heightNote">每段至少占总高 0.10；高度滑条的上限会随另一段变化。</p>
+        <div class="inspector-actions"><button id="randomize" class="button primary" data-i18n="randomize">⤨ 随机一组形状</button><button id="reset" class="button" data-i18n="reset">重置</button></div>
       </aside>
-
-      <div class="viewport-column">
-        <div id="stage" class="stage">
-          <img id="poster" src="./assets/previews/A07.webp" alt="H 形四坡屋顶建筑预览">
+      <div class="viewer-column">
+        <div class="viewer-head"><div><span class="eyebrow">NORMALIZED MASSING</span><h2 id="shape-title">均衡退台</h2></div><div class="view-buttons" role="group" aria-label="相机视图"><button data-view="iso" class="active" aria-pressed="true" data-i18n="iso">立体</button><button data-view="top" aria-pressed="false" data-i18n="top">顶视</button><button data-view="front" aria-pressed="false" data-i18n="front">正视</button><button id="reset-view" aria-label="重置视角" title="重置视角">↺</button></div></div>
+        <div class="stage" id="stage">
           <canvas id="scene" tabindex="0" aria-label="三维建筑，拖动旋转、滚轮缩放、右键平移"></canvas>
-          <div class="scene-heading"><span id="engine-label" class="engine-label">BUILDING TOOLS / ORIGINAL</span><h2 id="scene-title">A07 · H 形四坡屋顶</h2><p id="scene-subtitle">Blender 4.0.2 · m</p></div>
-          <div class="view-buttons" role="group" aria-label="相机视图"><button class="active" data-view="iso" aria-pressed="true" data-i18n="iso">立体</button><button data-view="top" aria-pressed="false" data-i18n="top">顶视</button><button data-view="front" aria-pressed="false" data-i18n="front">正视</button><button id="reset-view" title="重置视角" aria-label="重置视角">↺</button></div>
-          <div id="loading" class="loading" role="status"><i></i><span data-i18n="loading">正在装入几何…</span></div>
-          <div class="axis-key" aria-hidden="true"><span>X</span><span>Y</span><span>Z ↑</span></div>
-          <div class="stage-bottom"><span class="gesture" data-i18n="gesture">拖动旋转 · 滚轮缩放 · 右键平移</span><div><button id="wireframe" aria-pressed="false" data-i18n="wireframe">线框</button><button id="rotate" aria-pressed="false" data-i18n="rotate">自动旋转</button><button id="screenshot" title="下载当前视图 PNG" aria-label="下载当前视图 PNG">PNG ↓</button></div></div>
+          <div id="fallback" hidden></div>
+          <div class="stage-tag"><span>H = 1</span><small data-i18n="unitless">无量纲形状</small></div>
+          <div class="stage-legend"><span><i class="swatch base"></i><span data-i18n="base">底段</span></span><span><i class="swatch middle"></i><span data-i18n="middle">中段</span></span><span><i class="swatch top"></i><span data-i18n="crown">顶段</span></span></div>
         </div>
-        <div class="metrics" aria-live="polite"><div><small data-i18n="bboxWidth">包围盒宽</small><strong id="metric-width">—</strong><span>m</span></div><div><small data-i18n="bboxDepth">包围盒深</small><strong id="metric-depth">—</strong><span>m</span></div><div><small data-i18n="height">总高度</small><strong id="metric-height">—</strong><span>m</span></div><div><small data-i18n="footprintArea">占地面积</small><strong id="metric-area">—</strong><span>m²</span></div><div><small data-i18n="volume">几何体积</small><strong id="metric-volume">—</strong><span>m³</span></div></div>
-        <div class="export-row"><div><span class="status-dot"></span><span id="geometry-state" data-i18n="geometryOnly">几何展示 · CFD 网格尚未验证</span></div><div class="downloads"><button id="download-json">JSON ↓</button><button id="download-glb">GLB ↓</button><button id="download-stl" class="button primary" data-i18n="downloadSTL">导出 STL ↓</button></div></div>
+        <div class="viewer-tools"><span data-i18n="gesture">拖动旋转 · 滚轮缩放 · 右键平移</span><div><button id="wireframe" aria-pressed="false" data-i18n="wireframe">线框</button><button id="rotate" aria-pressed="false" data-i18n="rotate">自动旋转</button><button id="screenshot" aria-label="下载当前视图 PNG">PNG ↓</button></div></div>
+        <div class="parameter-focus" aria-live="polite"><span id="focus-index">θ₁</span><p id="focus-copy">改变底部宽度；上部两段按相对比例一起变化。</p></div>
+        <div class="shape-details">
+          <div class="plan-card"><div class="mini-heading"><span data-i18n="plan">叠合平面</span><small>XY / H</small></div><svg id="plan" viewBox="0 0 210 135" role="img" aria-label="三段体量的叠合平面"></svg></div>
+          <div class="dimensions-card"><div class="mini-heading"><span data-i18n="derived">各段实际比例</span><small data-i18n="unitLabel">宽 × 深 × 高 / H</small></div><div id="band-dimensions"></div><div class="height-stack" id="height-stack" role="img" aria-label="三段高度分配"></div><div class="shape-volume"><span data-i18n="volume">归一化体积 V / H³</span><strong id="volume">—</strong></div></div>
+        </div>
+        <div class="export-row"><div><span class="status-dot"></span><span id="surface-state" data-i18n="surfaceState">闭合外表面 · H = 1 · Z 向上</span></div><div class="downloads"><button id="share" data-i18n="share">分享参数</button><button id="download-json">JSON ↓</button><button id="download-glb">GLB ↓</button><button id="download-stl" class="button primary">STL ↓</button></div></div>
+        <div id="share-fallback" class="share-fallback" hidden><label for="share-url" data-i18n="copyLink">复制此链接以还原当前形状</label><input id="share-url" readonly></div>
       </div>
     </section>
-
-    <section class="gallery-section" id="examples">
-      <div class="section-heading"><div><span class="eyebrow">THE ORIGINAL COLLECTION</span><h2 data-i18n="collectionTitle">同一个生成器，八种建筑形状。</h2><p data-i18n="collectionCopy">这些模型来自 Building Tools 的真实生成结果。点击任意样例，在上方旋转查看。</p></div><a class="text-link" href="./assets/building-tools-originals.zip" download data-i18n="downloadAll">下载全部原始样例 ↗</a></div>
-      <div id="gallery" class="gallery" aria-label="Building Tools 原始样例"></div>
+    <section class="vector-section"><div class="vector-heading"><span class="eyebrow">CURRENT DESIGN VECTOR</span><span data-i18n="vectorCopy">同一个 8 维向量，完整复现当前形状。</span></div><div id="vector" class="vector"></div></section>
+    <section class="gallery-section">
+      <div class="section-heading"><div><span class="eyebrow">ONE SPACE, MANY SHAPES</span><h2 data-i18n="examplesTitle">连续变化，不必切换建筑类型。</h2><p data-i18n="examplesCopy">下面的形状只改变同一组八个数值。点击载入，再继续调整。</p></div><span class="quiet-label" data-i18n="examplesNote">预设示例 · 非离散类别</span></div>
+      <div id="gallery" class="gallery"></div>
     </section>
-
-    <section class="context-section">
-      <div><span class="eyebrow">WHY GEOMETRY COMES FIRST</span><h2 data-i18n="contextTitle">先探索形状，再准备流场数据。</h2><p data-i18n="contextCopy">可控的几何变化，让数据覆盖变得具体。建筑高度、长宽比例、凹口和屋顶，都是值得单独观察的设计变量。</p><a href="../#urban" class="text-link" data-i18n="researchLink">回到建筑风环境研究 ↗</a></div>
-      <div class="context-list"><article><span>01</span><div><h3 data-i18n="step1">定义几何空间</h3><p data-i18n="step1Copy">确定建筑类型与尺寸范围，保留每个样本的生成参数。</p></div></article><article><span>02</span><div><h3 data-i18n="step2">检查表面与网格</h3><p data-i18n="step2Copy">封闭表面只是起点；自交、细小特征和体网格质量仍需检查。</p></div></article><article><span>03</span><div><h3 data-i18n="step3">计算并检验泛化</h3><p data-i18n="step3Copy">结合来流等条件制备 CFD 数据，按几何分组验证模型。</p></div></article></div>
+    <section class="explanation">
+      <div><span class="eyebrow">WHAT MAKES IT EIGHT?</span><h2 data-i18n="whyTitle">去掉尺度，保留形状。</h2><p data-i18n="whyCopy">等比归一化只去掉整体大小。宽高比、深高比、每次退台的比例，以及各段如何分配高度，仍然决定建筑的外形。</p><p class="scope-note" data-i18n="scopeCopy">本页固定三段、居中对齐、平屋顶，上段不超出下段。展示范围由滑条定义；不是任意建筑的完整表达，也不是已经验证的训练覆盖范围。</p></div>
+      <div class="equations"><div><b>02</b><span data-i18n="equation1">底部比例</span><code>L₁/H, D₁/H</code></div><div><b>04</b><span data-i18n="equation2">两次退台</span><code>L₂/L₁, D₂/D₁, L₃/L₂, D₃/D₂</code></div><div><b>02</b><span data-i18n="equation3">高度分配</span><code>h₁/H, h₂/H</code></div><p>h₃/H = 1 − h₁/H − h₂/H</p></div>
     </section>
-    <details class="about"><summary data-i18n="about">关于生成方式与使用范围</summary><div><p data-i18n="aboutOriginal">源码样例：Building Tools v1.0.13 / Blender 4.0.2，已补齐接地底面。STL 使用米制、Z 向上；GLB 遵循 glTF 的 Y 向上约定。封闭边拓扑已检查，自交和 CFD 体网格未验收。</p><p data-i18n="aboutWorkshop">参数工坊：独立的浏览器轻量实现，提供矩形、圆形、L 形与 H 形体量。矩形支持三种屋顶，其余平面使用平屋顶；导出参数注明 browser-workshop-v1，不作为原 Blender 插件的执行结果。</p><p><a href="https://github.com/ranjian0/building_tools" target="_blank" rel="noopener">Building Tools ↗</a> · <a href="./assets/BUILDING-TOOLS-LICENSE.txt">MIT License</a> · <a href="./vendor/THREE-LICENSE.txt">Three.js License</a></p></div></details>
+    <details class="about"><summary data-i18n="about">生成方法、导出与使用范围</summary><div><p data-i18n="aboutCopy">参考 glb-buildings-skill 的分段体量思路，本页独立实现固定三段的 8 维连续形状子空间，并未在浏览器中运行原项目。使用浮点比例生成三段体量的并集外表面，移除内部接触面。JSON 保存参数顺序、归一化约定和派生尺寸；STL 为无量纲 Z-up，GLB 为无量纲 Y-up。几何需映射到实际 CFD 尺度后制样；本页不执行体网格、CFD 或 AI 预测。</p><p><a href="https://github.com/hec-ovi/glb-buildings-skill" target="_blank" rel="noopener">glb-buildings-skill ↗</a> · <a href="./vendor/THREE-LICENSE.txt">Three.js License</a></p></div></details>
   </main>
-  <footer><a href="../">AI × CFD <span> / </span> Leidafang</a><span data-i18n="footer">建筑几何实验室 · 2026.11</span><a href="https://github.com/Leidafang" target="_blank" rel="noopener">GitHub ↗</a></footer>
+  <footer><a href="../">AI × CFD <span>/</span> Leidafang</a><span data-i18n="footer">8 维建筑形状实验室 · 2026.11</span><a href="../building-library/?v=plateau-map-20261104" data-i18n="footerMap">浏览真实建筑 ↗</a></footer>
   <div id="toast" class="toast" role="status" hidden></div>
-  <noscript><p>启用 JavaScript 可交互查看和调整几何。<a href="./assets/building-tools-originals.zip">下载八个原始建筑模型</a>。</p></noscript>
+  <noscript>启用 JavaScript 可调整参数、预览和导出建筑几何。</noscript>
 </body>
 </html>

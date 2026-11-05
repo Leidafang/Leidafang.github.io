@@ -145,7 +145,7 @@ function installWorker(){
 
 function disposeModel(){
   for(const object of [root,overlay])if(object){object.traverse(o=>o.geometry?.dispose());object.removeFromParent();}
-  if(facadeDetail){const geometries=new Set();facadeDetail.traverse(o=>{if(o.geometry)geometries.add(o.geometry);o.material?.dispose();});geometries.forEach(g=>g.dispose());facadeDetail.removeFromParent();facadeDetail=null;}
+  if(facadeDetail){const geometries=new Set();facadeDetail.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.isInstancedMesh)o.dispose();o.material?.dispose();});geometries.forEach(g=>g.dispose());facadeDetail.removeFromParent();facadeDetail=null;}
   if(groundShadow){groundShadow.geometry.dispose();groundShadow.material.map.dispose();groundShadow.material.dispose();groundShadow.removeFromParent();groundShadow=null;}
 }
 

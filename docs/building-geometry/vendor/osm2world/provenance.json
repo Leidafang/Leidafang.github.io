@@ -1,0 +1,10 @@
+{
+  "engine": "OSM2World 0.5.0-SNAPSHOT_2026-02-18",
+  "url": "https://osm2world.org/build/web/0.5.0-SNAPSHOT_2026-02-18/osm2world-core-web.mjs",
+  "bytes": 3884381,
+  "sha256": "7714acd3a2e187af9183b402e9d7874a787342fe235de502b98df76b6a6a59a5",
+  "upstream_bytes_unmodified": true,
+  "license": "LICENSE.txt",
+  "integration": "Synthetic OSM input; indexed mesh expansion; Z-up isotropic normalization; winding adapted to native outward normals",
+  "external_runtime_requests_required": false
+}

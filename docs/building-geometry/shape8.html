@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="用八个连续的无量纲形状参数探索三段建筑：固定总高 H=1，实时调整比例、退台和高度分配，导出几何与参数。">
+  <meta name="theme-color" content="#f5f6f7">
+  <link rel="canonical" href="https://leidafang.github.io/building-geometry/">
+  <meta property="og:title" content="8 维建筑形状实验室 · Leidafang">
+  <meta property="og:description" content="八个参数，三段体量。探索归一化建筑形状的连续变化。">
+  <meta property="og:url" content="https://leidafang.github.io/building-geometry/">
+  <title>8 维建筑形状实验室 · Leidafang</title>
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./shape8.css?v=shape8-20261105">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+  <script type="module" src="./shape8-app.mjs?v=shape8-20261105"></script>
+</head>
+<body>
+  <a class="skip" href="#lab" data-i18n="skip">跳到参数实验室</a>
+  <header class="topbar">
+    <a class="brand" href="../"><img src="./mark.svg" width="34" height="34" alt=""><span>AI <i>×</i> CFD<small data-i18n="brand">Leidafang 的研究笔记</small></span></a>
+    <nav aria-label="导航"><a href="../" data-i18n="home">研究主页</a><a href="../building-library/?v=plateau-map-20261104" data-i18n="library">真实建筑地图 ↗</a><button id="language" type="button" aria-label="Switch to English">EN</button></nav>
+  </header>
+  <main>
+    <section class="intro">
+      <div><div class="eyebrow"><span></span> BUILDING SHAPES / 8D</div><h1 data-i18n="title">八个参数，一栋建筑。</h1><p data-i18n="intro">固定总高 H = 1，让比例、退台与高度分配定义形状。拖动参数，观察同一个连续设计空间里的变化。</p></div>
+      <div class="intro-meta"><span><b>08</b><small data-i18n="dimensions">独立形状参数</small></span><span><b>03</b><small data-i18n="bands">堆叠体量</small></span><span><b>H = 1</b><small data-i18n="normalized">等比归一化</small></span></div>
+    </section>
+    <section class="lab" id="lab" aria-label="八维建筑参数实验室">
+      <aside class="inspector">
+        <div class="panel-head"><div><span class="eyebrow">SHAPE PARAMETERS</span><h2 data-i18n="controlsTitle">从比例到退台</h2></div><span class="live"><i></i> LIVE</span></div>
+        <div id="controls"></div>
+        <div class="height-remainder"><span><i class="swatch top"></i><span data-i18n="remaining">顶部高度 · 自动确定</span></span><strong id="height3">0.33</strong><small>h₃ / H = 1 − h₁ / H − h₂ / H</small></div>
+        <p class="range-note" data-i18n="heightNote">每段至少占总高 0.10；高度滑条的上限会随另一段变化。</p>
+        <div class="inspector-actions"><button id="randomize" class="button primary" data-i18n="randomize">⤨ 随机一组形状</button><button id="reset" class="button" data-i18n="reset">重置</button></div>
+      </aside>
+      <div class="viewer-column">
+        <div class="viewer-head"><div><span class="eyebrow">NORMALIZED MASSING</span><h2 id="shape-title">均衡退台</h2></div><div class="view-buttons" role="group" aria-label="相机视图"><button data-view="iso" class="active" aria-pressed="true" data-i18n="iso">立体</button><button data-view="top" aria-pressed="false" data-i18n="top">顶视</button><button data-view="front" aria-pressed="false" data-i18n="front">正视</button><button id="reset-view" aria-label="重置视角" title="重置视角">↺</button></div></div>
+        <div class="stage" id="stage">
+          <canvas id="scene" tabindex="0" aria-label="三维建筑，拖动旋转、滚轮缩放、右键平移"></canvas>
+          <div id="fallback" hidden></div>
+          <div class="stage-tag"><span>H = 1</span><small data-i18n="unitless">无量纲形状</small></div>
+          <div class="stage-legend"><span><i class="swatch base"></i><span data-i18n="base">底段</span></span><span><i class="swatch middle"></i><span data-i18n="middle">中段</span></span><span><i class="swatch top"></i><span data-i18n="crown">顶段</span></span></div>
+        </div>
+        <div class="viewer-tools"><span data-i18n="gesture">拖动旋转 · 滚轮缩放 · 右键平移</span><div><button id="wireframe" aria-pressed="false" data-i18n="wireframe">线框</button><button id="rotate" aria-pressed="false" data-i18n="rotate">自动旋转</button><button id="screenshot" aria-label="下载当前视图 PNG">PNG ↓</button></div></div>
+        <div class="parameter-focus" aria-live="polite"><span id="focus-index">θ₁</span><p id="focus-copy">改变底部宽度；上部两段按相对比例一起变化。</p></div>
+        <div class="shape-details">
+          <div class="plan-card"><div class="mini-heading"><span data-i18n="plan">叠合平面</span><small>XY / H</small></div><svg id="plan" viewBox="0 0 210 135" role="img" aria-label="三段体量的叠合平面"></svg></div>
+          <div class="dimensions-card"><div class="mini-heading"><span data-i18n="derived">各段实际比例</span><small data-i18n="unitLabel">宽 × 深 × 高 / H</small></div><div id="band-dimensions"></div><div class="height-stack" id="height-stack" role="img" aria-label="三段高度分配"></div><div class="shape-volume"><span data-i18n="volume">归一化体积 V / H³</span><strong id="volume">—</strong></div></div>
+        </div>
+        <div class="export-row"><div><span class="status-dot"></span><span id="surface-state" data-i18n="surfaceState">闭合外表面 · H = 1 · Z 向上</span></div><div class="downloads"><button id="share" data-i18n="share">分享参数</button><button id="download-json">JSON ↓</button><button id="download-glb">GLB ↓</button><button id="download-stl" class="button primary">STL ↓</button></div></div>
+        <div id="share-fallback" class="share-fallback" hidden><label for="share-url" data-i18n="copyLink">复制此链接以还原当前形状</label><input id="share-url" readonly></div>
+      </div>
+    </section>
+    <section class="vector-section"><div class="vector-heading"><span class="eyebrow">CURRENT DESIGN VECTOR</span><span data-i18n="vectorCopy">同一个 8 维向量，完整复现当前形状。</span></div><div id="vector" class="vector"></div></section>
+    <section class="gallery-section">
+      <div class="section-heading"><div><span class="eyebrow">ONE SPACE, MANY SHAPES</span><h2 data-i18n="examplesTitle">连续变化，不必切换建筑类型。</h2><p data-i18n="examplesCopy">下面的形状只改变同一组八个数值。点击载入，再继续调整。</p></div><span class="quiet-label" data-i18n="examplesNote">预设示例 · 非离散类别</span></div>
+      <div id="gallery" class="gallery"></div>
+    </section>
+    <section class="explanation">
+      <div><span class="eyebrow">WHAT MAKES IT EIGHT?</span><h2 data-i18n="whyTitle">去掉尺度，保留形状。</h2><p data-i18n="whyCopy">等比归一化只去掉整体大小。宽高比、深高比、每次退台的比例，以及各段如何分配高度，仍然决定建筑的外形。</p><p class="scope-note" data-i18n="scopeCopy">本页固定三段、居中对齐、平屋顶，上段不超出下段。展示范围由滑条定义；不是任意建筑的完整表达，也不是已经验证的训练覆盖范围。</p></div>
+      <div class="equations"><div><b>02</b><span data-i18n="equation1">底部比例</span><code>L₁/H, D₁/H</code></div><div><b>04</b><span data-i18n="equation2">两次退台</span><code>L₂/L₁, D₂/D₁, L₃/L₂, D₃/D₂</code></div><div><b>02</b><span data-i18n="equation3">高度分配</span><code>h₁/H, h₂/H</code></div><p>h₃/H = 1 − h₁/H − h₂/H</p></div>
+    </section>
+    <details class="about"><summary data-i18n="about">生成方法、导出与使用范围</summary><div><p data-i18n="aboutCopy">参考 glb-buildings-skill 的分段体量思路，本页独立实现固定三段的 8 维连续形状子空间，并未在浏览器中运行原项目。使用浮点比例生成三段体量的并集外表面，移除内部接触面。JSON 保存参数顺序、归一化约定和派生尺寸；STL 为无量纲 Z-up，GLB 为无量纲 Y-up。几何需映射到实际 CFD 尺度后制样；本页不执行体网格、CFD 或 AI 预测。</p><p><a href="https://github.com/hec-ovi/glb-buildings-skill" target="_blank" rel="noopener">glb-buildings-skill ↗</a> · <a href="./vendor/THREE-LICENSE.txt">Three.js License</a></p></div></details>
+  </main>
+  <footer><a href="../">AI × CFD <span>/</span> Leidafang</a><span data-i18n="footer">8 维建筑形状实验室 · 2026.11</span><a href="../building-library/?v=plateau-map-20261104" data-i18n="footerMap">浏览真实建筑 ↗</a></footer>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript>启用 JavaScript 可调整参数、预览和导出建筑几何。</noscript>
+</body>
+</html>

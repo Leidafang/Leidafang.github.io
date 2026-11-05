@@ -1,0 +1,1533 @@
+{
+  "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+  "module_url": "https://osm2world.org/build/web/0.5.0-SNAPSHOT_2026-02-18/osm2world-core-web.mjs",
+  "module_sha256": "7714acd3a2e187af9183b402e9d7874a787342fe235de502b98df76b6a6a59a5",
+  "synthetic_footprints": true,
+  "records": [
+    {
+      "id": "office",
+      "parameters": {
+        "family": "podium",
+        "roof": "flat",
+        "width": 1.4,
+        "depth": 0.95,
+        "chamfer": 0,
+        "leftWidth": 0.25,
+        "rightWidth": 0.23,
+        "crossDepth": 0.26,
+        "rightReach": 0.9,
+        "leftHeight": 0.82,
+        "rightHeight": 0.92,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.17,
+        "roofDirection": 90
+      },
+      "visualFloors": 14,
+      "triangles": 22,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "podium",
+        "roof": "flat",
+        "parameters": {
+          "family": "podium",
+          "roof": "flat",
+          "width": 1.4,
+          "depth": 0.95,
+          "chamfer": 0,
+          "leftWidth": 0.25,
+          "rightWidth": 0.23,
+          "crossDepth": 0.26,
+          "rightReach": 0.9,
+          "leftHeight": 0.82,
+          "rightHeight": 0.92,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.17,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "podiumHeight",
+          "towerWidth",
+          "towerDepth",
+          "towerX",
+          "towerY"
+        ],
+        "active_parameter_values": [
+          1.4,
+          0.95,
+          0.18,
+          0.4,
+          0.52,
+          0.26,
+          -0.18
+        ],
+        "active_numeric_control_count": 7,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 14,
+        "outline": [
+          [
+            -0.7,
+            -0.475
+          ],
+          [
+            0.7,
+            -0.475
+          ],
+          [
+            0.7,
+            0.475
+          ],
+          [
+            -0.7,
+            0.475
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "podium",
+            "outer": [
+              [
+                -0.7,
+                -0.475
+              ],
+              [
+                0.7,
+                -0.475
+              ],
+              [
+                0.7,
+                0.475
+              ],
+              [
+                -0.7,
+                0.475
+              ]
+            ],
+            "holes": [],
+            "height": 0.18,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          },
+          {
+            "id": "tower",
+            "outer": [
+              [
+                -0.17079999999999995,
+                -0.28803999999999996
+              ],
+              [
+                0.3892,
+                -0.28803999999999996
+              ],
+              [
+                0.3892,
+                0.20596
+              ],
+              [
+                -0.17079999999999995,
+                0.20596
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0.18,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 22,
+          "bounds": [
+            [
+              -0.699999988079071,
+              -0.4749999940395355,
+              0
+            ],
+            [
+              0.699999988079071,
+              0.4749999940395355,
+              1
+            ]
+          ],
+          "native_meshes": 3,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 22,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "office.webp"
+    },
+    {
+      "id": "slab",
+      "parameters": {
+        "family": "bar",
+        "roof": "flat",
+        "width": 1.4,
+        "depth": 0.34,
+        "chamfer": 0,
+        "leftWidth": 0.25,
+        "rightWidth": 0.23,
+        "crossDepth": 0.26,
+        "rightReach": 0.9,
+        "leftHeight": 0.82,
+        "rightHeight": 0.92,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.17,
+        "roofDirection": 90
+      },
+      "visualFloors": 10,
+      "triangles": 10,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "bar",
+        "roof": "flat",
+        "parameters": {
+          "family": "bar",
+          "roof": "flat",
+          "width": 1.4,
+          "depth": 0.34,
+          "chamfer": 0,
+          "leftWidth": 0.25,
+          "rightWidth": 0.23,
+          "crossDepth": 0.26,
+          "rightReach": 0.9,
+          "leftHeight": 0.82,
+          "rightHeight": 0.92,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.17,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "chamfer"
+        ],
+        "active_parameter_values": [
+          1.4,
+          0.34,
+          0
+        ],
+        "active_numeric_control_count": 3,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 10,
+        "outline": [
+          [
+            -0.7,
+            -0.17
+          ],
+          [
+            0.7,
+            -0.17
+          ],
+          [
+            0.7,
+            0.17
+          ],
+          [
+            -0.7,
+            0.17
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "main",
+            "outer": [
+              [
+                -0.7,
+                -0.17
+              ],
+              [
+                0.7,
+                -0.17
+              ],
+              [
+                0.7,
+                0.17
+              ],
+              [
+                -0.7,
+                0.17
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 10,
+          "bounds": [
+            [
+              -0.699999988079071,
+              -0.17000000178813934,
+              0
+            ],
+            [
+              0.699999988079071,
+              0.17000000178813934,
+              1
+            ]
+          ],
+          "native_meshes": 2,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 10,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "slab.webp"
+    },
+    {
+      "id": "l-wings",
+      "parameters": {
+        "family": "l",
+        "roof": "flat",
+        "width": 1.4,
+        "depth": 1.05,
+        "chamfer": 0,
+        "leftWidth": 0.23,
+        "rightWidth": 0.23,
+        "crossDepth": 0.28,
+        "rightReach": 0.9,
+        "leftHeight": 0.77,
+        "rightHeight": 0.92,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.17,
+        "roofDirection": 90
+      },
+      "visualFloors": 7,
+      "triangles": 20,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "l",
+        "roof": "flat",
+        "parameters": {
+          "family": "l",
+          "roof": "flat",
+          "width": 1.4,
+          "depth": 1.05,
+          "chamfer": 0,
+          "leftWidth": 0.23,
+          "rightWidth": 0.23,
+          "crossDepth": 0.28,
+          "rightReach": 0.9,
+          "leftHeight": 0.77,
+          "rightHeight": 0.92,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.17,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "leftWidth",
+          "crossDepth",
+          "leftHeight"
+        ],
+        "active_parameter_values": [
+          1.4,
+          1.05,
+          0.23,
+          0.28,
+          0.77
+        ],
+        "active_numeric_control_count": 5,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 7,
+        "outline": [
+          [
+            -0.7,
+            -0.525
+          ],
+          [
+            0.7,
+            -0.525
+          ],
+          [
+            0.7,
+            -0.23099999999999998
+          ],
+          [
+            -0.37799999999999995,
+            -0.23099999999999998
+          ],
+          [
+            -0.37799999999999995,
+            0.525
+          ],
+          [
+            -0.7,
+            0.525
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "main",
+            "outer": [
+              [
+                -0.7,
+                -0.525
+              ],
+              [
+                0.7,
+                -0.525
+              ],
+              [
+                0.7,
+                -0.23099999999999998
+              ],
+              [
+                -0.7,
+                -0.23099999999999998
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          },
+          {
+            "id": "left-wing",
+            "outer": [
+              [
+                -0.7,
+                -0.23099999999999998
+              ],
+              [
+                -0.37799999999999995,
+                -0.23099999999999998
+              ],
+              [
+                -0.37799999999999995,
+                0.525
+              ],
+              [
+                -0.7,
+                0.525
+              ]
+            ],
+            "holes": [],
+            "height": 0.77,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 20,
+          "bounds": [
+            [
+              -0.699999988079071,
+              -0.5249999761581421,
+              0
+            ],
+            [
+              0.699999988079071,
+              0.5249999761581421,
+              1
+            ]
+          ],
+          "native_meshes": 2,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 20,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "l-wings.webp"
+    },
+    {
+      "id": "u-wings",
+      "parameters": {
+        "family": "u",
+        "roof": "flat",
+        "width": 1.45,
+        "depth": 1.12,
+        "chamfer": 0,
+        "leftWidth": 0.22,
+        "rightWidth": 0.24,
+        "crossDepth": 0.28,
+        "rightReach": 0.9,
+        "leftHeight": 0.85,
+        "rightHeight": 0.94,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.17,
+        "roofDirection": 90
+      },
+      "visualFloors": 6,
+      "triangles": 30,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "u",
+        "roof": "flat",
+        "parameters": {
+          "family": "u",
+          "roof": "flat",
+          "width": 1.45,
+          "depth": 1.12,
+          "chamfer": 0,
+          "leftWidth": 0.22,
+          "rightWidth": 0.24,
+          "crossDepth": 0.28,
+          "rightReach": 0.9,
+          "leftHeight": 0.85,
+          "rightHeight": 0.94,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.17,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "leftWidth",
+          "rightWidth",
+          "crossDepth",
+          "rightReach",
+          "leftHeight",
+          "rightHeight"
+        ],
+        "active_parameter_values": [
+          1.45,
+          1.12,
+          0.22,
+          0.24,
+          0.28,
+          0.9,
+          0.85,
+          0.94
+        ],
+        "active_numeric_control_count": 8,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 6,
+        "outline": [
+          [
+            -0.725,
+            -0.56
+          ],
+          [
+            0.725,
+            -0.56
+          ],
+          [
+            0.725,
+            0.4480000000000002
+          ],
+          [
+            0.377,
+            0.4480000000000002
+          ],
+          [
+            0.377,
+            -0.2464
+          ],
+          [
+            -0.40599999999999997,
+            -0.2464
+          ],
+          [
+            -0.40599999999999997,
+            0.56
+          ],
+          [
+            -0.725,
+            0.56
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "main",
+            "outer": [
+              [
+                -0.725,
+                -0.56
+              ],
+              [
+                0.725,
+                -0.56
+              ],
+              [
+                0.725,
+                -0.2464
+              ],
+              [
+                -0.725,
+                -0.2464
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          },
+          {
+            "id": "left-wing",
+            "outer": [
+              [
+                -0.725,
+                -0.2464
+              ],
+              [
+                -0.40599999999999997,
+                -0.2464
+              ],
+              [
+                -0.40599999999999997,
+                0.56
+              ],
+              [
+                -0.725,
+                0.56
+              ]
+            ],
+            "holes": [],
+            "height": 0.85,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          },
+          {
+            "id": "right-wing",
+            "outer": [
+              [
+                0.377,
+                -0.2464
+              ],
+              [
+                0.725,
+                -0.2464
+              ],
+              [
+                0.725,
+                0.4480000000000002
+              ],
+              [
+                0.377,
+                0.4480000000000002
+              ]
+            ],
+            "holes": [],
+            "height": 0.94,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 30,
+          "bounds": [
+            [
+              -0.7250000238418579,
+              -0.5600000023841858,
+              0
+            ],
+            [
+              0.7250000238418579,
+              0.5600000023841858,
+              1
+            ]
+          ],
+          "native_meshes": 2,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 30,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "u-wings.webp"
+    },
+    {
+      "id": "courtyard",
+      "parameters": {
+        "family": "court",
+        "roof": "flat",
+        "width": 1.75,
+        "depth": 1.35,
+        "chamfer": 0,
+        "leftWidth": 0.25,
+        "rightWidth": 0.23,
+        "crossDepth": 0.26,
+        "rightReach": 0.9,
+        "leftHeight": 0.82,
+        "rightHeight": 0.92,
+        "courtWidth": 0.53,
+        "courtDepth": 0.5,
+        "courtX": 0.14,
+        "courtY": 0.04,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.17,
+        "roofDirection": 90
+      },
+      "visualFloors": 5,
+      "triangles": 24,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "court",
+        "roof": "flat",
+        "parameters": {
+          "family": "court",
+          "roof": "flat",
+          "width": 1.75,
+          "depth": 1.35,
+          "chamfer": 0,
+          "leftWidth": 0.25,
+          "rightWidth": 0.23,
+          "crossDepth": 0.26,
+          "rightReach": 0.9,
+          "leftHeight": 0.82,
+          "rightHeight": 0.92,
+          "courtWidth": 0.53,
+          "courtDepth": 0.5,
+          "courtX": 0.14,
+          "courtY": 0.04,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.17,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "courtWidth",
+          "courtDepth",
+          "courtX",
+          "courtY"
+        ],
+        "active_parameter_values": [
+          1.75,
+          1.35,
+          0.53,
+          0.5,
+          0.14,
+          0.04
+        ],
+        "active_numeric_control_count": 6,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 5,
+        "outline": [
+          [
+            -0.875,
+            -0.675
+          ],
+          [
+            0.875,
+            -0.675
+          ],
+          [
+            0.875,
+            0.675
+          ],
+          [
+            -0.875,
+            0.675
+          ]
+        ],
+        "holes": [
+          [
+            [
+              -0.406175,
+              -0.324
+            ],
+            [
+              0.521325,
+              -0.324
+            ],
+            [
+              0.521325,
+              0.35100000000000003
+            ],
+            [
+              -0.406175,
+              0.35100000000000003
+            ]
+          ]
+        ],
+        "parts": [
+          {
+            "id": "main",
+            "outer": [
+              [
+                -0.875,
+                -0.675
+              ],
+              [
+                0.875,
+                -0.675
+              ],
+              [
+                0.875,
+                0.675
+              ],
+              [
+                -0.875,
+                0.675
+              ]
+            ],
+            "holes": [
+              [
+                [
+                  -0.406175,
+                  -0.324
+                ],
+                [
+                  0.521325,
+                  -0.324
+                ],
+                [
+                  0.521325,
+                  0.35100000000000003
+                ],
+                [
+                  -0.406175,
+                  0.35100000000000003
+                ]
+              ]
+            ],
+            "height": 1,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 24,
+          "bounds": [
+            [
+              -0.875,
+              -0.675000011920929,
+              0
+            ],
+            [
+              0.875,
+              0.675000011920929,
+              1
+            ]
+          ],
+          "native_meshes": 2,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 24,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "courtyard.webp"
+    },
+    {
+      "id": "twins",
+      "parameters": {
+        "family": "twin",
+        "roof": "flat",
+        "width": 1.75,
+        "depth": 1.02,
+        "chamfer": 0,
+        "leftWidth": 0.25,
+        "rightWidth": 0.23,
+        "crossDepth": 0.26,
+        "rightReach": 0.9,
+        "leftHeight": 0.82,
+        "rightHeight": 0.92,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.16,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": 0.1,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.79,
+        "roofRise": 0.17,
+        "roofDirection": 90
+      },
+      "visualFloors": 16,
+      "triangles": 34,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "twin",
+        "roof": "flat",
+        "parameters": {
+          "family": "twin",
+          "roof": "flat",
+          "width": 1.75,
+          "depth": 1.02,
+          "chamfer": 0,
+          "leftWidth": 0.25,
+          "rightWidth": 0.23,
+          "crossDepth": 0.26,
+          "rightReach": 0.9,
+          "leftHeight": 0.82,
+          "rightHeight": 0.92,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.16,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": 0.1,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.79,
+          "roofRise": 0.17,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "podiumHeight",
+          "towerDepth",
+          "towerY",
+          "twinWidth",
+          "towerGap",
+          "secondHeight"
+        ],
+        "active_parameter_values": [
+          1.75,
+          1.02,
+          0.16,
+          0.52,
+          0.1,
+          0.25,
+          0.18,
+          0.79
+        ],
+        "active_numeric_control_count": 8,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 16,
+        "outline": [
+          [
+            -0.875,
+            -0.51
+          ],
+          [
+            0.875,
+            -0.51
+          ],
+          [
+            0.875,
+            0.51
+          ],
+          [
+            -0.875,
+            0.51
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "podium",
+            "outer": [
+              [
+                -0.875,
+                -0.51
+              ],
+              [
+                0.875,
+                -0.51
+              ],
+              [
+                0.875,
+                0.51
+              ],
+              [
+                -0.875,
+                0.51
+              ]
+            ],
+            "holes": [],
+            "height": 0.16,
+            "base": 0,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          },
+          {
+            "id": "tower-1",
+            "outer": [
+              [
+                -0.595,
+                -0.24072
+              ],
+              [
+                -0.15749999999999997,
+                -0.24072
+              ],
+              [
+                -0.15749999999999997,
+                0.28968
+              ],
+              [
+                -0.595,
+                0.28968
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0.16,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          },
+          {
+            "id": "tower-2",
+            "outer": [
+              [
+                0.15749999999999997,
+                -0.24072
+              ],
+              [
+                0.595,
+                -0.24072
+              ],
+              [
+                0.595,
+                0.28968
+              ],
+              [
+                0.15749999999999997,
+                0.28968
+              ]
+            ],
+            "holes": [],
+            "height": 0.79,
+            "base": 0.16,
+            "roof": "flat",
+            "roofRise": 0,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 34,
+          "bounds": [
+            [
+              -0.875,
+              -0.5099999904632568,
+              0
+            ],
+            [
+              0.875,
+              0.5099999904632568,
+              1
+            ]
+          ],
+          "native_meshes": 3,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 34,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "twins.webp"
+    },
+    {
+      "id": "house",
+      "parameters": {
+        "family": "bar",
+        "roof": "gabled",
+        "width": 1.85,
+        "depth": 1.15,
+        "chamfer": 0,
+        "leftWidth": 0.25,
+        "rightWidth": 0.23,
+        "crossDepth": 0.26,
+        "rightReach": 0.9,
+        "leftHeight": 0.82,
+        "rightHeight": 0.92,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.25,
+        "roofDirection": 90
+      },
+      "visualFloors": 3,
+      "triangles": 14,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "bar",
+        "roof": "gabled",
+        "parameters": {
+          "family": "bar",
+          "roof": "gabled",
+          "width": 1.85,
+          "depth": 1.15,
+          "chamfer": 0,
+          "leftWidth": 0.25,
+          "rightWidth": 0.23,
+          "crossDepth": 0.26,
+          "rightReach": 0.9,
+          "leftHeight": 0.82,
+          "rightHeight": 0.92,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.25,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "chamfer",
+          "roofRise",
+          "roofDirection"
+        ],
+        "active_parameter_values": [
+          1.85,
+          1.15,
+          0,
+          0.25,
+          90
+        ],
+        "active_numeric_control_count": 5,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 3,
+        "outline": [
+          [
+            -0.925,
+            -0.575
+          ],
+          [
+            0.925,
+            -0.575
+          ],
+          [
+            0.925,
+            0.575
+          ],
+          [
+            -0.925,
+            0.575
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "main",
+            "outer": [
+              [
+                -0.925,
+                -0.575
+              ],
+              [
+                0.925,
+                -0.575
+              ],
+              [
+                0.925,
+                0.575
+              ],
+              [
+                -0.925,
+                0.575
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0,
+            "roof": "gabled",
+            "roofRise": 0.25,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 14,
+          "bounds": [
+            [
+              -0.925000011920929,
+              -0.574999988079071,
+              0
+            ],
+            [
+              0.925000011920929,
+              0.574999988079071,
+              1
+            ]
+          ],
+          "native_meshes": 2,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 14,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "house.webp"
+    },
+    {
+      "id": "hip",
+      "parameters": {
+        "family": "bar",
+        "roof": "hipped",
+        "width": 1.65,
+        "depth": 1.05,
+        "chamfer": 0,
+        "leftWidth": 0.25,
+        "rightWidth": 0.23,
+        "crossDepth": 0.26,
+        "rightReach": 0.9,
+        "leftHeight": 0.82,
+        "rightHeight": 0.92,
+        "courtWidth": 0.54,
+        "courtDepth": 0.52,
+        "courtX": 0,
+        "courtY": 0,
+        "podiumHeight": 0.18,
+        "towerWidth": 0.4,
+        "towerDepth": 0.52,
+        "towerX": 0.26,
+        "towerY": -0.18,
+        "twinWidth": 0.25,
+        "towerGap": 0.18,
+        "secondHeight": 0.78,
+        "roofRise": 0.19,
+        "roofDirection": 90
+      },
+      "visualFloors": 4,
+      "triangles": 14,
+      "metadata": {
+        "generator": "architectural-forms-o2w-v1",
+        "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
+        "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
+        "normalization": {
+          "height": 1,
+          "units": "dimensionless",
+          "isotropic": true,
+          "stl_up_axis": "Z",
+          "glb_up_axis": "Y"
+        },
+        "structure": "bar",
+        "roof": "hipped",
+        "parameters": {
+          "family": "bar",
+          "roof": "hipped",
+          "width": 1.65,
+          "depth": 1.05,
+          "chamfer": 0,
+          "leftWidth": 0.25,
+          "rightWidth": 0.23,
+          "crossDepth": 0.26,
+          "rightReach": 0.9,
+          "leftHeight": 0.82,
+          "rightHeight": 0.92,
+          "courtWidth": 0.54,
+          "courtDepth": 0.52,
+          "courtX": 0,
+          "courtY": 0,
+          "podiumHeight": 0.18,
+          "towerWidth": 0.4,
+          "towerDepth": 0.52,
+          "towerX": 0.26,
+          "towerY": -0.18,
+          "twinWidth": 0.25,
+          "towerGap": 0.18,
+          "secondHeight": 0.78,
+          "roofRise": 0.19,
+          "roofDirection": 90
+        },
+        "active_parameter_order": [
+          "width",
+          "depth",
+          "chamfer",
+          "roofRise"
+        ],
+        "active_parameter_values": [
+          1.65,
+          1.05,
+          0,
+          0.19
+        ],
+        "active_numeric_control_count": 4,
+        "control_count_is_not_global_independent_dimension": true,
+        "visual_floor_divisions": 4,
+        "outline": [
+          [
+            -0.825,
+            -0.525
+          ],
+          [
+            0.825,
+            -0.525
+          ],
+          [
+            0.825,
+            0.525
+          ],
+          [
+            -0.825,
+            0.525
+          ]
+        ],
+        "holes": [],
+        "parts": [
+          {
+            "id": "main",
+            "outer": [
+              [
+                -0.825,
+                -0.525
+              ],
+              [
+                0.825,
+                -0.525
+              ],
+              [
+                0.825,
+                0.525
+              ],
+              [
+                -0.825,
+                0.525
+              ]
+            ],
+            "holes": [],
+            "height": 1,
+            "base": 0,
+            "roof": "hipped",
+            "roofRise": 0.19,
+            "roofDirection": 90
+          }
+        ],
+        "cfd_mesh_validated": false,
+        "output": {
+          "triangles": 14,
+          "bounds": [
+            [
+              -0.824999988079071,
+              -0.5249999761581421,
+              0
+            ],
+            [
+              0.824999988079071,
+              0.5249999761581421,
+              1
+            ]
+          ],
+          "native_meshes": 2,
+          "source_reference_height_m": 30,
+          "front_faces_adapted_to_outward_normals": true,
+          "rewound_triangles": 14,
+          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "closed_solid_validated": false
+        }
+      },
+      "raster_preview_file": "hip.webp"
+    }
+  ],
+  "raster_preview": "Native OSM2World mesh rendered in Three.js with display-only procedural facade divisions"
+}

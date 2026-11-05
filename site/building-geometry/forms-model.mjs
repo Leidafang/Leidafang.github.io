@@ -1,4 +1,4 @@
-export const VERSION='architectural-forms-o2w-v1';
+export const VERSION='architectural-forms-o2w-v1.1';
 export const ENGINE='OSM2World 0.5.0-SNAPSHOT / 2026-02-18';
 export const FAMILIES=[
   {id:'bar',zh:'板式 / 独立主体',en:'Bar / single volume'},
@@ -81,7 +81,9 @@ export function deriveBuilding(input={}){
   const rectangle=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
   const outer=rectangle(x,y,x+w,y+d),holes=[],parts=[];
   let outline=outer;
-  const add=(id,poly,height=1,base=0,roof=p.roof)=>parts.push({id,outer:poly,holes:[],height,base,roof,roofRise:roof==='flat'?0:Math.min(p.roofRise,height*.35),roofDirection:p.roofDirection});
+  // Direction is an active control for gable/shed roofs only. Hip roofs keep
+  // the established orientation, independent of a previous roof's hidden value.
+  const add=(id,poly,height=1,base=0,roof=p.roof)=>parts.push({id,outer:poly,holes:[],height,base,roof,roofRise:roof==='flat'?0:Math.min(p.roofRise,height*.35),roofDirection:['gabled','skillion'].includes(roof)?p.roofDirection:90});
   if(p.family==='bar'){
     const c=Math.min(w,d)*p.chamfer;
     outline=c?[[x+c,y],[x+w-c,y],[x+w,y+c],[x+w,y+d-c],[x+w-c,y+d],[x+c,y+d],[x,y+d-c],[x,y+c]]:outer;

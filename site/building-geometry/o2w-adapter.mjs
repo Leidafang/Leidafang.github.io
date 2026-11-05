@@ -1,5 +1,6 @@
 import {O2WConverter} from './vendor/osm2world/osm2world-core-web.mjs';
-import {buildOsmData,exportParameters} from './forms-model.mjs?v=forms-o2w-20261105';
+import {buildOsmData,exportParameters} from './forms-model.mjs?v=roof-junction-20261105';
+import {JUNCTION_VERSION,matchRoofWallJunctions} from './roof-wall-junction.mjs?v=roof-junction-20261105';
 
 // The upstream module emits Y-up meshes. Convert to the project's Z-up frame
 // and normalize by the requested reference height, without reshaping axes.
@@ -27,9 +28,11 @@ export async function generateBuilding(config,floors=10){
     triangles+=positions.length/9;meshes.push({positions,normals,color,role:color.reduce((s,v)=>s+v,0)/3<.63?'roof':'wall'});
   }
   if(!triangles||Math.abs(hi[2]-1)>.0001||Math.abs(lo[2])>.0001)throw Error('Native building height did not match H=1');
+  const junctions=config.roof==='hipped'?matchRoofWallJunctions(meshes):{meshes,report:{version:JUNCTION_VERSION,repaired_panels:0,added_triangles:0,max_height_difference:0,roof_vertices_modified:false,repairs:[]}};
+  const nativeTriangles=triangles;triangles+=junctions.report.added_triangles;
   const metadata=exportParameters(config,floors);
-  metadata.output={triangles,bounds:[lo,hi],native_meshes:meshes.length,source_reference_height_m:referenceHeight,
+  metadata.output={triangles,native_triangles:nativeTriangles,roof_wall_junctions:junctions.report,bounds:[lo,hi],native_meshes:meshes.length,source_reference_height_m:referenceHeight,
     front_faces_adapted_to_outward_normals:true,rewound_triangles:rewoundTriangles,
-    surface_kind:'Native OSM2World preview assembly; ground caps and internal contacts are not repaired',closed_solid_validated:false};
-  return {meshes,bounds:[lo,hi],triangles,metadata,footprintArea:shape.footprintArea};
+    surface_kind:'OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired',closed_solid_validated:false};
+  return {meshes:junctions.meshes,bounds:[lo,hi],triangles,metadata,footprintArea:shape.footprintArea};
 }

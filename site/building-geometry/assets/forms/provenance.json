@@ -194,7 +194,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "office.webp"
+      "raster_preview_file": "office.webp",
+      "raster_preview_sha256": "a6b5dc33f7c3e5a1b9bde13573d3038b1e87e28eff9b5431ab216bff2cc56659",
+      "raster_preview_bytes": 6576,
+      "raster_preview_material_style": "office"
     },
     {
       "id": "slab",
@@ -351,7 +354,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "slab.webp"
+      "raster_preview_file": "slab.webp",
+      "raster_preview_sha256": "21fc02bf385120fd8ab82fccd0dda4f468f988a000cb5c69813d1b78d92765e9",
+      "raster_preview_bytes": 8802,
+      "raster_preview_material_style": "residential"
     },
     {
       "id": "l-wings",
@@ -547,7 +553,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "l-wings.webp"
+      "raster_preview_file": "l-wings.webp",
+      "raster_preview_sha256": "a060d8dcb0aef18a836b4de2db6310bc93867b28a4d22dc759b3646182b7a70a",
+      "raster_preview_bytes": 8766,
+      "raster_preview_material_style": "stone"
     },
     {
       "id": "u-wings",
@@ -784,7 +793,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "u-wings.webp"
+      "raster_preview_file": "u-wings.webp",
+      "raster_preview_sha256": "144124aac208e5dfa821de2b931e0b38259e71b9fbf44f3a4c807fe440a480ce",
+      "raster_preview_bytes": 9474,
+      "raster_preview_material_style": "stone"
     },
     {
       "id": "courtyard",
@@ -985,7 +997,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "courtyard.webp"
+      "raster_preview_file": "courtyard.webp",
+      "raster_preview_sha256": "1c08a742bf32199b238b4c065490f7e2f17a9e912139bd4b80d02e6f963b2a92",
+      "raster_preview_bytes": 15322,
+      "raster_preview_material_style": "brick"
     },
     {
       "id": "twins",
@@ -1206,7 +1221,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "twins.webp"
+      "raster_preview_file": "twins.webp",
+      "raster_preview_sha256": "8d20581864f5fbb99b34a93dab8bda3decebd450fe441df191cef4b772ba9a20",
+      "raster_preview_bytes": 8304,
+      "raster_preview_material_style": "office"
     },
     {
       "id": "house",
@@ -1367,7 +1385,10 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "house.webp"
+      "raster_preview_file": "house.webp",
+      "raster_preview_sha256": "f8e63c7286ace3fb8b4b7aed11fdf08d7d554cd87e17cc111a43a53d9724b14a",
+      "raster_preview_bytes": 9250,
+      "raster_preview_material_style": "residential"
     },
     {
       "id": "hip",
@@ -1526,8 +1547,19 @@
           "closed_solid_validated": false
         }
       },
-      "raster_preview_file": "hip.webp"
+      "raster_preview_file": "hip.webp",
+      "raster_preview_sha256": "abeaa773b0538341438462d889192c182c75e5743589d92c45de780e1d26c82e",
+      "raster_preview_bytes": 9404,
+      "raster_preview_material_style": "residential"
     }
   ],
-  "raster_preview": "Native OSM2World mesh rendered in Three.js with display-only procedural facade divisions"
+  "raster_preview": "Native OSM2World mesh rendered in Three.js r180 with display-only procedural PBR materials and shallow facade relief",
+  "presentation": {
+    "version": "architectural-pbr-v1",
+    "albedo_normal_roughness_metalness_ao_maps": true,
+    "source_geometry_modified": false,
+    "shallow_facade_relief_display_only": true,
+    "window_openings_modeled": false,
+    "external_texture_assets": false
+  }
 }

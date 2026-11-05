@@ -2,7 +2,7 @@
 // perimeter without inserting that vertex into its adjacent facade. Rebuild
 // only those native vertical panels whose top differs from the roof boundary.
 // Roof vertices, footprints, heights and all other native faces stay intact.
-export const JUNCTION_VERSION='roof-wall-junction-v1';
+export const JUNCTION_VERSION='roof-wall-junction-v2';
 const EPS=2e-6;
 const key=p=>p.map(x=>Math.round(x/EPS)).join(',');
 const vertex=(array,i)=>Array.from(array.slice(i,i+3));
@@ -14,10 +14,44 @@ function boundaryEdges(meshes){
     const points=[0,3,6].map(j=>vertex(mesh.positions,i+j));
     for(let j=0;j<3;j++){
       const a=points[j],b=points[(j+1)%3],ka=key(a),kb=key(b),id=ka<kb?ka+'|'+kb:kb+'|'+ka;
+      if(ka===kb)continue;
       if(edges.has(id))edges.get(id).count++;else edges.set(id,{a,b,count:1});
     }
   }
   return [...edges.values()].filter(e=>e.count===1);
+}
+
+export const getRoofBoundaryEdges=meshes=>boundaryEdges(meshes.filter(m=>m.role==='roof'));
+
+// Presentation uses the actual roof perimeter, including inner courtyard
+// edges, instead of drawing a constant-height trim through pitched walls.
+export function facadeRoofProfile(basis,edges){
+  const {a,tx,ty,length,normal,part}=basis,tolerance=1e-4,low=part.height-part.roofRise;
+  const onPlane=p=>Math.abs((p[0]-a[0])*normal[0]+(p[1]-a[1])*normal[1])<=tolerance;
+  const points=new Map();
+  for(const edge of edges){
+    if(!onPlane(edge.a)||!onPlane(edge.b))continue;
+    for(const p of [edge.a,edge.b]){
+      const u=(p[0]-a[0])*tx+(p[1]-a[1])*ty;
+      if(u< -tolerance||u>length+tolerance||p[2]<low-tolerance||p[2]>part.height+tolerance)continue;
+      const id=Math.round(u/tolerance),value={u:Math.max(0,Math.min(length,u)),z:p[2],position:p};
+      if(!points.has(id)||points.get(id).z<p[2])points.set(id,value);
+    }
+  }
+  const profile=[...points.values()].sort((a,b)=>a.u-b.u);
+  return profile.length>=2&&profile[0].u<tolerance&&length-profile.at(-1).u<tolerance?profile:[];
+}
+
+export function auditRoofWallSeams(meshes){
+  const roofs=getRoofBoundaryEdges(meshes),walls=boundaryEdges(meshes.filter(m=>m.role==='wall'));
+  const distance=(p,a,b)=>{const d=b.map((x,k)=>x-a[k]),length=d.reduce((s,x)=>s+x*x,0);if(!length)return Infinity;const u=Math.max(0,Math.min(1,d.reduce((s,x,k)=>s+x*(p[k]-a[k]),0)/length));return Math.hypot(...p.map((x,k)=>x-a[k]-u*d[k]));};
+  let error=0;
+  for(const {a,b} of roofs)for(const u of [0,.25,.5,.75,1]){
+    const p=a.map((x,k)=>x+(b[k]-x)*u);let closest=Infinity;
+    for(const e of walls)closest=Math.min(closest,distance(p,e.a,e.b));
+    error=Math.max(error,closest);
+  }
+  return {roof_boundary_edges:roofs.length,samples_per_edge:5,max_distance:error,tolerance:5e-5,passed:Number.isFinite(error)&&error<=5e-5,scope:'Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance'};
 }
 
 function verticalPanels(mesh){
@@ -40,7 +74,7 @@ function verticalPanels(mesh){
 }
 
 export function matchRoofWallJunctions(meshes){
-  const roofBoundary=boundaryEdges(meshes.filter(m=>m.role==='roof'));
+  const roofBoundary=getRoofBoundaryEdges(meshes);
   const repairs=[];let addedTriangles=0,maxGap=0;
   const result=meshes.map((mesh,meshIndex)=>{
     if(mesh.role!=='wall')return mesh;

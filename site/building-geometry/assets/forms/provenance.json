@@ -36,7 +36,7 @@
       "visualFloors": 14,
       "triangles": 22,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -174,6 +174,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 22,
+          "native_triangles": 22,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 8,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.699999988079071,
@@ -190,7 +210,7 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 22,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
@@ -231,7 +251,7 @@
       "visualFloors": 10,
       "triangles": 10,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -334,6 +354,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 10,
+          "native_triangles": 10,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 4,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.699999988079071,
@@ -350,7 +390,7 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 10,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
@@ -391,7 +431,7 @@
       "visualFloors": 7,
       "triangles": 20,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -533,6 +573,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 20,
+          "native_triangles": 20,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 8,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.699999988079071,
@@ -549,13 +609,13 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 20,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
       "raster_preview_file": "l-wings.webp",
-      "raster_preview_sha256": "a060d8dcb0aef18a836b4de2db6310bc93867b28a4d22dc759b3646182b7a70a",
-      "raster_preview_bytes": 8766,
+      "raster_preview_sha256": "eb304f237e61b6ddde2468154d24341d4882ef5bc33761d228b046540433b47e",
+      "raster_preview_bytes": 8742,
       "raster_preview_material_style": "stone"
     },
     {
@@ -590,7 +650,7 @@
       "visualFloors": 6,
       "triangles": 30,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -773,6 +833,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 30,
+          "native_triangles": 30,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 12,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.7250000238418579,
@@ -789,13 +869,13 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 30,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
       "raster_preview_file": "u-wings.webp",
-      "raster_preview_sha256": "144124aac208e5dfa821de2b931e0b38259e71b9fbf44f3a4c807fe440a480ce",
-      "raster_preview_bytes": 9474,
+      "raster_preview_sha256": "3af18c93e4342d811f1db63e6eed1640da20a14da537b423c1a80798d4388c40",
+      "raster_preview_bytes": 9538,
       "raster_preview_material_style": "stone"
     },
     {
@@ -830,7 +910,7 @@
       "visualFloors": 5,
       "triangles": 24,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -977,6 +1057,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 24,
+          "native_triangles": 24,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 8,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.875,
@@ -993,7 +1093,7 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 24,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
@@ -1034,7 +1134,7 @@
       "visualFloors": 16,
       "triangles": 34,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -1201,6 +1301,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 34,
+          "native_triangles": 34,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 12,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.875,
@@ -1217,7 +1337,7 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 34,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
@@ -1258,7 +1378,7 @@
       "visualFloors": 3,
       "triangles": 14,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -1365,6 +1485,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 14,
+          "native_triangles": 14,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 6,
+            "samples_per_edge": 5,
+            "max_distance": 6.206335383118183e-17,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.925000011920929,
@@ -1381,13 +1521,13 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 14,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
       "raster_preview_file": "house.webp",
-      "raster_preview_sha256": "f8e63c7286ace3fb8b4b7aed11fdf08d7d554cd87e17cc111a43a53d9724b14a",
-      "raster_preview_bytes": 9250,
+      "raster_preview_sha256": "cf62a2425b40a9c69f898e4d5075d08bae25b9da652a3b3d4e0bfd6404cea12e",
+      "raster_preview_bytes": 9794,
       "raster_preview_material_style": "residential"
     },
     {
@@ -1422,7 +1562,7 @@
       "visualFloors": 4,
       "triangles": 14,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1",
+        "generator": "architectural-forms-o2w-v1.2",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -1527,6 +1667,26 @@
         "cfd_mesh_validated": false,
         "output": {
           "triangles": 14,
+          "native_triangles": 14,
+          "roof_construction": {
+            "method": "native-roof"
+          },
+          "roof_wall_junctions": {
+            "version": "roof-wall-junction-v2",
+            "repaired_panels": 0,
+            "added_triangles": 0,
+            "max_height_difference": 0,
+            "roof_vertices_modified": false,
+            "repairs": []
+          },
+          "roof_wall_seam_audit": {
+            "roof_boundary_edges": 4,
+            "samples_per_edge": 5,
+            "max_distance": 0,
+            "tolerance": 5e-05,
+            "passed": true,
+            "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
+          },
           "bounds": [
             [
               -0.824999988079071,
@@ -1543,23 +1703,25 @@
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
           "rewound_triangles": 14,
-          "surface_kind": "Native OSM2World preview assembly; ground caps and internal contacts are not repaired",
+          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
       },
       "raster_preview_file": "hip.webp",
-      "raster_preview_sha256": "abeaa773b0538341438462d889192c182c75e5743589d92c45de780e1d26c82e",
-      "raster_preview_bytes": 9404,
+      "raster_preview_sha256": "cf71574315cf309723b4163a2256509fd5d15f4f8bebff33033d335adca5adac",
+      "raster_preview_bytes": 9568,
       "raster_preview_material_style": "residential"
     }
   ],
-  "raster_preview": "Native OSM2World mesh rendered in Three.js r180 with display-only procedural PBR materials and shallow facade relief",
+  "raster_preview": "Native OSM2World-based geometry rendered in Three.js r180 with procedural PBR materials, continuous gable materials and display-only cornices/fascia/gutters/attic louvers",
   "presentation": {
-    "version": "architectural-pbr-v1",
+    "version": "architectural-pbr-v2",
     "albedo_normal_roughness_metalness_ao_maps": true,
     "source_geometry_modified": false,
     "shallow_facade_relief_display_only": true,
     "window_openings_modeled": false,
-    "external_texture_assets": false
+    "external_texture_assets": false,
+    "roof_edge_relief_display_only": true,
+    "attic_louvers_display_only": true
   }
 }

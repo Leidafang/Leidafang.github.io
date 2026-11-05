@@ -1,4 +1,4 @@
-export const VERSION='architectural-forms-o2w-v1.1';
+export const VERSION='architectural-forms-o2w-v1.2';
 export const ENGINE='OSM2World 0.5.0-SNAPSHOT / 2026-02-18';
 export const FAMILIES=[
   {id:'bar',zh:'板式 / 独立主体',en:'Bar / single volume'},

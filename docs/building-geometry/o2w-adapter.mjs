@@ -1,11 +1,15 @@
 import {O2WConverter} from './vendor/osm2world/osm2world-core-web.mjs';
-import {buildOsmData,exportParameters} from './forms-model.mjs?v=roof-junction-20261105';
-import {JUNCTION_VERSION,matchRoofWallJunctions} from './roof-wall-junction.mjs?v=roof-junction-20261105';
+import {buildOsmData,exportParameters} from './forms-model.mjs?v=roof-envelope-20261105';
+import {matchRoofWallJunctions,auditRoofWallSeams} from './roof-wall-junction.mjs?v=roof-envelope-20261105';
+import {applyPlanarSkillion} from './planar-roof.mjs?v=roof-envelope-20261105';
 
 // The upstream module emits Y-up meshes. Convert to the project's Z-up frame
 // and normalize by the requested reference height, without reshaping axes.
 export async function generateBuilding(config,floors=10){
   const {osm,referenceHeight,shape}=buildOsmData(config,floors);
+  if(shape.config.roof==='skillion')for(const element of osm.elements){
+    if(element.tags?.['roof:shape']==='skillion'){element.tags['roof:shape']='flat';element.tags['roof:height']='0';}
+  }
   const native=await new Promise((resolve,reject)=>new O2WConverter().convertJson(JSON.stringify(osm),resolve,error=>reject(Error(String(error)))));
   const meshes=[],lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];let triangles=0,rewoundTriangles=0;
   for(const m of native){
@@ -28,10 +32,17 @@ export async function generateBuilding(config,floors=10){
     triangles+=positions.length/9;meshes.push({positions,normals,color,role:color.reduce((s,v)=>s+v,0)/3<.63?'roof':'wall'});
   }
   if(!triangles||Math.abs(hi[2]-1)>.0001||Math.abs(lo[2])>.0001)throw Error('Native building height did not match H=1');
-  const junctions=config.roof==='hipped'?matchRoofWallJunctions(meshes):{meshes,report:{version:JUNCTION_VERSION,repaired_panels:0,added_triangles:0,max_height_difference:0,roof_vertices_modified:false,repairs:[]}};
+  const construction=shape.config.roof==='skillion'?applyPlanarSkillion(meshes,shape.parts):{meshes,report:{method:'native-roof'}};
+  // Gable roofs over courtyard holes can miss the same boundary ridge vertices
+  // as hip roofs. Apply the geometry-driven correction to every roof form.
+  const junctions=matchRoofWallJunctions(construction.meshes),seams=auditRoofWallSeams(junctions.meshes);
+  if(!seams.passed)throw Error('Generated roof-to-wall boundary did not pass the seam check');
+  lo.fill(Infinity);hi.fill(-Infinity);
+  for(const mesh of junctions.meshes)for(let i=0;i<mesh.positions.length;i+=3)for(let k=0;k<3;k++){lo[k]=Math.min(lo[k],mesh.positions[i+k]);hi[k]=Math.max(hi[k],mesh.positions[i+k]);}
+  if(Math.abs(hi[2]-1)>.0001||Math.abs(lo[2])>.0001)throw Error('Constructed building height did not match H=1');
   const nativeTriangles=triangles;triangles+=junctions.report.added_triangles;
   const metadata=exportParameters(config,floors);
-  metadata.output={triangles,native_triangles:nativeTriangles,roof_wall_junctions:junctions.report,bounds:[lo,hi],native_meshes:meshes.length,source_reference_height_m:referenceHeight,
+  metadata.output={triangles,native_triangles:nativeTriangles,roof_construction:construction.report,roof_wall_junctions:junctions.report,roof_wall_seam_audit:seams,bounds:[lo,hi],native_meshes:meshes.length,source_reference_height_m:referenceHeight,
     front_faces_adapted_to_outward_normals:true,rewound_triangles:rewoundTriangles,
     surface_kind:'OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired',closed_solid_validated:false};
   return {meshes:junctions.meshes,bounds:[lo,hi],triangles,metadata,footprintArea:shape.footprintArea};

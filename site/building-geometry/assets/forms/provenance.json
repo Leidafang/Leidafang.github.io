@@ -95,6 +95,14 @@
         ],
         "active_numeric_control_count": 7,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.17,
+          "applied_roof_rise": 0.17
+        },
         "visual_floor_divisions": 14,
         "outline": [
           [
@@ -213,11 +221,7 @@
           "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "office.webp",
-      "raster_preview_sha256": "a6b5dc33f7c3e5a1b9bde13573d3038b1e87e28eff9b5431ab216bff2cc56659",
-      "raster_preview_bytes": 6576,
-      "raster_preview_material_style": "office"
+      }
     },
     {
       "id": "slab",
@@ -302,6 +306,14 @@
         ],
         "active_numeric_control_count": 3,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.17,
+          "applied_roof_rise": 0.17
+        },
         "visual_floor_divisions": 10,
         "outline": [
           [
@@ -393,11 +405,7 @@
           "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "slab.webp",
-      "raster_preview_sha256": "21fc02bf385120fd8ab82fccd0dda4f468f988a000cb5c69813d1b78d92765e9",
-      "raster_preview_bytes": 8802,
-      "raster_preview_material_style": "residential"
+      }
     },
     {
       "id": "l-wings",
@@ -486,6 +494,14 @@
         ],
         "active_numeric_control_count": 5,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.17,
+          "applied_roof_rise": 0.17
+        },
         "visual_floor_divisions": 7,
         "outline": [
           [
@@ -612,11 +628,7 @@
           "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "l-wings.webp",
-      "raster_preview_sha256": "eb304f237e61b6ddde2468154d24341d4882ef5bc33761d228b046540433b47e",
-      "raster_preview_bytes": 8742,
-      "raster_preview_material_style": "stone"
+      }
     },
     {
       "id": "u-wings",
@@ -711,6 +723,14 @@
         ],
         "active_numeric_control_count": 8,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.17,
+          "applied_roof_rise": 0.17
+        },
         "visual_floor_divisions": 6,
         "outline": [
           [
@@ -872,11 +892,7 @@
           "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "u-wings.webp",
-      "raster_preview_sha256": "3af18c93e4342d811f1db63e6eed1640da20a14da537b423c1a80798d4388c40",
-      "raster_preview_bytes": 9538,
-      "raster_preview_material_style": "stone"
+      }
     },
     {
       "id": "courtyard",
@@ -967,6 +983,14 @@
         ],
         "active_numeric_control_count": 6,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.17,
+          "applied_roof_rise": 0.17
+        },
         "visual_floor_divisions": 5,
         "outline": [
           [
@@ -1096,11 +1120,7 @@
           "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "courtyard.webp",
-      "raster_preview_sha256": "1c08a742bf32199b238b4c065490f7e2f17a9e912139bd4b80d02e6f963b2a92",
-      "raster_preview_bytes": 15322,
-      "raster_preview_material_style": "brick"
+      }
     },
     {
       "id": "twins",
@@ -1195,6 +1215,14 @@
         ],
         "active_numeric_control_count": 8,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.17,
+          "applied_roof_rise": 0.17
+        },
         "visual_floor_divisions": 16,
         "outline": [
           [
@@ -1340,11 +1368,7 @@
           "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "twins.webp",
-      "raster_preview_sha256": "8d20581864f5fbb99b34a93dab8bda3decebd450fe441df191cef4b772ba9a20",
-      "raster_preview_bytes": 8304,
-      "raster_preview_material_style": "office"
+      }
     },
     {
       "id": "house",
@@ -1376,9 +1400,9 @@
         "roofDirection": 90
       },
       "visualFloors": 3,
-      "triangles": 14,
+      "triangles": 20,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1.2",
+        "generator": "architectural-forms-o2w-v1.4",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -1421,18 +1445,24 @@
           "width",
           "depth",
           "chamfer",
-          "roofRise",
-          "roofDirection"
+          "roofRise"
         ],
         "active_parameter_values": [
           1.85,
           1.15,
           0,
-          0.25,
-          90
+          0.25
         ],
-        "active_numeric_control_count": 5,
+        "active_numeric_control_count": 4,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.25,
+          "applied_roof_rise": 0.25
+        },
         "visual_floor_divisions": 3,
         "outline": [
           [
@@ -1484,10 +1514,42 @@
         ],
         "cfd_mesh_validated": false,
         "output": {
-          "triangles": 14,
-          "native_triangles": 14,
+          "triangles": 20,
+          "native_triangles": 10,
           "roof_construction": {
-            "method": "native-roof"
+            "method": "architectural-roof-envelope-v1",
+            "roof_direction_control": "skillion-only",
+            "maximum_pitch_degrees": 60,
+            "parts": [
+              {
+                "id": "main",
+                "roof": "gabled",
+                "common_eave_height": 0.75,
+                "peak_height": 1,
+                "roof_rise": 0.25,
+                "equal_pitch": 0.4347826086956522,
+                "max_actual_gradient": 0.43478261434736076,
+                "ridge_layout": "long-axis",
+                "wing_rectangles": [
+                  [
+                    -0.925,
+                    0.925,
+                    -0.575,
+                    0.575
+                  ]
+                ],
+                "ridge_axes": [
+                  "x"
+                ],
+                "ridge_end_conditions": [
+                  "none"
+                ],
+                "partition_cells": 2,
+                "roof_triangles": 8,
+                "wall_triangles": 12
+              }
+            ],
+            "ground_closure_validated": false
           },
           "roof_wall_junctions": {
             "version": "roof-wall-junction-v2",
@@ -1500,7 +1562,7 @@
           "roof_wall_seam_audit": {
             "roof_boundary_edges": 6,
             "samples_per_edge": 5,
-            "max_distance": 6.206335383118183e-17,
+            "max_distance": 0,
             "tolerance": 5e-05,
             "passed": true,
             "scope": "Roof-to-wall boundary alignment only; not closed-solid or CFD acceptance"
@@ -1520,15 +1582,11 @@
           "native_meshes": 2,
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
-          "rewound_triangles": 14,
-          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
+          "rewound_triangles": 10,
+          "surface_kind": "OSM2World flat-source preview with architectural equal-pitch gable/hip roofs and matching walls; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "house.webp",
-      "raster_preview_sha256": "cf62a2425b40a9c69f898e4d5075d08bae25b9da652a3b3d4e0bfd6404cea12e",
-      "raster_preview_bytes": 9794,
-      "raster_preview_material_style": "residential"
+      }
     },
     {
       "id": "hip",
@@ -1560,9 +1618,9 @@
         "roofDirection": 90
       },
       "visualFloors": 4,
-      "triangles": 14,
+      "triangles": 76,
       "metadata": {
-        "generator": "architectural-forms-o2w-v1.2",
+        "generator": "architectural-forms-o2w-v1.4",
         "engine": "OSM2World 0.5.0-SNAPSHOT / 2026-02-18",
         "source": "Synthetic parametric footprints and building parts; no real OSM buildings",
         "normalization": {
@@ -1615,6 +1673,14 @@
         ],
         "active_numeric_control_count": 4,
         "control_count_is_not_global_independent_dimension": true,
+        "roof_parameter_constraints": {
+          "maximum_pitch_degrees": 60,
+          "roof_rise_limit": 0.26,
+          "roof_direction_active": false,
+          "gable_ridge_rule": "wing-aligned or simple-part long axis",
+          "requested_roof_rise": 0.19,
+          "applied_roof_rise": 0.19
+        },
         "visual_floor_divisions": 4,
         "outline": [
           [
@@ -1666,10 +1732,38 @@
         ],
         "cfd_mesh_validated": false,
         "output": {
-          "triangles": 14,
-          "native_triangles": 14,
+          "triangles": 76,
+          "native_triangles": 10,
           "roof_construction": {
-            "method": "native-roof"
+            "method": "architectural-roof-envelope-v1",
+            "roof_direction_control": "skillion-only",
+            "maximum_pitch_degrees": 60,
+            "parts": [
+              {
+                "id": "main",
+                "roof": "hipped",
+                "common_eave_height": 0.8100000023841858,
+                "peak_height": 1,
+                "roof_rise": 0.19,
+                "equal_pitch": 0.3619047573634556,
+                "max_actual_gradient": 0.3619051754356495,
+                "ridge_layout": "equal-pitch-hip",
+                "wing_rectangles": [
+                  [
+                    -0.825,
+                    0.825,
+                    -0.525,
+                    0.525
+                  ]
+                ],
+                "ridge_axes": null,
+                "ridge_end_conditions": null,
+                "partition_cells": 16,
+                "roof_triangles": 52,
+                "wall_triangles": 24
+              }
+            ],
+            "ground_closure_validated": false
           },
           "roof_wall_junctions": {
             "version": "roof-wall-junction-v2",
@@ -1680,7 +1774,7 @@
             "repairs": []
           },
           "roof_wall_seam_audit": {
-            "roof_boundary_edges": 4,
+            "roof_boundary_edges": 12,
             "samples_per_edge": 5,
             "max_distance": 0,
             "tolerance": 5e-05,
@@ -1702,20 +1796,16 @@
           "native_meshes": 2,
           "source_reference_height_m": 30,
           "front_faces_adapted_to_outward_normals": true,
-          "rewound_triangles": 14,
-          "surface_kind": "OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired",
+          "rewound_triangles": 10,
+          "surface_kind": "OSM2World flat-source preview with architectural equal-pitch gable/hip roofs and matching walls; ground caps and internal contacts are not repaired",
           "closed_solid_validated": false
         }
-      },
-      "raster_preview_file": "hip.webp",
-      "raster_preview_sha256": "cf71574315cf309723b4163a2256509fd5d15f4f8bebff33033d335adca5adac",
-      "raster_preview_bytes": 9568,
-      "raster_preview_material_style": "residential"
+      }
     }
   ],
-  "raster_preview": "OSM2World-based parametric geometry with common-eave L/U hip roof correction, rendered in Three.js r180 with procedural PBR materials and display-only continuous roof-edge trim and window surrounds",
+  "raster_preview": "OSM2World-based flat-source parametric geometry with continuous architectural gable/hip roofs, rendered in Three.js r180 with procedural PBR materials and display-only roof-edge trim and window surrounds",
   "presentation": {
-    "version": "architectural-pbr-v6",
+    "version": "architectural-pbr-v7",
     "albedo_normal_roughness_metalness_ao_maps": true,
     "source_geometry_modified": false,
     "shallow_facade_relief_display_only": true,
@@ -1731,17 +1821,23 @@
       "hipped": "residential",
       "explicit_choice_preserved": true
     },
-    "roof_edge_trim": "continuous-roof-trim-v2",
+    "roof_edge_trim": "continuous-roof-trim-v3",
     "frame_joints_non_overlapping": true,
     "roof_trim_follows_adjacent_roof_planes": true,
-    "steep_roof_trim_projection_limited": true
+    "steep_roof_trim_projection_limited": true,
+    "automatic_gable_and_hip_finish": "residential",
+    "coplanar_flat_parts_share_trim": true,
+    "collinear_profile_segments_merged": true,
+    "short_edge_overhang_limited": true
   },
   "geometry_versions": {
-    "default": "architectural-forms-o2w-v1.2",
-    "l_hipped_and_u_hipped": "architectural-forms-o2w-v1.3",
-    "correction": "Common-eave equal-pitch wing roofs and matching vertical walls; preview, GLB and STL use the same corrected base meshes",
-    "method": "orthogonal-wing-hip-envelope-v1",
-    "unchanged_scope": "All other combinations including R3 bar/flat retain geometry version 1.2; sampled baseline STL hashes are unchanged",
+    "flat": "architectural-forms-o2w-v1.2",
+    "pitched": "architectural-forms-o2w-v1.4",
+    "method": "architectural-roof-envelope-v1",
+    "gable_ridge_rule": "Wing-aligned with continuous junctions, or simple-part long axis; arbitrary gable direction inactive",
+    "maximum_pitch_degrees": 60,
+    "roof_rise_domain": "Conditional maximum follows span; controls and JSON record applied range",
+    "unchanged_scope": "Flat geometry and R3 bar/flat parameter domains and STL bytes preserved",
     "closed_solid_validated": false,
     "cfd_mesh_validated": false
   }

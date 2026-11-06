@@ -1,8 +1,8 @@
 import * as THREE from './vendor/three.module.js';
 import {roofDetailClearance,DETAIL_CLEARANCE_VERSION,DETAIL_CLEARANCE,DETAIL_WALL_GAP} from './roof-detail-clearance.mjs?v=roof-depth-20261106';
-import {roofEdgeTrim} from './roof-edge-trim.mjs?v=roof-slope-20261106';
+import {roofEdgeTrim} from './roof-edge-trim.mjs?v=roof-boundaries-20261106';
 
-export const MATERIAL_VERSION='architectural-pbr-v6';
+export const MATERIAL_VERSION='architectural-pbr-v7';
 export const LOOKS=[{id:'auto',zh:'自动匹配建筑',en:'Match building'},{id:'office',zh:'办公玻璃',en:'Office glazing'},{id:'residential',zh:'浅色住宅',en:'Light residential'},{id:'brick',zh:'暖色砖石',en:'Warm masonry'}];
 const palettes={
   office:{wall:'#65717a',frame:'#9ba6ad',glass:'#577580',band:'#485a68',width:.94,height:.83,metal:.72},
@@ -45,7 +45,8 @@ export function atticVent(b){
 export function resolveLook(metadata,choice='auto'){
   if(choice!=='auto')return choice;
   const p=metadata.parameters;
-  if(['podium','twin'].includes(p.family))return ['gabled','hipped'].includes(p.roof)?'residential':'office';
+  if(['gabled','hipped'].includes(p.roof))return 'residential';
+  if(['podium','twin'].includes(p.family))return 'office';
   if(p.family==='court')return 'brick';
   if(p.family==='bar'&&p.roof!=='flat')return 'residential';
   if(p.family==='bar')return 'residential';

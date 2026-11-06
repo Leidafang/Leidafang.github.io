@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
 import {DETAIL_CLEARANCE,DETAIL_WALL_GAP} from './roof-detail-clearance.mjs?v=roof-depth-20261106';
 
-export const ROOF_TRIM_VERSION='continuous-roof-trim-v2';
+export const ROOF_TRIM_VERSION='continuous-roof-trim-v3';
 const pointKey=p=>p.toArray().map(v=>Math.round(v/2e-6)).join(',');
 const edgeKey=(a,b)=>[pointKey(a),pointKey(b)].sort().join('|');
 
@@ -23,12 +23,71 @@ function adjacentRoofPlanes(meshes){
   };
 }
 
+// Coplanar flat parts share one external trim, with internal seams removed.
+function mergeFlatRings(rings){
+  const groups=new Map();
+  for(const [id,bases]of rings){const part=bases[0].part;if(part.roof!=='flat')continue;const key=Math.round(part.height/1e-6);if(!groups.has(key))groups.set(key,new Map());groups.get(key).set(part.id,part);}
+  let merged=0;
+  for(const parts of groups.values()){
+    if(parts.size<2)continue;
+    const segments=[],vertices=[],height=[...parts.values()][0].height;
+    for(const part of parts.values())for(const [ri,source]of [part.outer,...part.holes].entries()){
+      let ring=source.map(([x,y])=>[x,-y]);
+      const area=ring.reduce((sum,a,i)=>{const b=ring[(i+1)%ring.length];return sum+a[0]*b[1]-a[1]*b[0];},0);
+      if((area>0)!==Boolean(ri))ring=ring.reverse();
+      vertices.push(...ring);for(let i=0;i<ring.length;i++)segments.push({a:ring[i],b:ring[(i+1)%ring.length]});
+    }
+    const key=p=>p.map(v=>Math.round(v/1e-7)).join(','),edges=new Map();
+    for(const {a,b}of segments){
+      const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy),cuts=[0,1];
+      for(const p of vertices){const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(length*length),distance=Math.abs((p[0]-a[0])*dy-(p[1]-a[1])*dx)/length;if(t>1e-8&&t<1-1e-8&&distance<1e-7)cuts.push(t);}
+      cuts.sort((a,b)=>a-b);
+      for(let i=1;i<cuts.length;i++){
+        if(cuts[i]-cuts[i-1]<1e-8)continue;
+        const start=[a[0]+dx*cuts[i-1],a[1]+dy*cuts[i-1]],end=[a[0]+dx*cuts[i],a[1]+dy*cuts[i]],id=key(start)+'|'+key(end),reverse=key(end)+'|'+key(start);
+        if(edges.has(reverse))edges.delete(reverse);else edges.set(id,{a:start,b:end});
+      }
+    }
+    const loops=[];
+    while(edges.size){
+      const [firstId,first]=edges.entries().next().value;edges.delete(firstId);const loop=[first.a];let end=first.b;
+      while(key(end)!==key(first.a)){
+        loop.push(end);const next=[...edges.entries()].find(([,e])=>key(e.a)===key(end));if(!next)throw Error('Flat trim union has an open boundary');edges.delete(next[0]);end=next[1].b;
+      }
+      loops.push(loop);
+    }
+    for(const [id,bases]of rings)if(parts.has(bases[0].part.id))rings.delete(id);
+    for(const [i,loop]of loops.entries()){
+      const part={...parts.values().next().value,id:'flat-union-'+height+'-'+i,outer:loop.map(([x,y])=>[x,-y]),holes:[]},bases=[];
+      // Loop winding is clockwise on outer boundaries, counterclockwise in holes.
+      for(let j=0;j<loop.length;j++){const a=loop[j],b=loop[(j+1)%loop.length],length=Math.hypot(b[0]-a[0],b[1]-a[1]);bases.push({part,edge:j,normal:[-(b[1]-a[1])/length,(b[0]-a[0])/length],roofProfile:[{position:[...a,height]},{position:[...b,height]}]});}
+      rings.set(part.id,bases);
+    }
+    merged+=parts.size-1;
+  }
+  return merged;
+}
+function mergeCollinear(segments){
+  let merged=0,changed=true;
+  while(changed&&segments.length>3){
+    changed=false;
+    for(let i=0;i<segments.length;i++){
+      const j=(i+1)%segments.length,a=segments[i],b=segments[j],la=Math.hypot(a.b.x-a.a.x,a.b.y-a.a.y),lb=Math.hypot(b.b.x-b.a.x,b.b.y-b.a.y);
+      if(a.normal.dot(b.normal)<1-1e-7||Math.abs((a.b.z-a.a.z)/la-(b.b.z-b.a.z)/lb)>1e-5)continue;
+      const combined={...a,b:b.b,planes:[...a.planes,...b.planes]};
+      if(j===0){segments[0]=combined;segments.splice(i,1);}else{segments[i]=combined;segments.splice(j,1);}
+      merged++;changed=true;break;
+    }
+  }
+  return merged;
+}
+
 // A closed, mitered ring replaces intersecting fascia/gutter/head-course boxes.
 // The drip lip and fascia are one section, so roof cuts cannot create stacked
 // coincident caps. Each section stays outside the actual facade perimeter.
 export function roofEdgeTrim(bases,sourceMeshes=[]){
   const rings=new Map(),buffers={flat:{positions:[],normals:[]},pitched:{positions:[],normals:[]}};
-  const stats={version:ROOF_TRIM_VERSION,rings:0,flatRings:0,pitchedRings:0,eaveSegments:0,gutters:0,hiddenFlatEdges:0,skippedRings:0,roofPlaneEdges:0,unmatchedRoofEdges:0,pitchLimitedRings:0,maxSlopeDrop:0},planesFor=adjacentRoofPlanes(sourceMeshes);
+  const stats={version:ROOF_TRIM_VERSION,rings:0,flatRings:0,pitchedRings:0,eaveSegments:0,gutters:0,hiddenFlatEdges:0,skippedRings:0,roofPlaneEdges:0,unmatchedRoofEdges:0,pitchLimitedRings:0,maxSlopeDrop:0,mergedFlatParts:0,mergedCollinearSegments:0},planesFor=adjacentRoofPlanes(sourceMeshes);
   for(const basis of bases){
     const id=basis.part.id+'/'+Math.floor(basis.edge/1000);
     if(!rings.has(id))rings.set(id,[]);rings.get(id).push(basis);
@@ -50,6 +109,7 @@ export function roofEdgeTrim(bases,sourceMeshes=[]){
       list.push({part,edge:ringIndex*1000+i,normal:outward(i),roofProfile:[{position:[...a,part.height]},{position:[...b,part.height]}]});stats.hiddenFlatEdges++;
     }
   }
+  stats.mergedFlatParts=mergeFlatRings(rings);
   for(const bases of rings.values()){
     const segments=[],part=bases[0].part,pitched=part.roof!=='flat',total=part.height-part.base;
     for(const b of bases.sort((a,b)=>a.edge-b.edge))for(let i=1;i<b.roofProfile.length;i++){
@@ -63,6 +123,7 @@ export function roofEdgeTrim(bases,sourceMeshes=[]){
       stats.skippedRings++;continue;
     }
     if(pitched&&segments.some(s=>!s.planes.length)){stats.skippedRings++;continue;}
+    stats.mergedCollinearSegments+=mergeCollinear(segments);
     const vertices=[];
     for(let i=0;i<segments.length;i++){
       const current=segments[i],previous=segments[(i+segments.length-1)%segments.length],denominator=1+current.normal.dot(previous.normal);
@@ -71,6 +132,7 @@ export function roofEdgeTrim(bases,sourceMeshes=[]){
     }
     if(!vertices.length){stats.skippedRings++;continue;}
     const height=pitched?Math.min(.012,total*.014):.004,gap=DETAIL_WALL_GAP;let depth=pitched?Math.min(.017,total*.018):.006;
+    const shortest=Math.min(...segments.map(s=>Math.hypot(s.b.x-s.a.x,s.b.y-s.a.y)));depth=Math.min(depth,Math.max(1e-6,shortest*.2-gap));
     if(pitched){
       // A fixed overhang becomes a long downward skirt on very steep/narrow
       // wings. Keep one constant depth around each ring and shorten it so the

@@ -1,15 +1,15 @@
 import {O2WConverter} from './vendor/osm2world/osm2world-core-web.mjs';
-import {buildOsmData,exportParameters} from './forms-model.mjs?v=hip-ridge-20261106';
+import {buildOsmData,exportParameters} from './forms-model.mjs?v=roof-boundaries-20261106';
 import {matchRoofWallJunctions,auditRoofWallSeams} from './roof-wall-junction.mjs?v=roof-envelope-20261105';
 import {applyPlanarSkillion} from './planar-roof.mjs?v=roof-envelope-20261105';
-import {applyOrthogonalHip} from './orthogonal-hip-roof.mjs?v=hip-ridge-20261106';
+import {applyRoofEnvelope} from './roof-envelope.mjs?v=roof-boundaries-20261106';
 
 // The upstream module emits Y-up meshes. Convert to the project's Z-up frame
 // and normalize by the requested reference height, without reshaping axes.
 export async function generateBuilding(config,floors=10){
   const {osm,referenceHeight,shape}=buildOsmData(config,floors);
-  const orthogonalHip=shape.config.roof==='hipped'&&['l','u'].includes(shape.config.family);
-  if(shape.config.roof==='skillion'||orthogonalHip)for(const element of osm.elements){
+  const envelope=['gabled','hipped'].includes(shape.config.roof);
+  if(shape.config.roof==='skillion'||envelope)for(const element of osm.elements){
     if(element.tags?.['roof:shape']===shape.config.roof){element.tags['roof:shape']='flat';element.tags['roof:height']='0';}
   }
   const native=await new Promise((resolve,reject)=>new O2WConverter().convertJson(JSON.stringify(osm),resolve,error=>reject(Error(String(error)))));
@@ -34,7 +34,7 @@ export async function generateBuilding(config,floors=10){
     triangles+=positions.length/9;meshes.push({positions,normals,color,role:color.reduce((s,v)=>s+v,0)/3<.63?'roof':'wall'});
   }
   if(!triangles||Math.abs(hi[2]-1)>.0001||Math.abs(lo[2])>.0001)throw Error('Native building height did not match H=1');
-  const nativeTriangles=triangles,construction=orthogonalHip?applyOrthogonalHip(meshes,shape):shape.config.roof==='skillion'?applyPlanarSkillion(meshes,shape.parts):{meshes,report:{method:'native-roof'}};
+  const nativeTriangles=triangles,construction=envelope?applyRoofEnvelope(meshes,shape):shape.config.roof==='skillion'?applyPlanarSkillion(meshes,shape.parts):{meshes,report:{method:'native-roof'}};
   // Gable roofs over courtyard holes can miss the same boundary ridge vertices
   // as hip roofs. Apply the geometry-driven correction to every roof form.
   const junctions=matchRoofWallJunctions(construction.meshes),seams=auditRoofWallSeams(junctions.meshes);
@@ -46,6 +46,6 @@ export async function generateBuilding(config,floors=10){
   const metadata=exportParameters(config,floors);
   metadata.output={triangles,native_triangles:nativeTriangles,roof_construction:construction.report,roof_wall_junctions:junctions.report,roof_wall_seam_audit:seams,bounds:[lo,hi],native_meshes:meshes.length,source_reference_height_m:referenceHeight,
     front_faces_adapted_to_outward_normals:true,rewound_triangles:rewoundTriangles,
-    surface_kind:orthogonalHip?'OSM2World flat-source preview with reconstructed common-eave equal-pitch L/U hip roof and matching walls; ground caps and internal contacts are not repaired':'OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired',closed_solid_validated:false};
+    surface_kind:envelope?'OSM2World flat-source preview with architectural equal-pitch gable/hip roofs and matching walls; ground caps and internal contacts are not repaired':'OSM2World preview assembly with roof-to-wall junction matching; ground caps and internal contacts are not repaired',closed_solid_validated:false};
   return {meshes:junctions.meshes,bounds:[lo,hi],triangles,metadata,footprintArea:shape.footprintArea};
 }

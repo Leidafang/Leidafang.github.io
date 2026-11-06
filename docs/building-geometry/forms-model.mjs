@@ -1,7 +1,8 @@
+import {roofRiseLimit} from './roof-design.mjs?v=roof-boundaries-20261106';
 export const VERSION='architectural-forms-o2w-v1.2';
 // Preserve the established identity for unaffected geometry, including R3
-// bar/flat datasets. Corrected concave hip roofs have a new geometry identity.
-export const geometryVersion=p=>p.roof==='hipped'&&['l','u'].includes(p.family)?'architectural-forms-o2w-v1.3':VERSION;
+// bar/flat datasets. Architectural pitched roofs have a new geometry identity.
+export const geometryVersion=p=>p.roof!=='flat'?'architectural-forms-o2w-v1.4':VERSION;
 export const ENGINE='OSM2World 0.5.0-SNAPSHOT / 2026-02-18';
 export const FAMILIES=[
   {id:'bar',zh:'板式 / 独立主体',en:'Bar / single volume'},
@@ -47,7 +48,7 @@ export const PRESETS=[
   {id:'courtyard',zh:'内庭院建筑',en:'Courtyard block',floors:5,values:{...defaults,family:'court',width:1.75,depth:1.35,courtWidth:.53,courtDepth:.50,courtX:.14,courtY:.04}},
   {id:'twins',zh:'双塔综合体',en:'Twin-tower complex',floors:16,values:{...defaults,family:'twin',width:1.75,depth:1.02,twinWidth:.25,towerGap:.18,towerDepth:.52,towerY:.10,podiumHeight:.16,secondHeight:.79}},
   {id:'house',zh:'双坡屋顶住宅',en:'Gabled residence',floors:3,values:{...defaults,family:'bar',roof:'gabled',width:1.85,depth:1.15,roofRise:.25,roofDirection:90}},
-  {id:'hip',zh:'四坡屋顶办公楼',en:'Hip-roof office',floors:4,values:{...defaults,family:'bar',roof:'hipped',width:1.65,depth:1.05,roofRise:.19,roofDirection:90,chamfer:0}}
+  {id:'hip',zh:'四坡屋顶住宅',en:'Hip-roof residence',floors:4,values:{...defaults,family:'bar',roof:'hipped',width:1.65,depth:1.05,roofRise:.19,roofDirection:90,chamfer:0}}
 ];
 
 export function normalizeConfig(input={}){
@@ -58,6 +59,7 @@ export function normalizeConfig(input={}){
     if(p[s.key]===null||p[s.key]===''||typeof p[s.key]==='boolean')throw Error(`Invalid ${s.key}`);
     p[s.key]=Number(p[s.key]);if(!Number.isFinite(p[s.key])||p[s.key]<s.min-1e-9||p[s.key]>s.max+1e-9)throw Error(`Outside range: ${s.key}`);
   }
+  if(p.roof!=='flat')p.roofRise=Math.min(p.roofRise,roofRiseLimit(p));
   return Object.fromEntries(['family','roof',...PARAMETERS.map(s=>s.key)].map(k=>[k,p[k]]));
 }
 
@@ -75,8 +77,8 @@ export function activeParameters(input){
   if(p.family==='podium')keys.push('towerWidth','towerX');
   if(p.family==='twin')keys.push('twinWidth','towerGap','secondHeight');
   if(p.roof!=='flat')keys.push('roofRise');
-  if(['gabled','skillion'].includes(p.roof))keys.push('roofDirection');
-  return PARAMETERS.filter(s=>keys.includes(s.key));
+  if(p.roof==='skillion')keys.push('roofDirection');
+  return PARAMETERS.filter(s=>keys.includes(s.key)).map(s=>s.key==='roofRise'?{...s,max:roofRiseLimit(p)}:s);
 }
 
 export function deriveBuilding(input={}){
@@ -84,9 +86,9 @@ export function deriveBuilding(input={}){
   const rectangle=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
   const outer=rectangle(x,y,x+w,y+d),holes=[],parts=[];
   let outline=outer;
-  // Direction is an active control for gable/shed roofs only. Hip roofs keep
-  // the established orientation, independent of a previous roof's hidden value.
-  const add=(id,poly,height=1,base=0,roof=p.roof)=>parts.push({id,outer:poly,holes:[],height,base,roof,roofRise:roof==='flat'?0:Math.min(p.roofRise,height*.35),roofDirection:['gabled','skillion'].includes(roof)?p.roofDirection:90});
+  // Roof direction controls shed roofs. Gable ridges follow the footprint
+  // wings or each simple part's long axis; hip roofs follow the perimeter.
+  const add=(id,poly,height=1,base=0,roof=p.roof)=>parts.push({id,outer:poly,holes:[],height,base,roof,roofRise:roof==='flat'?0:Math.min(p.roofRise,height*.35),roofDirection:roof==='skillion'?p.roofDirection:90});
   if(p.family==='bar'){
     const c=Math.min(w,d)*p.chamfer;
     outline=c?[[x+c,y],[x+w-c,y],[x+w,y+c],[x+w,y+d-c],[x+w-c,y+d],[x+c,y+d],[x,y+d-c],[x,y+c]]:outer;
@@ -158,13 +160,14 @@ export function buildOsmData(input={},floors=10){
   return {shape,referenceHeight,osm:{version:.6,generator:geometryVersion(shape.config),elements}};
 }
 
-export function exportParameters(input,floors=10){
+export function exportParameters(input={},floors=10){
   const b=deriveBuilding(input),active=activeParameters(input);
   return {generator:geometryVersion(b.config),engine:ENGINE,source:'Synthetic parametric footprints and building parts; no real OSM buildings',
     normalization:{height:1,units:'dimensionless',isotropic:true,stl_up_axis:'Z',glb_up_axis:'Y'},
     structure:b.config.family,roof:b.config.roof,parameters:b.config,
     active_parameter_order:active.map(s=>s.key),active_parameter_values:active.map(s=>b.config[s.key]),
     active_numeric_control_count:active.length,control_count_is_not_global_independent_dimension:true,
+    roof_parameter_constraints:{maximum_pitch_degrees:60,roof_rise_limit:roofRiseLimit(b.config),roof_direction_active:b.config.roof==='skillion',gable_ridge_rule:'wing-aligned or simple-part long axis',requested_roof_rise:Number(input.roofRise??defaults.roofRise),applied_roof_rise:b.config.roofRise},
     visual_floor_divisions:floors,outline:b.outline,holes:b.holes,parts:b.parts,
     cfd_mesh_validated:false};
 }

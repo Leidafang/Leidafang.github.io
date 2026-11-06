@@ -8,7 +8,7 @@
   <meta property="og:title" content="建筑形态实验室 · Leidafang"><meta property="og:description" content="从平面、翼楼到屋顶，探索参数化建筑。"><title>建筑形态实验室 · Leidafang</title>
   <link rel="icon" href="./mark.svg" type="image/svg+xml"><link rel="stylesheet" href="./forms.css?v=facade-pbr-20261105">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-  <script type="module" src="./forms-app.mjs?v=roof-boundaries-20261106"></script>
+  <script type="module" src="./forms-app.mjs?v=number-input-20261106"></script>
 </head>
 <body>
   <a class="skip" href="#lab" data-i18n="skip">跳到形态实验室</a>
@@ -21,7 +21,7 @@
         <p class="range-note" id="structure-note">平面限定裙房范围，塔楼可以在其中偏移。</p>
         <div id="controls"></div>
         <div class="inspector-actions"><button id="randomize" class="button primary" data-i18n="randomize">⤨ 邻近形态变化</button><button id="reset" class="button" data-i18n="reset">重置</button></div>
-        <p class="range-note" data-i18n="controlsNote">数值参数在当前构型内连续变化。构型、屋顶属于结构选择；显示的数量不等于统一的独立形状维数。</p>
+        <p class="range-note" data-i18n="controlsNote">数值参数在当前构型内连续变化。构型、屋顶属于结构选择；显示的数量不等于统一的独立形状维数。数字输入后按 Enter 或移开焦点应用，Esc 取消。</p>
       </aside>
       <div class="viewer-column">
         <div class="viewer-head"><div><span class="eyebrow">OSM2WORLD / ARCHITECTURAL FORMS</span><h2 id="shape-title">偏心塔楼与裙房</h2></div><div class="view-buttons" role="group" aria-label="相机视图"><button data-view="iso" class="active" aria-pressed="true" data-i18n="iso">立体</button><button data-view="top" aria-pressed="false" data-i18n="top">顶视</button><button data-view="front" aria-pressed="false" data-i18n="front">正视</button><button id="reset-view" aria-label="重置视角">↺</button></div></div>

@@ -1715,7 +1715,7 @@
   ],
   "raster_preview": "Native OSM2World-based geometry rendered in Three.js r180 with procedural PBR materials, continuous mitered roof-edge profiles, and non-overlapping open-backed display window surrounds",
   "presentation": {
-    "version": "architectural-pbr-v4",
+    "version": "architectural-pbr-v5",
     "albedo_normal_roughness_metalness_ao_maps": true,
     "source_geometry_modified": false,
     "shallow_facade_relief_display_only": true,
@@ -1731,7 +1731,9 @@
       "hipped": "residential",
       "explicit_choice_preserved": true
     },
-    "roof_edge_trim": "continuous-roof-trim-v1",
-    "frame_joints_non_overlapping": true
+    "roof_edge_trim": "continuous-roof-trim-v2",
+    "frame_joints_non_overlapping": true,
+    "roof_trim_follows_adjacent_roof_planes": true,
+    "steep_roof_trim_projection_limited": true
   }
 }

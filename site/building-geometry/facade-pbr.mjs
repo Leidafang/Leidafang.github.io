@@ -1,8 +1,8 @@
 import * as THREE from './vendor/three.module.js';
 import {roofDetailClearance,DETAIL_CLEARANCE_VERSION,DETAIL_CLEARANCE,DETAIL_WALL_GAP} from './roof-detail-clearance.mjs?v=roof-depth-20261106';
-import {roofEdgeTrim} from './roof-edge-trim.mjs?v=roof-depth-20261106';
+import {roofEdgeTrim} from './roof-edge-trim.mjs?v=roof-slope-20261106';
 
-export const MATERIAL_VERSION='architectural-pbr-v4';
+export const MATERIAL_VERSION='architectural-pbr-v5';
 export const LOOKS=[{id:'auto',zh:'自动匹配建筑',en:'Match building'},{id:'office',zh:'办公玻璃',en:'Office glazing'},{id:'residential',zh:'浅色住宅',en:'Light residential'},{id:'brick',zh:'暖色砖石',en:'Warm masonry'}];
 const palettes={
   office:{wall:'#65717a',frame:'#9ba6ad',glass:'#577580',band:'#485a68',width:.94,height:.83,metal:.72},
@@ -235,7 +235,7 @@ export function facadeRelief(bases,style,sourceMeshes=[]){
     }else if(!ordinary.length)material.dispose();
   }
   if(!boxUsed)geometry.dispose();
-  const trim=roofEdgeTrim(bases);
+  const trim=roofEdgeTrim(bases,sourceMeshes);
   for(const [kind,geometry] of Object.entries(trim.geometries)){
     const color=kind==='flat'?(style==='office'?'#a3a9a6':palette.frame):(style==='office'||style==='stone'?'#52656c':'#786858');
     const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,metalness:kind==='flat'?.06:.30,roughness:.57,envMapIntensity:.85}));mesh.name='continuous-roof-trim-'+kind;mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);

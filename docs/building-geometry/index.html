@@ -8,7 +8,7 @@
   <meta property="og:title" content="建筑形态实验室 · Leidafang"><meta property="og:description" content="从平面、翼楼到屋顶，探索参数化建筑。"><title>建筑形态实验室 · Leidafang</title>
   <link rel="icon" href="./mark.svg" type="image/svg+xml"><link rel="stylesheet" href="./forms.css?v=facade-pbr-20261105">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-  <script type="module" src="./forms-app.mjs?v=roof-depth-20261106"></script>
+  <script type="module" src="./forms-app.mjs?v=roof-slope-20261106"></script>
 </head>
 <body>
   <a class="skip" href="#lab" data-i18n="skip">跳到形态实验室</a>
@@ -25,7 +25,7 @@
       </aside>
       <div class="viewer-column">
         <div class="viewer-head"><div><span class="eyebrow">OSM2WORLD / ARCHITECTURAL FORMS</span><h2 id="shape-title">偏心塔楼与裙房</h2></div><div class="view-buttons" role="group" aria-label="相机视图"><button data-view="iso" class="active" aria-pressed="true" data-i18n="iso">立体</button><button data-view="top" aria-pressed="false" data-i18n="top">顶视</button><button data-view="front" aria-pressed="false" data-i18n="front">正视</button><button id="reset-view" aria-label="重置视角">↺</button></div></div>
-        <div class="stage" id="stage"><img id="poster" src="./assets/forms/office.webp?v=roof-depth-20261106" alt="OSM2World 生成的塔楼裙房预览"><canvas id="scene" tabindex="0" aria-label="拖动旋转、滚轮缩放、右键平移建筑"></canvas><div class="stage-tag"><span>H = 1</span><small data-i18n="unitless">无量纲形状</small></div><div id="loading" class="generation-status" role="status"><i></i><span data-i18n="loading">正在生成建筑…</span></div><div class="stage-caption" id="view-caption" data-i18n="facadeCaption">建筑材质 · 日光与材质反射</div></div>
+        <div class="stage" id="stage"><img id="poster" src="./assets/forms/office.webp?v=roof-slope-20261106" alt="OSM2World 生成的塔楼裙房预览"><canvas id="scene" tabindex="0" aria-label="拖动旋转、滚轮缩放、右键平移建筑"></canvas><div class="stage-tag"><span>H = 1</span><small data-i18n="unitless">无量纲形状</small></div><div id="loading" class="generation-status" role="status"><i></i><span data-i18n="loading">正在生成建筑…</span></div><div class="stage-caption" id="view-caption" data-i18n="facadeCaption">建筑材质 · 日光与材质反射</div></div>
         <div class="viewer-tools"><span data-i18n="gesture">拖动旋转 · 滚轮缩放 · 右键平移</span><div><button id="facade" aria-pressed="true" data-i18n="facade">建筑材质</button><button id="wireframe" aria-pressed="false" data-i18n="wireframe">线框</button><button id="rotate" aria-pressed="false" data-i18n="rotate">自动旋转</button><button id="screenshot">PNG ↓</button></div></div>
         <div class="appearance-row"><div><label for="appearance" data-i18n="appearance">立面外观</label><span data-i18n="appearanceNote">只改变显示，不改变几何</span></div><select id="appearance" aria-label="立面外观"></select></div>
         <div class="parameter-focus" aria-live="polite"><span id="focus-index">01</span><p id="focus-copy">调整塔楼和裙房的比例与相对位置。</p></div>

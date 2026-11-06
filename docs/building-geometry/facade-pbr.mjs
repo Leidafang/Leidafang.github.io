@@ -1,7 +1,8 @@
 import * as THREE from './vendor/three.module.js';
-import {roofDetailClearance,DETAIL_CLEARANCE_VERSION,DETAIL_CLEARANCE} from './roof-detail-clearance.mjs?v=roof-clearance-20261105';
+import {roofDetailClearance,DETAIL_CLEARANCE_VERSION,DETAIL_CLEARANCE,DETAIL_WALL_GAP} from './roof-detail-clearance.mjs?v=roof-depth-20261106';
+import {roofEdgeTrim} from './roof-edge-trim.mjs?v=roof-depth-20261106';
 
-export const MATERIAL_VERSION='architectural-pbr-v3';
+export const MATERIAL_VERSION='architectural-pbr-v4';
 export const LOOKS=[{id:'auto',zh:'自动匹配建筑',en:'Match building'},{id:'office',zh:'办公玻璃',en:'Office glazing'},{id:'residential',zh:'浅色住宅',en:'Light residential'},{id:'brick',zh:'暖色砖石',en:'Warm masonry'}];
 const palettes={
   office:{wall:'#65717a',frame:'#9ba6ad',glass:'#577580',band:'#485a68',width:.94,height:.83,metal:.72},
@@ -179,18 +180,10 @@ export class FacadeMaterials{
 // It is kept outside the native mesh/export root and is never a CFD opening.
 export function facadeRelief(bases,style,sourceMeshes=[]){
   const group=new THREE.Group();group.name='display-only-facade-relief';group.userData.displayOnly=true;
-  const frames=[],sills=[],fascias=[],gutters=[],ventPanels=[],palette=palettes[style],axis=new THREE.Vector3(0,0,1),stats={pitchedWalls:0,cornices:0,eaveSegments:0,gutters:0,atticVents:0,roofClippedInstances:0,roofHiddenInstances:0,clearanceVersion:DETAIL_CLEARANCE_VERSION,clearance:DETAIL_CLEARANCE};
+  const frames=[],sills=[],ventPanels=[],palette=palettes[style],axis=new THREE.Vector3(0,0,1),stats={pitchedWalls:0,cornices:0,eaveSegments:0,gutters:0,atticVents:0,roofClippedInstances:0,roofHiddenInstances:0,clearanceVersion:DETAIL_CLEARANCE_VERSION,clearance:DETAIL_CLEARANCE};
   const add=(list,b,u,z,width,height,depth)=>{
-    const normal=b.normal,position=new THREE.Vector3(b.a[0]+b.tx*u+normal[0]*depth*.45,b.a[1]+b.ty*u+normal[1]*depth*.45,z),rotation=new THREE.Quaternion().setFromAxisAngle(axis,Math.atan2(b.ty,b.tx));
+    const normal=b.normal,offset=depth/2+DETAIL_WALL_GAP,position=new THREE.Vector3(b.a[0]+b.tx*u+normal[0]*offset,b.a[1]+b.ty*u+normal[1]*offset,z),rotation=new THREE.Quaternion().setFromAxisAngle(axis,Math.atan2(-normal[0],normal[1]));
     list.push(new THREE.Matrix4().compose(position,rotation,new THREE.Vector3(width,depth,height)));
-  };
-  const beam=(list,a,b,normal,depth,height)=>{
-    const start=new THREE.Vector3(...a),end=new THREE.Vector3(...b),direction=end.clone().sub(start),length=direction.length();if(length<1e-6)return;
-    direction.divideScalar(length);const outward=new THREE.Vector3(...normal,0).normalize(),up=new THREE.Vector3().crossVectors(direction,outward).normalize();
-    if(up.z<0){direction.negate();up.negate();}
-    const rotation=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(direction,outward,up));
-    const position=start.add(end).multiplyScalar(.5).addScaledVector(outward,depth*.45).addScaledVector(up,-height*.5);
-    list.push(new THREE.Matrix4().compose(position,rotation,new THREE.Vector3(length,depth,height)));
   };
   for(const b of bases){
     const body=b.height,total=b.part.height-b.base,cellW=b.length/b.columns,cellH=body/b.rows,podium=b.part.id==='podium',pitched=b.part.roof!=='flat';
@@ -202,35 +195,32 @@ export function facadeRelief(bases,style,sourceMeshes=[]){
       for(let row=0;row<b.rows;row++)for(let col=0;col<b.columns;col++){
         const isDoor=b.base===0&&(b.edge===0||b.edge===2)&&row===0&&col===Math.floor(b.columns/2),opening=openingRatios(style,podium,row,b.rows,isDoor,pitched),w=cellW*opening.width,h=cellH*opening.height;
         const u=(col+.5)*cellW,bottom=b.base+row*cellH+(cellH-h)*(1-opening.top);
-        for(const side of [-1,1])add(frames,b,u+side*(w-frame)/2,bottom+h/2,Math.max(.00065,frame),h,.0025);
+        const head=Math.max(.00065,frame),jambHeight=h-head-Math.min(2e-5,head*.05);
+        for(const side of [-1,1])add(frames,b,u+side*(w-head)/2,bottom+jambHeight/2,head,jambHeight,.0025);
         if(!isDoor)add(sills,b,u,bottom,w+frame*2,Math.max(.0012,cellH*.018),.008);
-        add(frames,b,u,bottom+h-frame/2,w,Math.max(.00065,frame),.0025);
+        add(frames,b,u,bottom+h-head/2,w,head,.0025);
       }
     }
-    if(!pitched){add(sills,b,b.length/2,b.base+body-.002-DETAIL_CLEARANCE,b.length,.004,.006);continue;}
+    if(!pitched)continue;
     stats.pitchedWalls++;stats.cornices++;
-    // A continuous head course ties the last storey to its attic material.
-    const courseHeight=Math.min(total*.006,cellH*.08),lipHeight=Math.min(total*.0025,cellH*.035);
-    add(sills,b,b.length/2,b.base+body-courseHeight/2-DETAIL_CLEARANCE,b.length,courseHeight,total*.012);
-    add(frames,b,b.length/2,b.base+body-lipHeight/2-DETAIL_CLEARANCE,b.length,lipHeight,total*.014);
-    for(let i=1;i<b.roofProfile.length;i++){
-      const a=b.roofProfile[i-1].position,c=b.roofProfile[i].position,slope=Math.abs(c[2]-a[2])/Math.hypot(c[0]-a[0],c[1]-a[1]);
-      beam(fascias,a,c,b.normal,Math.min(.017,total*.018),Math.min(.012,total*.014));stats.eaveSegments++;
-      if(slope<.08&&Math.min(a[2],c[2])<=b.base+body+1e-4){beam(gutters,a,c,b.normal,Math.min(.022,total*.024),total*.003);stats.gutters++;}
-    }
     const vent=atticVent(b);
     if(vent){
       stats.atticVents++;const f=total*.0022;
       add(ventPanels,b,vent.u,vent.z,vent.width,vent.height,total*.001);
       for(const side of [-1,1]){
-        add(sills,b,vent.u+side*vent.width/2,vent.z,f,vent.height+f*2,total*.003);
-        add(sills,b,vent.u,vent.z+side*vent.height/2,vent.width+f*2,f,total*.003);
+        add(sills,b,vent.u+side*vent.width/2,vent.z,f,vent.height-f-4e-5,total*.003);
+        add(sills,b,vent.u,vent.z+side*vent.height/2,vent.width+f,f,total*.003);
       }
-      for(let i=1;i<6;i++)add(frames,b,vent.u,vent.z-vent.height/2+i*vent.height/6,vent.width,vent.height*.045,total*.0035);
+      for(let i=1;i<6;i++)add(frames,b,vent.u,vent.z-vent.height/2+i*vent.height/6,vent.width-f-4e-5,vent.height*.045,total*.0035);
     }
   }
-  const geometry=new THREE.BoxGeometry(1,1,1),clearance=roofDetailClearance(sourceMeshes);let boxUsed=false;
-  for(const [name,matrices,color,metalness,roughness] of [['frames',frames,palette.frame,palette.metal,.36],['sills',sills,style==='office'?'#a3a9a6':palette.frame,.06,.78],['fascias',fascias,style==='office'||style==='stone'?'#52656c':'#786858',.30,.57],['gutters',gutters,'#657780',.65,.38],['vents',ventPanels,'#354346',.12,.70]]){
+  const geometry=new THREE.BoxGeometry(1,1,1),indices=[],normal=geometry.getAttribute('normal');
+  // The wall closes the attached trim's back. Omitting buried back faces also
+  // avoids duplicate rear planes where window surrounds meet sills or panels.
+  for(let i=0;i<geometry.index.count;i+=3)if(normal.getY(geometry.index.getX(i))>-.99)indices.push(...[0,1,2].map(k=>geometry.index.getX(i+k)));
+  geometry.setIndex(indices);geometry.clearGroups();
+  const clearance=roofDetailClearance(sourceMeshes,{openBack:true});let boxUsed=false;
+  for(const [name,matrices,color,metalness,roughness] of [['frames',frames,palette.frame,palette.metal,.36],['sills',sills,style==='office'?'#a3a9a6':palette.frame,.06,.78],['vents',ventPanels,'#354346',.12,.70]]){
     if(!matrices.length)continue;
     const ordinary=[],positions=[],normals=[];
     for(const matrix of matrices){const clipped=clearance(matrix);if(!clipped)ordinary.push(matrix);else if(!clipped.positions.length)stats.roofHiddenInstances++;else{stats.roofClippedInstances++;positions.push(...clipped.positions);normals.push(...clipped.normals);}}
@@ -245,7 +235,12 @@ export function facadeRelief(bases,style,sourceMeshes=[]){
     }else if(!ordinary.length)material.dispose();
   }
   if(!boxUsed)geometry.dispose();
-  group.userData.stats={...stats,instances:frames.length+sills.length+fascias.length+gutters.length+ventPanels.length};
+  const trim=roofEdgeTrim(bases);
+  for(const [kind,geometry] of Object.entries(trim.geometries)){
+    const color=kind==='flat'?(style==='office'?'#a3a9a6':palette.frame):(style==='office'||style==='stone'?'#52656c':'#786858');
+    const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,metalness:kind==='flat'?.06:.30,roughness:.57,envMapIntensity:.85}));mesh.name='continuous-roof-trim-'+kind;mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
+  }
+  group.userData.stats={...stats,eaveSegments:trim.stats.eaveSegments,gutters:trim.stats.gutters,roofTrim:trim.stats,instances:frames.length+sills.length+ventPanels.length};
   return group;
 }
 

@@ -2,7 +2,7 @@ import * as THREE from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
 import {VERSION,ENGINE,FAMILIES,ROOFS,PARAMETERS,PRESETS,defaults,normalizeConfig,activeParameters,availableRoofs,deriveBuilding} from './forms-model.mjs?v=roof-envelope-20261105';
 import {previewSTL,nativeSvg} from './forms-export.mjs?v=forms-o2w-20261105';
-import {MATERIAL_VERSION,LOOKS,FacadeMaterials,facadeRelief,installDaylight,contactShadow} from './facade-pbr.mjs?v=roof-clearance-20261105';
+import {MATERIAL_VERSION,LOOKS,FacadeMaterials,facadeRelief,installDaylight,contactShadow} from './facade-pbr.mjs?v=roof-depth-20261106';
 import {getRoofBoundaryEdges,facadeRoofProfile} from './roof-wall-junction.mjs?v=roof-envelope-20261105';
 
 const $=id=>document.getElementById(id);
@@ -33,7 +33,7 @@ function updateAppearanceCaption(){
   $('view-caption').textContent=facades?`${names[facadeMaterials?.style]||t('facadeCaption')} · ${language==='en'?'daylight & material reflections':'日光与材质反射'}`:t('solidCaption');
 }
 
-function exportMetadata(){return {...applied.metadata,presentation:{version:MATERIAL_VERSION,appearance:look,material_style:facadeMaterials?.style||null,materials_visible:facades,display_only:true,source_geometry_modified:false,window_openings_modeled:false,glb_material_maps_embedded:facades&&webgl,shallow_facade_relief_exported:false,roof_detail_clearance:facadeDetail?.userData.stats.clearanceVersion||null}};}
+function exportMetadata(){return {...applied.metadata,presentation:{version:MATERIAL_VERSION,appearance:look,material_style:facadeMaterials?.style||null,materials_visible:facades,display_only:true,source_geometry_modified:false,window_openings_modeled:false,glb_material_maps_embedded:facades&&webgl,shallow_facade_relief_exported:false,roof_detail_clearance:facadeDetail?.userData.stats.clearanceVersion||null,roof_edge_trim:facadeDetail?.userData.stats.roofTrim.version||null}};}
 
 function focusParameter(key){
   activeKey=key;const specs=activeParameters(config),index=specs.findIndex(s=>s.key===key),s=specs[index]||specs[0];
@@ -106,7 +106,7 @@ function showAppliedInfo(){
 function drawGallery(){
   $('gallery').replaceChildren(...PRESETS.map((p,i)=>{
     const button=document.createElement('button');button.type='button';button.className='sample';button.dataset.preset=p.id;
-    button.innerHTML=`<div class="sample-image"><img src="./assets/forms/${p.id}.webp?v=roof-clearance-20261105" alt="${fieldName(p)}" width="360" height="210" loading="lazy"><span class="sample-index">${String(i+1).padStart(2,'0')}</span><span class="sample-arrow">↗</span></div><div class="sample-copy"><h3>${fieldName(p)}</h3><p>${fieldName(FAMILIES.find(f=>f.id===p.values.family))} · ${fieldName(ROOFS.find(r=>r.id===p.values.roof))}</p></div>`;
+    button.innerHTML=`<div class="sample-image"><img src="./assets/forms/${p.id}.webp?v=roof-depth-20261106" alt="${fieldName(p)}" width="360" height="210" loading="lazy"><span class="sample-index">${String(i+1).padStart(2,'0')}</span><span class="sample-arrow">↗</span></div><div class="sample-copy"><h3>${fieldName(p)}</h3><p>${fieldName(FAMILIES.find(f=>f.id===p.values.family))} · ${fieldName(ROOFS.find(r=>r.id===p.values.roof))}</p></div>`;
     button.addEventListener('click',()=>choosePreset(p.id,true));return button;
   }));
 }

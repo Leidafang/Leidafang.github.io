@@ -1,7 +1,8 @@
 import * as THREE from './vendor/three.module.js';
 
-export const DETAIL_CLEARANCE_VERSION='roof-detail-clearance-v1';
+export const DETAIL_CLEARANCE_VERSION='roof-detail-clearance-v2';
 export const DETAIL_CLEARANCE=5e-5;
+export const DETAIL_WALL_GAP=1.5e-4;
 const EPS=1e-9;
 const faces=[[0,4,6,2],[1,3,7,5],[0,1,5,4],[2,6,7,3],[0,2,3,1],[4,5,7,6]];
 
@@ -32,7 +33,7 @@ function clip(polygons,plane){
 // Keep ordinary details instanced; clip only intersecting ones below the real
 // roof triangles, including a small separation and closed cut faces. Native
 // building vertices and the export root are never changed here.
-export function roofDetailClearance(meshes=[]){
+export function roofDetailClearance(meshes=[],{openBack=false}={}){
   const roofs=[];
   for(const mesh of meshes.filter(m=>m.role==='roof'))for(let i=0;i<mesh.positions.length;i+=9){
     const triangle=new THREE.Triangle(...[0,3,6].map(k=>new THREE.Vector3(...mesh.positions.slice(i+k,i+k+3))));
@@ -57,12 +58,12 @@ export function roofDetailClearance(meshes=[]){
     const corners=Array.from({length:8},(_,i)=>new THREE.Vector3(i&1?.5:-.5,i&2?.5:-.5,i&4?.5:-.5).applyMatrix4(matrix));
     let polygons=faces.map(face=>face.map(i=>corners[i]));
     for(const plane of planes.values())polygons=clip(polygons,plane);
-    const positions=[],normals=[];
+    const positions=[],normals=[],outward=new THREE.Vector3(matrix.elements[4],matrix.elements[5],matrix.elements[6]).normalize();
     for(const polygon of polygons)for(let i=1;i<polygon.length-1;i++){
       // Derive normals after Float32 rounding, as used by the renderer. Tiny
       // clipped corners can otherwise collapse or flip during buffer upload.
       const [a,b,c]=[polygon[0],polygon[i],polygon[i+1]].map(p=>new THREE.Vector3(...p.toArray().map(Math.fround))),normal=new THREE.Vector3().crossVectors(b.clone().sub(a),c.clone().sub(a));
-      if(normal.lengthSq()<1e-20)continue;normal.normalize();positions.push(...a,...b,...c);normals.push(...normal,...normal,...normal);
+      if(normal.lengthSq()<1e-20)continue;normal.normalize();if(openBack&&normal.dot(outward)<-.999999)continue;positions.push(...a,...b,...c);normals.push(...normal,...normal,...normal);
     }
     return {positions,normals};
   };

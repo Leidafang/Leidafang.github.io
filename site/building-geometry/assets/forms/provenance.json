@@ -1713,9 +1713,9 @@
       "raster_preview_material_style": "residential"
     }
   ],
-  "raster_preview": "Native OSM2World-based geometry rendered in Three.js r180 with procedural PBR materials, continuous mitered roof-edge profiles, and non-overlapping open-backed display window surrounds",
+  "raster_preview": "OSM2World-based parametric geometry with common-eave L/U hip roof correction, rendered in Three.js r180 with procedural PBR materials and display-only continuous roof-edge trim and window surrounds",
   "presentation": {
-    "version": "architectural-pbr-v5",
+    "version": "architectural-pbr-v6",
     "albedo_normal_roughness_metalness_ao_maps": true,
     "source_geometry_modified": false,
     "shallow_facade_relief_display_only": true,
@@ -1735,5 +1735,14 @@
     "frame_joints_non_overlapping": true,
     "roof_trim_follows_adjacent_roof_planes": true,
     "steep_roof_trim_projection_limited": true
+  },
+  "geometry_versions": {
+    "default": "architectural-forms-o2w-v1.2",
+    "l_hipped_and_u_hipped": "architectural-forms-o2w-v1.3",
+    "correction": "Common-eave equal-pitch wing roofs and matching vertical walls; preview, GLB and STL use the same corrected base meshes",
+    "method": "orthogonal-wing-hip-envelope-v1",
+    "unchanged_scope": "All other combinations including R3 bar/flat retain geometry version 1.2; sampled baseline STL hashes are unchanged",
+    "closed_solid_validated": false,
+    "cfd_mesh_validated": false
   }
 }

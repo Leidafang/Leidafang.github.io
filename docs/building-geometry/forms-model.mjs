@@ -1,4 +1,7 @@
 export const VERSION='architectural-forms-o2w-v1.2';
+// Preserve the established identity for unaffected geometry, including R3
+// bar/flat datasets. Corrected concave hip roofs have a new geometry identity.
+export const geometryVersion=p=>p.roof==='hipped'&&['l','u'].includes(p.family)?'architectural-forms-o2w-v1.3':VERSION;
 export const ENGINE='OSM2World 0.5.0-SNAPSHOT / 2026-02-18';
 export const FAMILIES=[
   {id:'bar',zh:'板式 / 独立主体',en:'Bar / single volume'},
@@ -152,12 +155,12 @@ export function buildOsmData(input={},floors=10){
       for(const part of shape.parts)way(part.outer,{'building:part':'yes',...tagsFor(part)});
     }
   }
-  return {shape,referenceHeight,osm:{version:.6,generator:VERSION,elements}};
+  return {shape,referenceHeight,osm:{version:.6,generator:geometryVersion(shape.config),elements}};
 }
 
 export function exportParameters(input,floors=10){
   const b=deriveBuilding(input),active=activeParameters(input);
-  return {generator:VERSION,engine:ENGINE,source:'Synthetic parametric footprints and building parts; no real OSM buildings',
+  return {generator:geometryVersion(b.config),engine:ENGINE,source:'Synthetic parametric footprints and building parts; no real OSM buildings',
     normalization:{height:1,units:'dimensionless',isotropic:true,stl_up_axis:'Z',glb_up_axis:'Y'},
     structure:b.config.family,roof:b.config.roof,parameters:b.config,
     active_parameter_order:active.map(s=>s.key),active_parameter_values:active.map(s=>b.config[s.key]),

@@ -1,4 +1,4 @@
-import {generateBuilding} from './o2w-adapter.mjs?v=roof-envelope-20261105';
+import {generateBuilding} from './o2w-adapter.mjs?v=hip-ridge-20261106';
 
 self.onmessage=async({data})=>{
   const {ticket,config,floors}=data;
